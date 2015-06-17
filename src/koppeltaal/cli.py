@@ -15,6 +15,9 @@ def cli():
     parser.add_argument('server', help='Koppeltaal server to connect to')
     parser.add_argument('--username')
     parser.add_argument('--password')
+    parser.add_argument(
+        '--domain',
+        help='The domain on the server to send data to.')
     parser.add_argument('--verbose', action='store_true')
 
     subparsers = parser.add_subparsers(title='commands', dest='command')
@@ -29,7 +32,6 @@ def cli():
     message_header.add_argument('--message_id')
 
     create_or_update_care_plan = subparsers.add_parser('create_or_update_care_plan')
-    create_or_update_care_plan.add_argument('domain')
     create_or_update_care_plan.add_argument('activity_id')
     create_or_update_care_plan.add_argument('patient_id')
     create_or_update_care_plan.add_argument('patient_url')
@@ -57,18 +59,21 @@ def cli():
 
     username = args.username
     password = args.password
-    if username is None or password is None:
+    domain = args.domain
+    if username is None or password is None or domain is None:
         parser = ConfigParser.ConfigParser()
         parser.read(os.path.expanduser('~/.koppeltaal.cfg'))
         if not parser.has_section(args.server):
             sys.exit('No user credentials found in ~/.koppeltaal.cfg')
         username = parser.get(args.server, 'username')
         password = parser.get(args.server, 'password')
+        # Domain is not required for all actions.
+        domain = parser.get(args.server, 'domain')
         if not username or not password:
             sys.exit('No user credentials found in ~/.koppeltaal.cfg')
 
     connection = koppeltaal.connect.Connector(
-        args.server, username, password)
+        args.server, username, password, domain=domain)
 
     if args.command == 'test_authentication':
         # Exit code is the opposite of the result from the Connector.
@@ -128,7 +133,7 @@ def cli():
         practitioner.name.family = args.practitioner_family_name
 
         xml = koppeltaal.create_or_update_care_plan.generate(
-            args.domain, activity, patient, careplan, practitioner)
+            connection.domain, activity, patient, careplan, practitioner)
         result = connection.create_or_update_care_plan(xml)
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'launch':

@@ -23,11 +23,13 @@ class Connector(object):
     server = None
     username = None
     password = None
+    domain = None  # The domain on the server to work against.
 
-    def __init__(self, server, username, password):
+    def __init__(self, server, username, password, domain=None):
         self.server = server
         self.username = username
         self.password = password
+        self.domain = domain
 
     # Some nice cache decorator here.
     def metadata(self):

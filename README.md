@@ -31,7 +31,15 @@ Arguments:
 
 The first argument to the *koppeltaal* script is the server to connect to, for
 example *https://testconnectors.vhscloud.nl*. The username and password can be
-passed in as arguments or taken from *~/.koppeltaal.cfg*.
+passed in as arguments or taken from *~/.koppeltaal.cfg*. The format of
+~/.koppeltaal.cfg looks like this:
+
+```
+[https://testconnectors.vhscloud.nl]
+username = MindDistrict
+password = gele-haas (replace with your own)
+domain = MindDistrict Kickass
+```
 
 If you want to see verbose output, use the *--verbose* flag.
 
@@ -63,7 +71,6 @@ $ bin/koppeltaal https://testconnectors.vhscloud.nl create_or_update_care_plan -
 
 To send a new careplan to the server, you need these arguments:
 
-- domain
 - activity_id
 - patient_id
 - patient_url

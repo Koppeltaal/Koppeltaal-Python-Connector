@@ -30,6 +30,7 @@ def generate(domain, activity, patient, careplan, practitioner):
       url
       name = object with attributes 'given' and 'family'
     '''
+    assert domain is not None
     now = datetime.datetime.utcnow().isoformat()
 
     # Create the feed envelope.
