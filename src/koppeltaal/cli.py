@@ -47,8 +47,6 @@ def cli():
     launch.add_argument('patient_url')
     launch.add_argument('user_url')
 
-    metadata = subparsers.add_parser('metadata')
-
     args = parser.parse_args()
 
     root = logging.getLogger()

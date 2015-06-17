@@ -11,3 +11,4 @@ parts
 pytestdebug.log
 dev
 tmp_*xml
+.mr.developer.cfg
