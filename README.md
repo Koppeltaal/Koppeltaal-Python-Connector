@@ -2,19 +2,18 @@
 
 ## Buildout
 
-This code is put together using buildout.
+The dependencies for the koppeltaal python connector is put together using [buildout].
 
 Run:
 
 ```sh
 $ python2.7 bootstrap.py
 $ bin/buildout
-$ bin/py.test
 ```
 
-## Tests:
+## Tests
 
-We use the excellent [pytest] framework. The tests are run against a Koppeltaal server, for instance:
+We use the [pytest] framework. The tests are run against a Koppeltaal server, for instance:
 
 ```sh
 $ bin/py.test --server https://testconnectors.vhscloud.nl
@@ -30,9 +29,9 @@ $ bin/koppeltaal --help
 
 Arguments:
 
-The first argument to the *koppeltaal* script is the server to connect to,
-for example `https://testconnectors.vhscloud.nl`. The username and password
-can be passed in as arguments or taken from *~/.koppeltaal.cfg*.
+The first argument to the *koppeltaal* script is the server to connect to, for
+example *https://testconnectors.vhscloud.nl*. The username and password can be
+passed in as arguments or taken from *~/.koppeltaal.cfg*.
 
 If you want to see verbose output, use the *--verbose* flag.
 
@@ -80,12 +79,16 @@ To send a new careplan to the server, you need these arguments:
 For example:
 
 ```sh
-$ bin/koppeltaal https://testconnectors.vhscloud.nl create_or_update_care_plan "MindDistrict Kickass" RANJKA 1 http://test.minddistrict.com/p/1 Claes Vries 7 http://test.minddistrict.com/cp/7 3 http://test.minddistrict.com/pp/3 Joop Smit
+$ bin/koppeltaal https://testconnectors.vhscloud.nl create_or_update_care_plan \
+  "MindDistrict Kickass" RANJKA \
+  1 http://test.minddistrict.com/p/1 Claes Vries \
+  7 http://test.minddistrict.com/cp/7 \
+  3 http://test.minddistrict.com/pp/3 Joop Smit
 ```
 
-## API
+## Python API
 
-Use the following API in your integration code::
+Use the following API in your integration code to talk to a koppeltaal server:
 
 ```python
 from koppeltaal.connect import Connector
@@ -113,4 +116,5 @@ stanza = generate(domain, activity, patient, careplan, practitioner)
 c.create_or_update_care_plan(stanza)
 ```
 
+[buildout]: http://www.buildout.org
 [pytest]: https://pytest.org
