@@ -36,8 +36,10 @@ def connector(request):
 
     username = config.get(server, 'username')
     password = config.get(server, 'password')
+    domain = config.get(server, 'domain')
 
-    connector = koppeltaal.connect.Connector(server, username, password)
+    connector = koppeltaal.connect.Connector(
+        server, username, password, domain=domain)
 
     # Test username+password.
     if not connector.test_authentication():
