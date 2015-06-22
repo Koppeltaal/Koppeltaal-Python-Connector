@@ -9,12 +9,8 @@ import koppeltaal.metadata
 # here.
 METADATA_URL = 'FHIR/Koppeltaal/metadata'
 ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
-
-
-# XXX Get these from the metadata / Conformance statement.
-# /implementation/url@value
-FHIR = 'FHIR/Koppeltaal'
-OAUTH_LAUNCH = 'OAuth2/Koppeltaal/Launch'
+MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
+OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
 
 # XXX Request pool, take into account multiple apps may be using this same
 # piece of code.
@@ -83,50 +79,58 @@ class Connector(object):
 
     def launch(self, activity_id, patient_url, user_url):
         response = requests.get(
-            '{}/{}'.format(self.server, OAUTH_LAUNCH),
+            '{}/{}'.format(self.server, OAUTH_LAUNCH_URL),
             auth=(self.username, self.password),
             params={
                 'client_id': activity_id,
                 'patient': patient_url,
                 'user': user_url,
                 'resource': activity_id
-            })
+            },
+            allow_redirects=False)
         assert response.is_redirect
         # The Launch sequence returns a redirect to the URL we should present
         # to the user.
         return response.headers.get('location')
 
-    # XXX Need to be reviewed first.
-
-    def message_header(self, patient_id=None, message_id=None):
+    def messages_for_patient(self, patient_url):
         # XXX No tests for this yet.
-        """Search for the message for the patient_id or
-        get the message with that specific id."""
         # XXX Split in separate search and retrieve functions.
-        assert (patient_id is not None) ^ (message_id is not None)
-        url = '/'.join([self.server, FHIR, 'MessageHeader'])
-        if patient_id is not None:
-            # messages for a specific patient resource.
-            url += '/_search?_count=1000&Patient={}/FHIR/Patient/{}'.format('foo', patient_id)
-            # XXX In case of more than one page, we need to do pagination.
-        if message_id is not None:
-            # specific message id.
-            url += '/_search?_id={}'.format(message_id)
+        """
+        Retrieving messages - There are 3 supported interactions:
+
+        https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_query=MessageHeader.GetNextNewAndClaim
+
+        This will find the next message with ProcessingStatus="New", set its
+        ProcessingStatus to "Claimed", and returns the complete Bundle for that
+        Message. This must always be followed by an update of the Message status.
+
+        https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_summary=true&_count=[X]
+        This will return a Bundle of MessageHeaders, allowing an application to
+        browse the available messages. A pagesize can be specified in the _count
+        parameter.
+
+        https://koppeltaal/FHIR/Koppeltaal/MessageHeader/_search?_id=[id]
+        This can be used to fetch the complete Bundle for a single Message for which
+        the MessageHeader was retrieved through the previous action.
+
+        The following additional query parameters can be specified:
+
+        Patient: Filters on the Patient dossier this message belongs
+        event: Filters on the message type
+        ProcessingStatus: Filters on the ProcessingStatus (New|Claimed|Success|Failed).
+        This query parameter cannot be passed to the named query used in interaction 1.
+        """
+
+        """XXX Search for the message for the patient_id or
+        get the message with that specific id."""
+        url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
         response = requests.get(
             url,
+            params={
+                'Patient': patient_url
+            },
             auth=(self.username, self.password),
             headers={'Accept': 'application/xml'})
-        response.raise_for_status()
-        return response.content
-
-    def get_next_and_claim(self):
-        # XXX No tests yet.
-        url = '/'.join([
-            self.server, FHIR,
-            'MessageHeader?_query=MessageHeader.GetNextNewAndClaim'])
-        response = requests.get(
-            url,
-            auth=(self.username, self.password),
-            headers={'accept': 'application/xml'})
         response.raise_for_status()
         return response.content
