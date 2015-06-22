@@ -30,9 +30,9 @@ $ bin/koppeltaal --help
 Arguments:
 
 The first argument to the *koppeltaal* script is the server to connect to, for
-example *https://testconnectors.vhscloud.nl*. The username and password can be
-passed in as arguments or taken from *~/.koppeltaal.cfg*. The format of
-~/.koppeltaal.cfg looks like this:
+example *https://testconnectors.vhscloud.nl*. The username, password and
+domain can be passed in as arguments or taken from *~/.koppeltaal.cfg*. The
+format of ~/.koppeltaal.cfg looks like this:
 
 ```
 [https://testconnectors.vhscloud.nl]
@@ -111,9 +111,9 @@ c.test_authentication()
 
 # get Activity definitions from server. Returns XML.
 xml = c.activity_definition()
-# use koppeltaal.activity_definition.activities to parse the XML feed.
-from koppeltaal.activity_definition import activities
-act = activities(xml)
+# use koppeltaal.activity_definition.parse to parse the XML feed.
+from koppeltaal.activity_definition import parse
+act = parse(xml)
 
 # Create or update a care plan.
 from koppeltaal.create_or_update_care_plan import generate
