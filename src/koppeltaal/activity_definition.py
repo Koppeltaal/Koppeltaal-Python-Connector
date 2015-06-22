@@ -2,7 +2,7 @@ import feedreader.parser
 import koppeltaal
 
 
-def activities(xml):
+def parse(xml):
     """
     Pass in a raw activity definition, will generate a list of activity
     information.
@@ -42,7 +42,7 @@ def activities(xml):
 def activity_info(xml, activity_id):
     '''Given an XML feed of Activities, return the info about the one with the
     given activity_id.'''
-    for info in activities(xml):
+    for info in parse(xml):
         if info['identifier'] == activity_id:
             return info
     # Raise an error in case of unknown activity id.
