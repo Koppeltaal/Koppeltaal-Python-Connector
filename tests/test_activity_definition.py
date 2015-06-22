@@ -1,17 +1,17 @@
 import py.path
 import pytest
 from koppeltaal import KoppeltaalException
-from koppeltaal.activity_definition import activity_info, activities
+from koppeltaal.activity_definition import activity_info, parse
 
 here = py.path.local(__file__)
 sample_feed = (here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
 
-def test_activities():
+def test_parse_activities():
     '''
     From the activities feed, get a list of activity information objects.
     '''
-    activity_infos = list(activities(sample_feed))
+    activity_infos = list(parse(sample_feed))
     assert len(activity_infos) == 3
     ad1 = activity_infos[0]
     assert 'node' in ad1
