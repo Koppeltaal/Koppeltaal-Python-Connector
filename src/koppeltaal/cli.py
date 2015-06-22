@@ -25,11 +25,11 @@ def cli():
     # XXX Inject possible commands here. Some sort of registry.
     subparsers.add_parser('test_authentication')
     subparsers.add_parser('activity_definition')
-    subparsers.add_parser('get_next_and_claim')
 
+    # XXX rename?
     message_header = subparsers.add_parser('message_header')
-    message_header.add_argument('--patient_id')
-    message_header.add_argument('--message_id')
+    message_header.add_argument('patient_url')
+    # XXX message_header.add_argument('message_id')
 
     create_or_update_care_plan = subparsers.add_parser('create_or_update_care_plan')
     create_or_update_care_plan.add_argument('activity_id')
@@ -85,12 +85,7 @@ def cli():
         result = connection.activity_definition()
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'message_header':
-        result = connection.message_header(
-            patient_id=args.patient_id,
-            message_id=args.message_id)
-        print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
-    elif args.command == 'get_next_and_claim':
-        result = connection.get_next_and_claim()
+        result = connection.messages_for_patient(args.patient_url)
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'create_or_update_care_plan':
         # XXX Refactor.
