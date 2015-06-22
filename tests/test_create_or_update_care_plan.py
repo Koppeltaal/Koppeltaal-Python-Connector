@@ -1,4 +1,5 @@
 import lxml.etree
+import pytest
 import py.path
 import koppeltaal
 
@@ -135,3 +136,48 @@ def test_create_or_update_care_plan():
         'fhir:given', namespaces=koppeltaal.NS).get('value') == 'Jozef'
     assert practitioner_name.find(
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'van Buuren'
+
+
+@pytest.mark.xfail(
+    reason='The server sends back a 405, which is not what we expect.')
+def test_send_create_or_update_care_plan_to_server(connector):
+    """
+    Send a careplan to the server and check that there is a message in the
+    mailbox.
+    """
+    from random import randint
+    from koppeltaal.activity_definition import parse
+    # A random activity, could be anything.
+    first_activity = list(parse(connector.activity_definition()))[0]
+
+    pat1 = Patient()
+    pat1.id = '1'
+    pat1.url = 'http://example.com/patient/1'
+    pat1.name.given = 'Claes'
+    pat1.name.family = 'de Vries'
+
+    cp2 = CarePlan()
+    cp2.id = str(randint(100000000000, 10000000000000000))
+    cp2.url = 'http://example.com/patient/1/careplan/{}'.format(cp2.id)
+
+    prac_a = Practitioner()
+    prac_a.id = 'a'
+    prac_a.url = 'http://example.com/practitioner/a'
+    prac_a.name.given = 'Jozef'
+    prac_a.name.family = 'van Buuren'
+
+    xml = generate(
+        connector.domain,
+        first_activity,
+        pat1,
+        cp2,
+        prac_a)
+
+    # XXX Fails with a 405.
+    result = connector.create_or_update_care_plan(xml)
+
+    # XXX Assert there is a message in the mailbox.
+
+
+# XXX test non-existing activity definition, should return an error from the
+# server.
