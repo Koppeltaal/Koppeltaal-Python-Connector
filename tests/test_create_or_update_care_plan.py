@@ -138,8 +138,6 @@ def test_create_or_update_care_plan():
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'van Buuren'
 
 
-@pytest.mark.xfail(
-    reason='The server sends back a 405, which is not what we expect.')
 def test_send_create_or_update_care_plan_to_server(connector):
     """
     Send a careplan to the server and check that there is a message in the
@@ -173,9 +171,8 @@ def test_send_create_or_update_care_plan_to_server(connector):
         cp2,
         prac_a)
 
-    # XXX Fails with a 405.
     result = connector.create_or_update_care_plan(xml)
-
+    assert result.startswith('<feed')
     # XXX Assert there is a message in the mailbox.
 
 
