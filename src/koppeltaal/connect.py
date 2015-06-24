@@ -1,6 +1,7 @@
 """
 Connect to Koppeltaal server
 """
+import urlparse
 import requests
 import koppeltaal
 import koppeltaal.metadata
@@ -62,6 +63,9 @@ class Connector(object):
         # Get from the metadata definition
         mailbox_url = koppeltaal.metadata.metadata(
             self.metadata())['messaging']['endpoint']
+        # Assert that the protocol is the same.
+        assert urlparse.urlparse(mailbox_url).scheme == urlparse.urlparse(self.server).scheme
+
         koppeltaal.logger.debug('Sending XML %s', xml)
         response = requests.post(
             mailbox_url,
@@ -70,7 +74,8 @@ class Connector(object):
             headers={
                 'Accept': 'application/xml',
                 'Content-Type': 'application/xml',
-            })
+            },
+            allow_redirects=False)
         response.raise_for_status()
         # We could parse the response.
         # In the response find the URL to the newly created careplan:
