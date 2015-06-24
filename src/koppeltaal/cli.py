@@ -25,6 +25,7 @@ def cli():
     # XXX Inject possible commands here. Some sort of registry.
     subparsers.add_parser('test_authentication')
     subparsers.add_parser('activity_definition')
+    subparsers.add_parser('metadata')
 
     # XXX rename?
     message_header = subparsers.add_parser('message_header')
