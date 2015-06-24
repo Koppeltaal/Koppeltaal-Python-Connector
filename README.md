@@ -4,11 +4,18 @@
 
 The dependencies for the koppeltaal python connector is put together using [buildout].
 
-Run:
+On Linux/OSX, run:
 
 ```sh
 $ python2.7 bootstrap.py
 $ bin/buildout
+```
+
+On Windows, run (this works best in a git shell):
+
+```sh
+$ C:\Python27\Python.exe bootstrap.py --allow-site-packages --setuptools-version=8.0
+$ bin\buildout.exe
 ```
 
 ## Tests
