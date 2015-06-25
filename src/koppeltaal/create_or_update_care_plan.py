@@ -41,6 +41,7 @@ def generate(domain, activity, patient, careplan, practitioner):
     feed_id = str(uuid.uuid4())
     feed.id(feed_id)
     feed.title('Feed with id {}'.format(feed_id))
+    # Required Koppeltaal elements.
     feed.category(
         term='{koppeltaal}/Domain#{domain}'.format(domain=domain, **koppeltaal.NS),
         label=domain,
@@ -58,7 +59,6 @@ def generate(domain, activity, patient, careplan, practitioner):
         'MessageHeader resource with id {}'.format(message_id))
     messageheader = lxml.etree.Element(
         'MessageHeader',
-        attrib={'id': message_id},
         nsmap={None: koppeltaal.NS['fhir']})
     extension = lxml.etree.SubElement(
         messageheader,
