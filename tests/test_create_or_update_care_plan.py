@@ -176,5 +176,7 @@ def test_send_create_or_update_care_plan_to_server(connector):
     messages_for_pat = parse_messages(connector.messages(patient_url=pat.url))
     assert len(messages_for_pat.entries) == 1
 
-# XXX test non-existing activity definition, should return an error from the
-# server.
+
+def test_send_incorrect_careplan_expect_failure(connector):
+    '''When sending a careplan with a non-existing activity definition,
+    the server should return an error.'''
