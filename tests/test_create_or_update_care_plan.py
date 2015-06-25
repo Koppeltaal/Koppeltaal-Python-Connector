@@ -1,4 +1,3 @@
-import uuid
 import lxml.etree
 import pytest
 import py.path
@@ -12,31 +11,6 @@ from koppeltaal_schema.validate import validate
 here = py.path.local(__file__)
 sample_feed = (here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
-def random_id():
-    return 'py-{}'.format(str(uuid.uuid4()).replace('-', ''))
-
-
-class Name(object):
-    given = family = None
-
-
-class Patient(object):
-    id = url = name = None
-
-    def __init__(self):
-        self.name = Name()
-
-
-class CarePlan(object):
-    id = url = None
-
-
-class Practitioner(object):
-    id = url = None
-
-    def __init__(self):
-        self.name = Name()
-
 
 def find_link(entry):
     # Ugly python, need to escape the {} to use .format().
@@ -46,21 +20,16 @@ def find_link(entry):
 
 
 def test_create_or_update_care_plan():
+    from koppeltaal.model import Patient, Practitioner, CarePlan
     activity = activity_info(sample_feed, 'AD1')
 
-    pat1 = Patient()
-    pat1.id = '1'
-    pat1.url = 'http://example.com/patient/1'
+    pat1 = Patient('1', 'http://example.com/patient/1')
     pat1.name.given = 'Claes'
     pat1.name.family = 'de Vries'
 
-    cp2 = CarePlan()
-    cp2.id = '2'
-    cp2.url = 'http://example.com/patient/1/careplan/2'
+    cp2 = CarePlan('2', 'http://example.com/patient/1/careplan/2')
 
-    prac_a = Practitioner()
-    prac_a.id = 'a'
-    prac_a.url = 'http://example.com/practitioner/a'
+    prac_a = Practitioner('a', 'http://example.com/practitioner/a')
     prac_a.name.given = 'Jozef'
     prac_a.name.family = 'van Buuren'
 
@@ -133,7 +102,8 @@ def test_create_or_update_care_plan():
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'van Buuren'
 
 
-def test_send_create_or_update_care_plan_to_server(connector):
+def test_send_create_or_update_care_plan_to_server(connector, patient,
+        practitioner, careplan):
     """
     Send a careplan to the server and check that there is a message in the
     mailbox.
@@ -144,36 +114,19 @@ def test_send_create_or_update_care_plan_to_server(connector):
     # A random activity, could be anything.
     first_activity = list(parse(connector.activity_definition()))[0]
 
-    pat = Patient()
-    pat.id = random_id()
-    pat.url = 'http://example.com/patient/{pat.id}'.format(pat=pat)
-    pat.name.given = 'Claes'
-    pat.name.family = 'de Vries'
-
-    cp = CarePlan()
-    cp.id = random_id()
-    cp.url = 'http://example.com/patient/{pat.id}/careplan/{cp.id}'.format(
-        pat=pat, cp=cp)
-
-    prac = Practitioner()
-    prac.id = random_id()
-    prac.url = 'http://example.com/practitioner/{prac.id}'.format(prac=prac)
-    prac.name.given = 'Jozef'
-    prac.name.family = 'van Buuren'
-
     # Before the careplan is sent, there are no messages for the patient.
-    messages_for_pat = parse_messages(connector.messages(patient_url=pat.url))
+    messages_for_pat = parse_messages(connector.messages(patient_url=patient.url))
     assert len(messages_for_pat.entries) == 0
 
-    xml = generate(connector.domain, first_activity, pat, cp, prac)
+    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
     result = connector.create_or_update_care_plan(xml)
 
     # The careplan was sent successfully and now has a _history.
     result = parse_feed(result)
-    assert cp.url in result['reference']
+    assert careplan.url in result['reference']
 
     # Assert there is a message in the mailbox for this patient.
-    messages_for_pat = parse_messages(connector.messages(patient_url=pat.url))
+    messages_for_pat = parse_messages(connector.messages(patient_url=patient.url))
     assert len(messages_for_pat.entries) == 1
 
 

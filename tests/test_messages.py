@@ -12,7 +12,7 @@ def test_message_for_id(connector):
     '''Get a specific message.'''
 
 
-def test_claim_message(connector):
+def test_claim_message(connector, patient, practitioner, careplan):
     '''Claim a specific message.'''
 
 

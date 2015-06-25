@@ -6,6 +6,7 @@ import lxml.etree
 import logging
 import koppeltaal
 import koppeltaal.connect
+import koppeltaal.model
 import koppeltaal.create_or_update_care_plan
 import koppeltaal.activity_definition
 
@@ -92,43 +93,19 @@ def cli():
     elif args.command == 'message':
         import pdb ; pdb.set_trace()
     elif args.command == 'create_or_update_care_plan':
-
-        # XXX Refactor.
-        class Name(object):
-            given = family = None
-
-        class Patient(object):
-            id = url = name = None
-
-            def __init__(self):
-                self.name = Name()
-
-        class CarePlan(object):
-            id = url = None
-
-        class Practitioner(object):
-            id = url = None
-
-            def __init__(self):
-                self.name = Name()
-
         # This will choke on unknown activity ids.
         activity = koppeltaal.activity_definition.activity_info(
             connection.activity_definition(), args.activity_id)
 
-        patient = Patient()
-        patient.id = args.patient_id
-        patient.url = args.patient_url
+        patient = koppeltaal.model.Patient(args.patient_id, args.patient_url)
         patient.name.given = args.patient_given_name
         patient.name.family = args.patient_family_name
 
-        careplan = CarePlan()
-        careplan.id = args.careplan_id
-        careplan.url = args.careplan_url
+        careplan = koppeltaal.model.CarePlan(
+            args.careplan_id, args.careplan_url)
 
-        practitioner = Practitioner()
-        practitioner.id = args.practitioner_id
-        practitioner.url = args.practitioner_url
+        practitioner = koppeltaal.model.Practitioner(
+            args.practitioner_id, args.practitioner_url)
         practitioner.name.given = args.practitioner_given_name
         practitioner.name.family = args.practitioner_family_name
 

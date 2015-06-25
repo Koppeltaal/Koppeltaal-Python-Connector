@@ -139,3 +139,12 @@ class Connector(object):
             allow_redirects=False)
         response.raise_for_status()
         return response.content
+
+    def message(self, id, action='get'):
+        """
+        Interact with a single message. Actions are:
+        get the message (default)
+        claim the message
+        finalize the message as a success
+        """
+        import pytest ; pytest.set_trace()

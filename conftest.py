@@ -1,8 +1,10 @@
+import uuid
 import urlparse
 import pytest
 import os.path
 import ConfigParser
 import koppeltaal.connect
+import koppeltaal.model
 
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
@@ -45,3 +47,46 @@ def connector(request):
     if not connector.test_authentication():
         raise ValueError('Wrong username/password/server combination.')
     return connector
+
+
+def random_id():
+    # Max 36 chars.
+    return 'py-{}'.format(str(uuid.uuid4()).replace('-', ''))
+
+
+@pytest.fixture
+def patient(request, connector):
+    id = random_id()
+    p = koppeltaal.model.Patient(
+        id, 'http://example.com/patient/{}'.format(id))
+    p.name.given = 'Claes'
+    p.name.family = 'de Vries'
+
+    def cleanup_patient_messages():
+        result = connector.messages(patient_url=p.url)
+        #import pytest ; pytest.set_trace()
+
+    request.addfinalizer(cleanup_patient_messages)
+    # XXX Cleanup message for this patient.
+    return p
+
+
+@pytest.fixture
+def practitioner():
+    id = random_id()
+    p = koppeltaal.model.Practitioner(
+        id, 'http://example.com/practitioner/{}'.format(id))
+    p.name.given = 'Jozef'
+    p.name.family = 'van Buuren'
+    return p
+
+
+@pytest.fixture
+def careplan(connector, patient):
+    from koppeltaal.activity_definition import parse
+
+    id = random_id()
+    return koppeltaal.model.CarePlan(
+        id,
+        'http://example.com/patient/{p.id}/careplan/{id}'.format(
+        id=id, p=patient))
