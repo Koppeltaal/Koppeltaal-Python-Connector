@@ -27,10 +27,11 @@ def cli():
     subparsers.add_parser('activity_definition')
     subparsers.add_parser('metadata')
 
-    # XXX rename?
-    message_header = subparsers.add_parser('message_header')
-    message_header.add_argument('patient_url')
-    # XXX message_header.add_argument('message_id')
+    messages = subparsers.add_parser('messages')
+    messages.add_argument('--patient_url')
+
+    message = subparsers.add_parser('message')
+    message.add_argument('id')
 
     create_or_update_care_plan = subparsers.add_parser('create_or_update_care_plan')
     create_or_update_care_plan.add_argument('activity_id')
@@ -85,10 +86,13 @@ def cli():
     elif args.command == 'activity_definition':
         result = connection.activity_definition()
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
-    elif args.command == 'message_header':
-        result = connection.messages_for_patient(args.patient_url)
+    elif args.command == 'messages':
+        result = connection.messages(patient_url=args.patient_url)
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
+    elif args.command == 'message':
+        import pdb ; pdb.set_trace()
     elif args.command == 'create_or_update_care_plan':
+
         # XXX Refactor.
         class Name(object):
             given = family = None

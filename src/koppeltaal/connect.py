@@ -34,7 +34,8 @@ class Connector(object):
         url = '{}/{}'.format(self.server, METADATA_URL)
         response = requests.get(
             url,
-            headers={'accept': 'application/xml'})
+            headers={'accept': 'application/xml'},
+            allow_redirects=False)
         response.raise_for_status()
         # The result is raw XML conformance statement.
         return response.content
@@ -46,7 +47,8 @@ class Connector(object):
         response = requests.get(
             url,
             headers={'accept': 'application/xml'},
-            auth=(self.username, self.password))
+            auth=(self.username, self.password),
+            allow_redirects=False)
         return response.status_code == 200
 
     def activity_definition(self):
@@ -55,7 +57,8 @@ class Connector(object):
         response = requests.get(
             url,
             auth=(self.username, self.password),
-            headers={'Accept': 'application/xml'})
+            headers={'Accept': 'application/xml'},
+            allow_redirects=False)
         response.raise_for_status()
         return response.content
 
@@ -98,17 +101,11 @@ class Connector(object):
         # to the user.
         return response.headers.get('location')
 
-    def messages_for_patient(self, patient_url):
-        # XXX No tests for this yet.
-        # XXX Split in separate search and retrieve functions.
+    def messages(self, patient_url=None):
         """
+        From the specs:
+
         Retrieving messages - There are 3 supported interactions:
-
-        https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_query=MessageHeader.GetNextNewAndClaim
-
-        This will find the next message with ProcessingStatus="New", set its
-        ProcessingStatus to "Claimed", and returns the complete Bundle for that
-        Message. This must always be followed by an update of the Message status.
 
         https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_summary=true&_count=[X]
         This will return a Bundle of MessageHeaders, allowing an application to
@@ -125,17 +122,20 @@ class Connector(object):
         event: Filters on the message type
         ProcessingStatus: Filters on the ProcessingStatus (New|Claimed|Success|Failed).
         This query parameter cannot be passed to the named query used in interaction 1.
-        """
 
-        """XXX Search for the message for the patient_id or
-        get the message with that specific id."""
+        Currently, only patient url is implemented.
+        """
         url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
+
+        params = {}
+        if patient_url:
+            params['Patient'] = patient_url
+
         response = requests.get(
             url,
-            params={
-                'Patient': patient_url
-            },
+            params=params,
             auth=(self.username, self.password),
-            headers={'Accept': 'application/xml'})
+            headers={'Accept': 'application/xml'},
+            allow_redirects=False)
         response.raise_for_status()
         return response.content
