@@ -1,11 +1,17 @@
-
-
-def test_messages(connector):
+def test_messages(connector, careplan):
     '''Get messages from the server.'''
+    from koppeltaal.message import parse_messages
+    messages = parse_messages(connector.messages())
+    assert len(messages.entries) > 0
 
 
-def test_messages_for_patient(connector):
+def test_messages_for_patient(connector, careplan):
     '''Get messages for a specific patient.'''
+    from koppeltaal.message import parse_messages
+    messages = parse_messages(connector.messages(
+        patient_url=careplan.patient.url))
+    # Because of random_id we know that this patient has exactly one message.
+    assert len(messages.entries) == 1
 
 
 def test_message_for_id(connector):

@@ -87,4 +87,7 @@ def careplan(connector, patient):
     return koppeltaal.model.CarePlan(
         id,
         'http://example.com/patient/{p.id}/careplan/{id}'.format(
-        id=id, p=patient))
+            id=id,
+            p=patient),
+        patient
+    )
