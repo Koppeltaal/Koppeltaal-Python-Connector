@@ -83,8 +83,6 @@ def practitioner():
 
 @pytest.fixture
 def careplan(connector, patient):
-    from koppeltaal.activity_definition import parse
-
     id = random_id()
     return koppeltaal.model.CarePlan(
         id,
