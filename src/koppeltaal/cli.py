@@ -79,8 +79,11 @@ def cli():
         args.server, username, password, domain=domain)
 
     if args.command == 'test_authentication':
+        result = connection.test_authentication()
+        print "Authentication successful." if result \
+            else "Authentication unsuccessful."
         # Exit code is the opposite of the result from the Connector.
-        sys.exit(not connection.test_authentication())
+        sys.exit(not result)
     elif args.command == 'metadata':
         result = connection.metadata()
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
