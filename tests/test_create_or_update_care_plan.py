@@ -131,7 +131,6 @@ def test_send_create_or_update_care_plan_to_server(
     assert len(messages_for_pat) == 1
 
 
-
 @pytest.mark.xfail(reason=
     'The call to the koppeltaal server with an unknown careplan '
     'activity id does not fail.')
