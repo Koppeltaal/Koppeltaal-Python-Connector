@@ -182,11 +182,12 @@ class Connector(object):
         response.raise_for_status()
         feed = feedreader.parser.from_string(response.content)
         # XXX How can you be so sure about nr 0.?
-        message_header = feed.entries[0].content.find('.//fhir:MessageHeader',
-            namespaces=koppeltaal.NS)
+        message_header = feed.entries[0].content.find(
+            './/fhir:MessageHeader', namespaces=koppeltaal.NS)
         # Parse the XML with lxml.etree and set the ProcessingStatus.
         processing_status = message_header.find(
-            './/fhir:extension[@url="{koppeltaal}/MessageHeader#ProcessingStatusStatus"]'.format(
+            './/fhir:extension[@url="{koppeltaal}/MessageHeader#'
+            'ProcessingStatusStatus"]'.format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCode', namespaces=koppeltaal.NS)
         processing_status.attrib['value'] = status
