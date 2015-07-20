@@ -24,7 +24,7 @@ def test_messages_for_patient(connector, patient, practitioner, careplan):
     messages = parse_messages(connector.messages(
         patient_url=careplan.patient.url, summary=True))
     # Because of random_id we know that this patient has exactly one message.
-    assert len(messages) == 1
+    assert len(list(messages)) == 1
 
 
 def test_message_for_id(connector):
@@ -43,8 +43,9 @@ def test_claim(connector, patient, practitioner, careplan):
 
     # XXX Move to a fixture.
     first_activity = list(parse(connector.activity_definition()))[0]
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
-    result = connector.create_or_update_care_plan(xml)
+    xml = generate(
+        connector.domain, first_activity, patient, careplan, practitioner)
+    connector.create_or_update_care_plan(xml)
 
     # Get the messages for this patient.
     messages_xml = connector.messages(patient_url=patient.url)
@@ -69,6 +70,7 @@ def test_claim(connector, patient, practitioner, careplan):
     assert message_info.id is not None
     assert message_info.status == 'Claimed'
 
+
 def test_success(connector, patient, practitioner, careplan):
     '''Claim a specific message and mark it as a success.'''
     from koppeltaal.activity_definition import parse
@@ -77,8 +79,9 @@ def test_success(connector, patient, practitioner, careplan):
 
     # XXX Move to a fixture.
     first_activity = list(parse(connector.activity_definition()))[0]
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
-    result = connector.create_or_update_care_plan(xml)
+    xml = generate(
+        connector.domain, first_activity, patient, careplan, practitioner)
+    connector.create_or_update_care_plan(xml)
 
     # Get the messages for this patient.
     messages_xml = connector.messages(patient_url=patient.url)
@@ -96,6 +99,7 @@ def test_success(connector, patient, practitioner, careplan):
     res = connector.process_message(message_info.id)
     # XXX We could parse this instead of doing a string check.
     assert '<valueCode value="Success" />' in res
+
 
 def test_cannot_finalize_non_claimed_message(connector):
     '''
