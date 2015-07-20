@@ -159,10 +159,10 @@ class Connector(object):
     def process_message(self, id, action='get'):
         """
         Interact with a single message. Actions are:
-        get the message (default)
-        claim the message
-        process the message as a success
-        error?
+        - get the message (default)
+        - claim the message
+        - process the message as a success
+        - error?
         """
         if action == 'get':
             url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
