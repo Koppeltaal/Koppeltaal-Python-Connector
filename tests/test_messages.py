@@ -19,10 +19,10 @@ def test_messages(connector, patient, practitioner, careplan):
     assert num_messages_after == num_messages_before + 1
 
 
-def test_messages_for_patient(connector, patient, careplan, careplan_on_server):
+def test_messages_for_patient(
+        connector, patient, careplan, careplan_on_server):
     '''Get messages for a specific patient.'''
     from koppeltaal.message import parse_messages
-
     messages = parse_messages(connector.messages(
         patient_url=careplan.patient.url, summary=True))
     # Because of random_id we know that this patient has exactly one message.
