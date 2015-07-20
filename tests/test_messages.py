@@ -55,7 +55,7 @@ def test_claim(connector, patient, practitioner, careplan):
     assert message_info.id is not None
     assert message_info.status == 'New'
 
-    full_message = connector.process_message(message_info.id)
+    full_message = connector.message(message_info.id)
     # Smoke test.
     assert patient.name.given in full_message
 
@@ -96,7 +96,7 @@ def test_success(connector, patient, practitioner, careplan):
     messages_xml = connector.messages(
         patient_url=patient.url, processing_status='New')
     assert len(list(parse_messages(messages_xml))) == 0
-    res = connector.process_message(message_info.id)
+    res = connector.message(message_info.id)
     # XXX We could parse this instead of doing a string check.
     assert '<valueCode value="Success" />' in res
 
