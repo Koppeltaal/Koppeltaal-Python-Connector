@@ -24,7 +24,7 @@ def test_messages_for_patient(connector, patient, practitioner, careplan):
     messages = parse_messages(connector.messages(
         patient_url=careplan.patient.url, summary=True))
     # Because of random_id we know that this patient has exactly one message.
-    assert len(messages.entries) == 1
+    assert len(messages) == 1
 
 
 def test_message_for_id(connector):

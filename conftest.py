@@ -5,6 +5,7 @@ import os.path
 import ConfigParser
 import koppeltaal.connect
 import koppeltaal.model
+import koppeltaal.message
 
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
@@ -64,10 +65,10 @@ def patient(request, connector):
 
     def cleanup_patient_messages():
         result = connector.messages(patient_url=p.url)
-        #import pytest ; pytest.set_trace()
+        for message in koppeltaal.message.parse_messages(result):
+            connector.process_message(message.id, action='success')
 
     request.addfinalizer(cleanup_patient_messages)
-    # XXX Cleanup message for this patient.
     return p
 
 
