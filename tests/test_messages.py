@@ -32,6 +32,6 @@ def test_handle_message_success(connector):
 
 def test_cannot_finalize_non_claimed_message(connector):
     '''
-    When we try to finalize a message that we hadn't claimed before, this should
-    yield an error.
+    When we try to finalize a message that we hadn't claimed before, this
+    should yield an error.
     '''
