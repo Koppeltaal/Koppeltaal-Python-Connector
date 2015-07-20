@@ -83,6 +83,16 @@ def practitioner():
 
 
 @pytest.fixture
+def practitioner2():
+    id = random_id()
+    p = koppeltaal.model.Practitioner(
+        id, 'http://example.com/practitioner/{}'.format(id))
+    p.name.given = 'Hank'
+    p.name.family = 'Schrader'
+    return p
+
+
+@pytest.fixture
 def careplan(connector, patient):
     id = random_id()
     return koppeltaal.model.CarePlan(
