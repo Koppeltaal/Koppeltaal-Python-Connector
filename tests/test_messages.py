@@ -15,12 +15,10 @@ def test_messages(connector, patient, practitioner, careplan):
     assert num_messages_after == num_messages_before + 1
 
 
-def test_messages_for_patient(connector, patient, practitioner, careplan):
+def test_messages_for_patient(connector, patient, careplan, careplan_on_server):
     '''Get messages for a specific patient.'''
     from koppeltaal.message import parse_messages
-    from testing import send_create_or_update_careplan_to_server
-    send_create_or_update_careplan_to_server(
-        connector, patient, practitioner, careplan)
+
     messages = parse_messages(connector.messages(
         patient_url=careplan.patient.url, summary=True))
     # Because of random_id we know that this patient has exactly one message.
@@ -35,17 +33,9 @@ def test_messages_for_status(connector):
     '''Get messages for a specific status.'''
 
 
-def test_claim(connector, patient, practitioner, careplan):
+def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     '''Claim a specific message.'''
-    from koppeltaal.activity_definition import parse
     from koppeltaal.message import parse_messages
-    from koppeltaal.create_or_update_care_plan import generate
-
-    # XXX Move to a fixture.
-    first_activity = list(parse(connector.activity_definition()))[0]
-    xml = generate(
-        connector.domain, first_activity, patient, careplan, practitioner)
-    connector.create_or_update_care_plan(xml)
 
     # Get the messages for this patient.
     messages_xml = connector.messages(patient_url=patient.url)
@@ -71,17 +61,10 @@ def test_claim(connector, patient, practitioner, careplan):
     assert message_info.status == 'Claimed'
 
 
-def test_success(connector, patient, practitioner, careplan):
+def test_success(
+        connector, patient, practitioner, careplan, careplan_on_server):
     '''Claim a specific message and mark it as a success.'''
-    from koppeltaal.activity_definition import parse
     from koppeltaal.message import parse_messages
-    from koppeltaal.create_or_update_care_plan import generate
-
-    # XXX Move to a fixture.
-    first_activity = list(parse(connector.activity_definition()))[0]
-    xml = generate(
-        connector.domain, first_activity, patient, careplan, practitioner)
-    connector.create_or_update_care_plan(xml)
 
     # Get the messages for this patient.
     messages_xml = connector.messages(patient_url=patient.url)
