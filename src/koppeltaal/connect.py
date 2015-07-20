@@ -2,9 +2,11 @@
 Connect to Koppeltaal server
 """
 import urlparse
+import lxml.etree
 import requests
 import koppeltaal
 import koppeltaal.metadata
+import feedreader.parser
 
 # The URLs that can't be reached from the metadata are defined as constants
 # here.
@@ -64,6 +66,8 @@ class Connector(object):
         return response.content
 
     def create_or_update_care_plan(self, xml):
+        # XXX This is no longer applicable to create-or-update-careplan only,
+        # rename to "post_mailbox" or some better name.
         # Get from the metadata definition
         mailbox_url = koppeltaal.metadata.metadata(
             self.metadata())['messaging']['endpoint']
@@ -103,7 +107,12 @@ class Connector(object):
         # to the user.
         return response.headers.get('location')
 
-    def messages(self, patient_url=None, summary=None, count=None):
+    def messages(
+            self,
+            patient_url=None,
+            processing_status=None,
+            summary=None,
+            count=None):
         """
         From the specs:
 
@@ -127,13 +136,16 @@ class Connector(object):
         """
         url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
 
-        params = {}
+        params = {
+            # Get all messages if no count is given.
+            '_count': count if count is not None else 5000
+        }
         if patient_url:
             params['Patient'] = patient_url
+        if processing_status:
+            params['ProcessingStatus'] = processing_status
         if summary:
             params['_summary'] = 'true'
-        # Get all messages if no count is given.
-        params['_count'] = count if count is not None else 5000
 
         response = requests.get(
             url,
@@ -144,11 +156,77 @@ class Connector(object):
         response.raise_for_status()
         return response.content
 
-    def message(self, id, action='get'):
+    def process_message(self, id, action='get'):
         """
         Interact with a single message. Actions are:
         get the message (default)
         claim the message
-        finalize the message as a success
+        process the message as a success
+        error?
         """
-        pass
+        if action == 'get':
+            url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
+            response = requests.get(
+                url,
+                params={'_id': id},
+                auth=(self.username, self.password),
+                headers={'Accept': 'application/xml'},
+                allow_redirects=False)
+            response.raise_for_status()
+            return response.content
+        elif action == 'claim':
+            # Get the message, change the processing status and PUT to the
+            # server.
+            message_xml = self.process_message(id, action='get')
+            # Updating the ProcessingStatus for a Message - After a message
+            # has been successfully processed, the application must update its
+            # ProcessingStatus to "Success" on URL
+            # [[|https://koppelbox/FHIR/Koppeltaal/MessageHeader/[id]]] (that
+            # is, the URL returned as id link in the for the MessageHeader in
+            # the bundle.)
+            feed = feedreader.parser.from_string(message_xml)
+            # XXX How can you be so sure about nr 0.?
+            message_header = feed.entries[0].content.find('.//fhir:MessageHeader',
+                namespaces=koppeltaal.NS)
+            # Parse the XML with lxml.etree and set the ProcessingStatus to
+            # "Claimed".
+            processing_status = message_header.find(
+                './/fhir:extension[@url="{koppeltaal}/MessageHeader#ProcessingStatusStatus"]'.format(
+                    **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+                'fhir:valueCode', namespaces=koppeltaal.NS)
+            processing_status.attrib['value'] = 'Claimed'
+
+            response = requests.put(
+                feed.entries[0].id,
+                data=lxml.etree.tostring(message_header),
+                auth=(self.username, self.password),
+                headers={'Accept': 'application/xml'},
+                allow_redirects=False)
+            response.raise_for_status()
+            return response.content
+        elif action == 'success':
+            # XXX Repetition vs 'claim'
+            # Get the message, change the processing status and PUT to the
+            # server.
+            message_xml = self.process_message(id, action='get')
+            feed = feedreader.parser.from_string(message_xml)
+            # XXX How can you be so sure about nr 0.?
+            message_header = feed.entries[0].content.find('.//fhir:MessageHeader',
+                namespaces=koppeltaal.NS)
+            # Parse the XML with lxml.etree and set the ProcessingStatus to
+            # "Claimed".
+            processing_status = message_header.find(
+                './/fhir:extension[@url="{koppeltaal}/MessageHeader#ProcessingStatusStatus"]'.format(
+                    **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+                'fhir:valueCode', namespaces=koppeltaal.NS)
+            processing_status.attrib['value'] = 'Success'
+            response = requests.put(
+                feed.entries[0].id,
+                data=lxml.etree.tostring(message_header),
+                auth=(self.username, self.password),
+                headers={'Accept': 'application/xml'},
+                allow_redirects=False)
+            response.raise_for_status()
+            return response.content
+        else:
+            raise ValueError('Unknown status')

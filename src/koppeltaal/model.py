@@ -29,3 +29,10 @@ class Practitioner(object):
         self.id = id
         self.url = url
         self.name = Name()
+
+
+class Message(object):
+
+    def __init__(self, id, status):
+        self.id = id
+        self.status = status
