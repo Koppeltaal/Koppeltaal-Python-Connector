@@ -16,6 +16,7 @@ OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
 # XXX Request pool, take into account multiple apps may be using this same
 # piece of code.
 
+
 class Connector(object):
     server = None
     username = None
@@ -67,7 +68,8 @@ class Connector(object):
         mailbox_url = koppeltaal.metadata.metadata(
             self.metadata())['messaging']['endpoint']
         # Assert that the protocol is the same.
-        assert urlparse.urlparse(mailbox_url).scheme == urlparse.urlparse(self.server).scheme
+        assert urlparse.urlparse(mailbox_url).scheme == urlparse.urlparse(
+            self.server).scheme
 
         koppeltaal.logger.debug('Sending XML %s', xml)
         response = requests.post(
@@ -108,22 +110,20 @@ class Connector(object):
         Retrieving messages - There are 3 supported interactions:
 
         https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_summary=true&_count=[X]
-        This will return a Bundle of MessageHeaders, allowing an application to
-        browse the available messages. A pagesize can be specified in the _count
-        parameter.
+        This will return a Bundle of MessageHeaders, allowing an application
+        to browse the available messages. A pagesize can be specified in the
+        _count parameter.
 
-        https://koppeltaal/FHIR/Koppeltaal/MessageHeader/_search?_id=[id]
-        This can be used to fetch the complete Bundle for a single Message for which
-        the MessageHeader was retrieved through the previous action.
+        https://koppeltaal/FHIR/Koppeltaal/MessageHeader/_search?_id=[id] This
+        can be used to fetch the complete Bundle for a single Message for
+        which the MessageHeader was retrieved through the previous action.
 
         The following additional query parameters can be specified:
 
-        Patient: Filters on the Patient dossier this message belongs
-        event: Filters on the message type
-        ProcessingStatus: Filters on the ProcessingStatus (New|Claimed|Success|Failed).
-        This query parameter cannot be passed to the named query used in interaction 1.
-
-        Currently, only patient url is implemented.
+        Patient: Filters on the Patient dossier this message belongs event:
+        Filters on the message type ProcessingStatus: Filters on the
+        ProcessingStatus (New|Claimed|Success|Failed).  This query parameter
+        cannot be passed to the named query used in interaction 1.
         """
         url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
 
@@ -147,4 +147,4 @@ class Connector(object):
         claim the message
         finalize the message as a success
         """
-        import pytest ; pytest.set_trace()
+        pass
