@@ -96,8 +96,8 @@ def test_create_or_update_care_plan():
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'van Buuren'
 
 
-def test_send_create_or_update_care_plan_to_server(connector, patient,
-        practitioner, careplan):
+def test_send_create_or_update_care_plan_to_server(
+        connector, patient, practitioner, careplan):
     """
     Send a careplan to the server and check that there is a message in the
     mailbox.
@@ -131,6 +131,18 @@ def test_send_create_or_update_care_plan_to_server(connector, patient,
     assert len(messages_for_pat) == 1
 
 
-def test_send_incorrect_careplan_expect_failure(connector):
+def test_send_incorrect_careplan_expect_failure(
+        connector, patient, practitioner, careplan):
     '''When sending a careplan with a non-existing activity definition,
     the server should return an error.'''
+    from koppeltaal.activity_definition import parse
+    from koppeltaal.create_or_update_care_plan import generate
+    import feedreader.parser
+    from koppeltaal.message import parse_messages
+
+    first_activity = list(parse(connector.activity_definition()))[0]
+    # Unknown activity, should fail.
+    first_activity['identifier'] = 'foobar'
+    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    # XXX The call to the koppeltaal server does not fail.
+    connector.create_or_update_care_plan(xml)
