@@ -131,6 +131,10 @@ def test_send_create_or_update_care_plan_to_server(
     assert len(messages_for_pat) == 1
 
 
+
+@pytest.mark.xfail(reason=
+    'The call to the koppeltaal server with an unknown careplan '
+    'activity id does not fail.')
 def test_send_incorrect_careplan_expect_failure(
         connector, patient, practitioner, careplan):
     '''When sending a careplan with a non-existing activity definition,
@@ -144,5 +148,5 @@ def test_send_incorrect_careplan_expect_failure(
     # Unknown activity, should fail.
     first_activity['identifier'] = 'foobar'
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
-    # XXX The call to the koppeltaal server does not fail.
-    connector.create_or_update_care_plan(xml)
+    with pytest.raises(KoppeltaalException) as cm:
+        connector.create_or_update_care_plan(xml)
