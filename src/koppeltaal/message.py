@@ -39,17 +39,3 @@ def parse_messages(xml):
             'fhir:valueCode', namespaces=koppeltaal.NS).get('value')
 
         yield koppeltaal.model.Message(message_id, processing_status)
-
-
-def parse_feed(xml):
-    """
-    Pass in a raw feed for a message, will generate a list of activity
-    information.
-    """
-    feed = feedreader.parser.from_string(xml)
-    return {
-        'reference': feed.entries[0].content.find(
-            'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
-            'fhir:data', namespaces=koppeltaal.NS).find(
-            'fhir:reference', namespaces=koppeltaal.NS).get('value')
-    }

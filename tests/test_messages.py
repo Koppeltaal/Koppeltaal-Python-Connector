@@ -7,7 +7,7 @@ def test_messages(connector, patient, practitioner, careplan):
     from testing import send_create_or_update_careplan_to_server
 
     def get_num_messages():
-        return len(parse_messages(connector.messages(summary=True)).entries)
+        return len(list(parse_messages(connector.messages(summary=True))))
 
     # We use the careplan fixture so we know there's at least one message in
     # the mailbox.
@@ -86,7 +86,7 @@ def test_success(connector, patient, practitioner, careplan):
     assert len(list(parse_messages(messages_xml))) == 0
     res = connector.process_message(message_info.id)
     # XXX We could parse this instead of doing a string check.
-    self.assertIn('<valueCode value="Success" />', res)
+    assert '<valueCode value="Success" />' in res
 
 def test_cannot_finalize_non_claimed_message(connector):
     '''

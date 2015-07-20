@@ -1,6 +1,6 @@
 import koppeltaal
 
-# Move this parsing to the python package "feedparser".
+# Move this parsing to the python package "feedreader".
 def find_link(entry):
     # Ugly python, need to escape the {} to use .format().
     for link in entry._xml.iterchildren(tag='{%(atom)s}link' % koppeltaal.NS):
