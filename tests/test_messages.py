@@ -1,7 +1,8 @@
 def test_messages(connector, patient, practitioner, careplan):
     '''Get messages from the server.'''
     from koppeltaal.message import parse_messages
-    from testing import send_create_or_update_careplan_to_server
+    from koppeltaal.activity_definition import parse
+    from koppeltaal.create_or_update_care_plan import generate
 
     def get_num_messages():
         return len(list(parse_messages(connector.messages(summary=True))))
@@ -9,8 +10,11 @@ def test_messages(connector, patient, practitioner, careplan):
     # We use the careplan fixture so we know there's at least one message in
     # the mailbox.
     num_messages_before = get_num_messages()
-    send_create_or_update_careplan_to_server(
-        connector, patient, practitioner, careplan)
+    # A random activity, could be anything.
+    first_activity = list(parse(connector.activity_definition()))[0]
+    xml = generate(
+        connector.domain, first_activity, patient, careplan, practitioner)
+    connector.create_or_update_care_plan(xml)
     num_messages_after = get_num_messages()
     assert num_messages_after == num_messages_before + 1
 
