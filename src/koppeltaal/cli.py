@@ -117,7 +117,7 @@ def cli():
         patient.name.family = args.patient_family_name
 
         careplan = koppeltaal.model.CarePlan(
-            args.careplan_id, args.careplan_url)
+            args.careplan_id, args.careplan_url, patient)
 
         practitioner = koppeltaal.model.Practitioner(
             args.practitioner_id, args.practitioner_url)
