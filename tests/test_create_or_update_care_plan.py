@@ -1,5 +1,6 @@
 import lxml.etree
 import pytest
+import requests
 import py.path
 import koppeltaal
 import koppeltaal.feed
@@ -129,6 +130,59 @@ def test_send_create_or_update_care_plan_to_server(
     messages_for_pat = list(parse_messages(
         connector.messages(patient_url=patient.url)))
     assert len(messages_for_pat) == 1
+
+
+def test_update_existing_care_plan(
+        connector, patient, practitioner, practitioner2, careplan):
+    """
+    Update an existing careplan, the history identifier is taken into account.
+    """
+    from koppeltaal.activity_definition import parse
+    from koppeltaal.create_or_update_care_plan import generate
+    import feedreader.parser
+    from koppeltaal.message import parse_messages
+
+    # A random activity, could be anything.
+    first_activity = list(parse(connector.activity_definition()))[0]
+
+    # Before the careplan is sent, there are no messages for the patient.
+    messages_for_pat = list(parse_messages(
+        connector.messages(patient_url=patient.url)))
+    assert len(messages_for_pat) == 0
+
+    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    result = connector.create_or_update_care_plan(xml)
+
+    # The careplan was sent successfully and now has a _history.
+    feed = feedreader.parser.from_string(result)
+    historic_careplan_url = feed.entries[0].content.find(
+        'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
+        'fhir:data', namespaces=koppeltaal.NS).find(
+        'fhir:reference', namespaces=koppeltaal.NS).get('value')
+    assert careplan.url in historic_careplan_url
+
+    # If we now create a careplan with a different practitioner, this will
+    # yield an error, because we are not injecting the historic information.
+    xml = generate(connector.domain, first_activity, patient, careplan, practitioner2)
+    with pytest.raises(requests.HTTPError) as excinfo:
+        connector.create_or_update_care_plan(xml)
+    assert "No version specfied for the focal resource, message is rejected." in excinfo.value.response.text
+
+    # When setting the care plan url from the server to the current careplan,
+    # we can generate the XML properly.
+    careplan.url = historic_careplan_url
+    xml = generate(connector.domain, first_activity, patient, careplan, practitioner2)
+    result = connector.create_or_update_care_plan(xml)
+
+    # The careplan was sent successfully and now has a _history.
+    feed = feedreader.parser.from_string(result)
+    historic_careplan_url_2 = feed.entries[0].content.find(
+        'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
+        'fhir:data', namespaces=koppeltaal.NS).find(
+        'fhir:reference', namespaces=koppeltaal.NS).get('value')
+    # Using string comparison on date strings is ok here. The second careplan
+    # accepted by the server has a later dt than the first one.
+    assert historic_careplan_url_2 > historic_careplan_url
 
 
 @pytest.mark.xfail(reason=
