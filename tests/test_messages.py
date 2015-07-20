@@ -40,8 +40,26 @@ def test_message_for_id(connector):
     assert message_id in message_details
 
 
-def test_messages_for_status(connector):
+def test_messages_for_status(connector, patient, careplan, careplan_on_server):
     '''Get messages for a specific status.'''
+    from koppeltaal.message import parse_messages
+    messages = list(parse_messages(connector.messages(
+        patient_url=careplan.patient.url)))
+    assert len(messages) == 1
+    id, status = messages[0].id, messages[0].status
+    assert status == "New"  # Because not claimed yet.
+
+    messages2 = list(parse_messages(connector.messages(
+        processing_status="New",
+        patient_url=careplan.patient.url)))
+    assert len(messages2) == 1
+    # The same message.
+    assert messages2[0].id == id
+
+    messages2 = list(parse_messages(connector.messages(
+        processing_status="Claimed",
+        patient_url=careplan.patient.url)))
+    assert len(messages2) == 0
 
 
 def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
