@@ -1,17 +1,20 @@
-def test_messages(connector, careplan):
+def test_messages(connector, patient, practitioner, careplan):
     '''Get messages from the server.'''
     from koppeltaal.message import parse_messages
-    messages = parse_messages(connector.messages())
-    assert len(messages.entries) > 0
+    from testing import send_create_or_update_careplan_to_server
+
+    def get_num_messages():
+        return len(parse_messages(connector.messages(summary=True)).entries)
+
+    # We use the careplan fixture so we know there's at least one message in
+    # the mailbox.
+    num_messages_before = get_num_messages()
+    send_create_or_update_careplan_to_server(
+        connector, patient, practitioner, careplan)
+    num_messages_after = get_num_messages()
+    assert num_messages_after == num_messages_before + 1
 
 
-def test_messages_for_patient(connector, careplan):
-    '''Get messages for a specific patient.'''
-    from koppeltaal.message import parse_messages
-    messages = parse_messages(connector.messages(
-        patient_url=careplan.patient.url))
-    # Because of random_id we know that this patient has exactly one message.
-    assert len(messages.entries) == 1
 
 
 def test_message_for_id(connector):

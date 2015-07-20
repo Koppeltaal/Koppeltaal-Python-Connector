@@ -103,7 +103,7 @@ class Connector(object):
         # to the user.
         return response.headers.get('location')
 
-    def messages(self, patient_url=None):
+    def messages(self, patient_url=None, summary=None, count=None):
         """
         From the specs:
 
@@ -130,6 +130,10 @@ class Connector(object):
         params = {}
         if patient_url:
             params['Patient'] = patient_url
+        if summary:
+            params['_summary'] = 'true'
+        # Get all messages if no count is given.
+        params['_count'] = count if count is not None else 5000
 
         response = requests.get(
             url,
