@@ -11,6 +11,31 @@ import koppeltaal.create_or_update_care_plan
 import koppeltaal.activity_definition
 
 
+def get_credentials(args):
+    # Domain is not required for all actions, so we're less strict about
+    # requiring that.
+    if args.username or args.password or args.domain:
+        if not(args.username and args.password):
+            sys.exit(
+                'When supplying credentials through the commandline '
+                'please always supply username and password.')
+        else:
+            return args.username, args.password, args.domain
+
+    # They're not passed in, so now look at ~/.koppeltaal.cfg.
+    parser = ConfigParser.ConfigParser()
+    parser.read(os.path.expanduser('~/.koppeltaal.cfg'))
+    if not parser.has_section(args.server):
+        sys.exit('No user credentials found in ~/.koppeltaal.cfg')
+    username = parser.get(args.server, 'username')
+    password = parser.get(args.server, 'password')
+    # Domain is not required for all actions.
+    domain = parser.get(args.server, 'domain')
+    if not username or not password:
+        sys.exit('No user credentials found in ~/.koppeltaal.cfg')
+    return username, password, domain
+
+
 def cli():
     parser = argparse.ArgumentParser(description='Koppeltaal connector')
     parser.add_argument('server', help='Koppeltaal server to connect to')
@@ -60,27 +85,17 @@ def cli():
     if args.verbose:
         root.setLevel(logging.DEBUG)
 
-    username = args.username
-    password = args.password
-    domain = args.domain
-    if username is None or password is None or domain is None:
-        parser = ConfigParser.ConfigParser()
-        parser.read(os.path.expanduser('~/.koppeltaal.cfg'))
-        if not parser.has_section(args.server):
-            sys.exit('No user credentials found in ~/.koppeltaal.cfg')
-        username = parser.get(args.server, 'username')
-        password = parser.get(args.server, 'password')
-        # Domain is not required for all actions.
-        domain = parser.get(args.server, 'domain')
-        if not username or not password:
-            sys.exit('No user credentials found in ~/.koppeltaal.cfg')
+    username, password, domain = get_credentials(args)
 
     connection = koppeltaal.connect.Connector(
         args.server, username, password, domain=domain)
 
     if args.command == 'test_authentication':
+        result = connection.test_authentication()
+        print "Authentication successful." if result \
+            else "Authentication unsuccessful."
         # Exit code is the opposite of the result from the Connector.
-        sys.exit(not connection.test_authentication())
+        sys.exit(not result)
     elif args.command == 'metadata':
         result = connection.metadata()
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
@@ -102,7 +117,7 @@ def cli():
         patient.name.family = args.patient_family_name
 
         careplan = koppeltaal.model.CarePlan(
-            args.careplan_id, args.careplan_url)
+            args.careplan_id, args.careplan_url, patient)
 
         practitioner = koppeltaal.model.Practitioner(
             args.practitioner_id, args.practitioner_url)
