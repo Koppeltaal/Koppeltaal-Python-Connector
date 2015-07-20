@@ -2,25 +2,19 @@ import lxml.etree
 import pytest
 import py.path
 import koppeltaal
-
+import koppeltaal.feed
 import feedreader.parser
-from koppeltaal.activity_definition import activity_info
-from koppeltaal.create_or_update_care_plan import generate
-from koppeltaal_schema.validate import validate
 
 here = py.path.local(__file__)
 sample_feed = (here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
 
-def find_link(entry):
-    # Ugly python, need to escape the {} to use .format().
-    for link in entry._xml.iterchildren(tag='{%(atom)s}link' % koppeltaal.NS):
-        if link.attrib.get('rel') == 'self':
-            return link.attrib['href']
-
-
 def test_create_or_update_care_plan():
     from koppeltaal.model import Patient, Practitioner, CarePlan
+    from koppeltaal.create_or_update_care_plan import generate
+    from koppeltaal_schema.validate import validate
+    from koppeltaal.activity_definition import activity_info
+
     activity = activity_info(sample_feed, 'AD1')
 
     pat1 = Patient('1', 'http://example.com/patient/1')
@@ -61,7 +55,7 @@ def test_create_or_update_care_plan():
 
     # Can't use feed.entries[x].link here, the feedreader code doesn't
     # know about "self". Perhaps fix this or use another feedreader component.
-    assert find_link(messageheader_entry) is None
+    assert koppeltaal.feed.find_link(messageheader_entry) is None
     messageheader = messageheader_entry.content.find(
         'fhir:MessageHeader', namespaces=koppeltaal.NS)
     # The message header mentions the Patient.
@@ -72,7 +66,7 @@ def test_create_or_update_care_plan():
             'fhir:reference', namespaces=koppeltaal.NS).get('value') == pat1.url
 
     # inspect careplan
-    assert find_link(feed.entries[1]) == cp2.url
+    assert koppeltaal.feed.find_link(feed.entries[1]) == cp2.url
     careplan = node.xpath('//fhir:CarePlan', namespaces=koppeltaal.NS)[0]
     activity_id = careplan.xpath(
         '//fhir:activity/fhir:extension/fhir:valueString',
@@ -84,7 +78,7 @@ def test_create_or_update_care_plan():
     assert activity_code == 'Game'
 
     # inspect patient
-    assert find_link(feed.entries[2]) == pat1.url
+    assert koppeltaal.feed.find_link(feed.entries[2]) == pat1.url
     patient = node.xpath('//fhir:Patient', namespaces=koppeltaal.NS)[0]
     patient_name = patient.find('fhir:name', namespaces=koppeltaal.NS)
     assert patient_name.find(
@@ -93,7 +87,7 @@ def test_create_or_update_care_plan():
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'de Vries'
 
     # inspect practitioner
-    assert find_link(feed.entries[3]) == prac_a.url
+    assert koppeltaal.feed.find_link(feed.entries[3]) == prac_a.url
     practitioner = node.xpath('//fhir:Practitioner', namespaces=koppeltaal.NS)[0]
     practitioner_name = practitioner.find('fhir:name', namespaces=koppeltaal.NS)
     assert practitioner_name.find(
@@ -109,6 +103,7 @@ def test_send_create_or_update_care_plan_to_server(connector, patient,
     mailbox.
     """
     from koppeltaal.activity_definition import parse
+    from koppeltaal.create_or_update_care_plan import generate
     from koppeltaal.message import parse_feed, parse_messages
 
     # A random activity, could be anything.
