@@ -105,13 +105,18 @@ def careplan(connector, patient):
 
 
 @pytest.fixture
-def careplan_on_server(
-        connector, patient, practitioner, careplan):
+def activity(connector):
     from koppeltaal.activity_definition import parse
+    # A random activity, could be anything.
+    return list(parse(connector.activity_definition()))[0]
+
+
+@pytest.fixture
+def careplan_on_server(
+        connector, activity, patient, practitioner, careplan):
     from koppeltaal.create_or_update_care_plan import generate
 
-    # A random activity, could be anything.
-    first_activity = list(parse(connector.activity_definition()))[0]
     xml = generate(
-        connector.domain, first_activity, patient, careplan, practitioner)
+        connector.domain, activity, patient, careplan, practitioner)
     connector.create_or_update_care_plan(xml)
+    # XXX Return the newly created URL including history?
