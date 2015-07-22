@@ -164,6 +164,8 @@ def test_update_existing_care_plan(
     # If we now create a careplan with a different practitioner, this will
     # yield an error, because we are not injecting the historic information.
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner2)
+    # XXX This should be a Koppeltaal Exception, and on the server this should
+    # be a 400 instead of a 500, because the request is wrong.
     with pytest.raises(requests.HTTPError) as excinfo:
         connector.create_or_update_care_plan(xml)
     assert "No version specfied for the focal resource, message is rejected." in excinfo.value.response.text
@@ -183,6 +185,20 @@ def test_update_existing_care_plan(
     # Using string comparison on date strings is ok here. The second careplan
     # accepted by the server has a later dt than the first one.
     assert historic_careplan_url_2 > historic_careplan_url
+
+    # We *do* need to use the _history URL, we can't just
+    # fabricate a URL by interpolating the current timestamp.
+    import datetime
+    now_url = '{}/{}'.format(
+        '/'.join(historic_careplan_url_2.split('/')[:-1]),
+        datetime.datetime.utcnow().isoformat())
+    # Just to be sure this is a 'newer' date.
+    assert now_url > historic_careplan_url_2
+    careplan.url = now_url
+    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    with pytest.raises(requests.HTTPError) as excinfo:
+        connector.create_or_update_care_plan(xml)
+    assert "Message Version mismatch: Please retrieve the latest version" in excinfo.value.response.text
 
 
 @pytest.mark.xfail(reason=
