@@ -19,24 +19,21 @@ def parse(xml):
             'fhir:extension[@url="{koppeltaal}/ActivityDefinition#ActivityKind"]'.format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCoding', namespaces=koppeltaal.NS)
-        yield {
-            'node': node,
-            # The raw element. We may want to remove this at some point in the
-            # future.
-            'identifier': node.find(
-                'fhir:identifier', namespaces=koppeltaal.NS).find(
-                    'fhir:value', namespaces=koppeltaal.NS).get('value'),
-            'ActivityName': node.find(
-                'fhir:extension[@url="{koppeltaal}/ActivityDefinition#ActivityName"]'.format(
-                    **koppeltaal.NS), namespaces=koppeltaal.NS).find(
-                    'fhir:valueString', namespaces=koppeltaal.NS).get('value'),
-            'ActivityKind': {
-                'code': activity_kind_value_coding.find('fhir:code',
-                    namespaces=koppeltaal.NS).get('value'),
-                'display': activity_kind_value_coding.find('fhir:display',
-                    namespaces=koppeltaal.NS).get('value')
+        identifier = node.find(
+            'fhir:identifier', namespaces=koppeltaal.NS).find(
+                'fhir:value', namespaces=koppeltaal.NS).get('value')
+        name = node.find(
+            'fhir:extension[@url="{koppeltaal}/ActivityDefinition#ActivityName"]'.format(
+                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+                'fhir:valueString', namespaces=koppeltaal.NS).get('value')
+        kind = {
+            'code': activity_kind_value_coding.find('fhir:code',
+                namespaces=koppeltaal.NS).get('value'),
+            'display': activity_kind_value_coding.find('fhir:display',
+                namespaces=koppeltaal.NS).get('value')
             }
-        }
+
+        yield koppeltaal.model.ActivityDefinition(identifier, name, kind)
 
 
 def activity_info(xml, activity_id):
