@@ -6,6 +6,7 @@ import lxml.etree
 import logging
 import koppeltaal
 import koppeltaal.connect
+import koppeltaal.message
 import koppeltaal.model
 import koppeltaal.create_or_update_care_plan
 import koppeltaal.activity_definition
@@ -54,7 +55,13 @@ def cli():
     subparsers.add_parser('metadata')
 
     messages = subparsers.add_parser('messages')
-    messages.add_argument('--patient_url')
+    messages.add_argument('--count')  # How many messages to show.
+    messages.add_argument('--patient_url')  # Filter on patient.
+    messages.add_argument(
+        '--status',
+        choices=['New', 'Claimed', 'Success', 'Failed'])
+    messages.add_argument('--xml', action='store_true')  # Show xml.
+    messages.add_argument('--info_per_message', action='store_true')
 
     message = subparsers.add_parser('message')
     message.add_argument('id')
@@ -106,9 +113,20 @@ def cli():
         print lxml.etree.tostring(
             lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'messages':
-        result = connection.messages(patient_url=args.patient_url)
-        print lxml.etree.tostring(
-            lxml.etree.fromstring(result), pretty_print=True)
+        print "Getting messages... (a slow query)..."
+        xml_result = connection.messages(
+            count=args.count,
+            patient_url=args.patient_url,
+            processing_status=args.status,
+            summary=True)
+        messages = list(koppeltaal.message.parse_messages(xml_result))
+        if args.info_per_message:
+            for msg in messages:
+                print msg.id, msg.status
+        if args.xml:
+            print lxml.etree.tostring(
+                lxml.etree.fromstring(xml_result), pretty_print=True)
+        print "Number of messages found: {}.".format(len(messages))
     elif args.command == 'message':
         import pdb
         pdb.set_trace()
