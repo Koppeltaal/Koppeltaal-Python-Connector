@@ -59,7 +59,8 @@ def cli():
     message = subparsers.add_parser('message')
     message.add_argument('id')
 
-    create_or_update_care_plan = subparsers.add_parser('create_or_update_care_plan')
+    create_or_update_care_plan = subparsers.add_parser(
+        'create_or_update_care_plan')
     create_or_update_care_plan.add_argument('activity_id')
     create_or_update_care_plan.add_argument('patient_id')
     create_or_update_care_plan.add_argument('patient_url')
@@ -98,15 +99,19 @@ def cli():
         sys.exit(not result)
     elif args.command == 'metadata':
         result = connection.metadata()
-        print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
+        print lxml.etree.tostring(
+            lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'activity_definition':
         result = connection.activity_definition()
-        print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
+        print lxml.etree.tostring(
+            lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'messages':
         result = connection.messages(patient_url=args.patient_url)
-        print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
+        print lxml.etree.tostring(
+            lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'message':
-        import pdb ; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
     elif args.command == 'create_or_update_care_plan':
         # This will choke on unknown activity ids.
         activity = koppeltaal.activity_definition.activity_info(
@@ -127,9 +132,11 @@ def cli():
         xml = koppeltaal.create_or_update_care_plan.generate(
             connection.domain, activity, patient, careplan, practitioner)
         result = connection.post_message(xml)
-        print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
+        print lxml.etree.tostring(
+            lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'launch':
         # XXX Validate activity-id?
-        print connection.launch(args.activity_id, args.patient_url, args.user_url)
+        print connection.launch(
+            args.activity_id, args.patient_url, args.user_url)
     else:
         sys.exit('Unknown command {}'.format(args.command))
