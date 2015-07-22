@@ -6,8 +6,10 @@ This creates a atom feed to send to the server.
 import uuid
 import datetime
 import feedgen.feed
+import feedreader.parser
 import lxml.etree
 import koppeltaal
+import koppeltaal.model
 import koppeltaal_schema.validate
 
 
@@ -214,3 +216,11 @@ def generate(domain, activity, patient, careplan, practitioner):
         raise
     return feed_str
 
+
+def parse_result(xml):
+    feed = feedreader.parser.from_string(xml)
+    reference = feed.entries[0].content.find(
+        'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
+        'fhir:data', namespaces=koppeltaal.NS).find(
+        'fhir:reference', namespaces=koppeltaal.NS).get('value')
+    return koppeltaal.model.CarePlanResult(reference)

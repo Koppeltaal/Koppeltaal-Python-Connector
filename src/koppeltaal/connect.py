@@ -66,6 +66,7 @@ class Connector(object):
     def create_or_update_care_plan(self, xml):
         # XXX This is no longer applicable to create-or-update-careplan only,
         # rename to "post_mailbox" or some better name.
+
         # Get from the metadata definition
         mailbox_url = koppeltaal.metadata.metadata(
             self.metadata())['messaging']['endpoint']
@@ -84,9 +85,6 @@ class Connector(object):
             },
             allow_redirects=False)
         response.raise_for_status()
-        # We could parse the response.
-        # In the response find the URL to the newly created careplan:
-        # XXX History information.
         return response.content
 
     def launch(self, activity_id, patient_url, user_url):

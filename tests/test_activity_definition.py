@@ -33,7 +33,7 @@ def test_activity_info():
         'code': 'Game',
         'display': 'Game'}
 
-    with pytest.raises(KoppeltaalException) as cm:
+    with pytest.raises(KoppeltaalException):
         activity_info(sample_feed, 'unknown')
 
 
