@@ -7,9 +7,11 @@ import koppeltaal.feed
 
 # XXX Not happy about the names here yet.
 
+
 def parse_messages(xml):
     # XXX total messages.
-    # <totalResults xmlns="http://a9.com/-/spec/opensearch/1.1/">1</totalResults>
+    # <totalResults xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    # 1</totalResults>
     #
     # id, processing status per message
     feed = feedreader.parser.from_string(xml)
@@ -32,9 +34,11 @@ def parse_messages(xml):
 
         processing_status = entry.content.find(
             'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
-            'fhir:extension[@url="{koppeltaal}/MessageHeader#ProcessingStatus"]'.format(
+            'fhir:extension['
+            '@url="{koppeltaal}/MessageHeader#ProcessingStatus"]'.format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
-            'fhir:extension[@url="{koppeltaal}/MessageHeader#ProcessingStatusStatus"]'.format(
+            'fhir:extension['
+            '@url="{koppeltaal}/MessageHeader#ProcessingStatusStatus"]'.format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCode', namespaces=koppeltaal.NS).get('value')
 
