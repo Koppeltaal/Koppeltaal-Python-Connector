@@ -127,7 +127,7 @@ from koppeltaal.create_or_update_care_plan import generate
 # Generate the XML feed to be sent to the server.
 stanza = generate(domain, activity, patient, careplan, practitioner)
 # Send to the server.
-c.create_or_update_care_plan(stanza)
+c.post_message(stanza)
 ```
 
 [buildout]: http://www.buildout.org

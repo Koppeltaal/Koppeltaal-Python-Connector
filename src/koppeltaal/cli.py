@@ -126,7 +126,7 @@ def cli():
 
         xml = koppeltaal.create_or_update_care_plan.generate(
             connection.domain, activity, patient, careplan, practitioner)
-        result = connection.create_or_update_care_plan(xml)
+        result = connection.post_message(xml)
         print lxml.etree.tostring(lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'launch':
         # XXX Validate activity-id?

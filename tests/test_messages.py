@@ -16,7 +16,7 @@ def test_messages(connector, patient, practitioner, careplan):
     first_activity = list(parse(connector.activity_definition()))[0]
     xml = generate(
         connector.domain, first_activity, patient, careplan, practitioner)
-    connector.create_or_update_care_plan(xml)
+    connector.post_message(xml)
     num_messages_after = get_num_messages(careplan.patient.url)
     assert num_messages_after == num_messages_before + 1
 

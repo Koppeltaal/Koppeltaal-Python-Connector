@@ -97,7 +97,7 @@ def test_create_or_update_care_plan():
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'van Buuren'
 
 
-def test_send_create_or_update_care_plan_to_server(
+def test_send_care_plan_to_server(
         connector, patient, practitioner, careplan):
     """
     Send a careplan to the server and check that there is a message in the
@@ -116,7 +116,7 @@ def test_send_create_or_update_care_plan_to_server(
     assert len(messages_for_pat) == 0
 
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
-    result = connector.create_or_update_care_plan(xml)
+    result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
     assert careplan.url in parse_result(result).reference
@@ -145,7 +145,7 @@ def test_update_existing_care_plan(
     assert len(messages_for_pat) == 0
 
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
-    result = connector.create_or_update_care_plan(xml)
+    result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
     historic_careplan_url = parse_result(result).reference
@@ -157,14 +157,14 @@ def test_update_existing_care_plan(
     # XXX This should be a Koppeltaal Exception, and on the server this should
     # be a 400 instead of a 500, because the request is wrong.
     with pytest.raises(requests.HTTPError) as excinfo:
-        connector.create_or_update_care_plan(xml)
+        connector.post_message(xml)
     assert "No version specfied for the focal resource, message is rejected." in excinfo.value.response.text
 
     # When setting the care plan url from the server to the current careplan,
     # we can generate the XML properly.
     careplan.url = historic_careplan_url
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner2)
-    result = connector.create_or_update_care_plan(xml)
+    result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
     historic_careplan_url_2 = parse_result(result).reference
@@ -181,7 +181,7 @@ def test_update_existing_care_plan(
     careplan.url = now_url
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
     with pytest.raises(requests.HTTPError) as excinfo:
-        connector.create_or_update_care_plan(xml)
+        connector.post_message(xml)
     assert "Message Version mismatch: Please retrieve the latest version" in excinfo.value.response.text
 
 
@@ -201,4 +201,4 @@ def test_send_incorrect_careplan_expect_failure(
     first_activity['identifier'] = 'foobar'
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
     with pytest.raises(KoppeltaalException):
-        connector.create_or_update_care_plan(xml)
+        connector.post_message(xml)
