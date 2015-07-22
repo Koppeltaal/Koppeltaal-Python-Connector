@@ -45,20 +45,21 @@ def parse_messages(xml):
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCode', namespaces=koppeltaal.NS).get('value')
 
-        yield koppeltaal.model.Message(message_id, processing_status)
+        yield koppeltaal.model.Message(entry, message_id, processing_status)
 
 
-def process(connector, id, action):
+def process(connector, id, action=None, status=None):
     # Updating the ProcessingStatus for a Message - After a message
     # has been successfully processed, the application must update its
     # ProcessingStatus to "Success" on URL
     # [[|https://koppelbox/FHIR/Koppeltaal/MessageHeader/[id]]] (that
     # is, the URL returned as id link in the for the MessageHeader in
     # the bundle.)
-    status = {
-        'claim': 'Claimed',
-        'success': 'Success'
-    }.get(action, None)
+    if action:
+        status = {
+            'claim': 'Claimed',
+            'success': 'Success'
+        }.get(action, None)
     if status is None:
         raise ValueError('Unknown status')
 

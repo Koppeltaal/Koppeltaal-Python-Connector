@@ -3,6 +3,7 @@ FHIR-like models.
 XXX Cross-reference with http://www.hl7.org/fhir/resourcelist.html
 """
 
+
 class Name(object):
     given = family = None
 
