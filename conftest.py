@@ -7,9 +7,11 @@ import koppeltaal.connect
 import koppeltaal.model
 import koppeltaal.message
 
+
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
     parser.addoption('--server', help='Koppeltaal server URL')
+
 
 @pytest.fixture(scope='session')
 def connector(request):
