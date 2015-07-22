@@ -7,9 +7,11 @@ import koppeltaal.connect
 import koppeltaal.model
 import koppeltaal.message
 
+
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
     parser.addoption('--server', help='Koppeltaal server URL')
+
 
 @pytest.fixture(scope='session')
 def connector(request):
@@ -66,7 +68,7 @@ def patient(request, connector):
     def cleanup_patient_messages():
         result = connector.messages(patient_url=p.url)
         for message in koppeltaal.message.parse_messages(result):
-            connector.process_message(message.id, action='success')
+            koppeltaal.message.process(connector, message.id, action='success')
 
     request.addfinalizer(cleanup_patient_messages)
     return p
