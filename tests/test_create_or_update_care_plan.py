@@ -4,7 +4,6 @@ import requests
 import py.path
 import koppeltaal
 import koppeltaal.feed
-import feedreader.parser
 
 here = py.path.local(__file__)
 sample_feed = (here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
@@ -15,6 +14,7 @@ def test_create_or_update_care_plan():
     from koppeltaal.create_or_update_care_plan import generate
     from koppeltaal_schema.validate import validate
     from koppeltaal.activity_definition import activity_info
+    import feedreader.parser
 
     activity = activity_info(sample_feed, 'AD1')
 
@@ -104,8 +104,7 @@ def test_send_create_or_update_care_plan_to_server(
     mailbox.
     """
     from koppeltaal.activity_definition import parse
-    from koppeltaal.create_or_update_care_plan import generate
-    import feedreader.parser
+    from koppeltaal.create_or_update_care_plan import generate, parse_result
     from koppeltaal.message import parse_messages
 
     # A random activity, could be anything.
@@ -120,11 +119,7 @@ def test_send_create_or_update_care_plan_to_server(
     result = connector.create_or_update_care_plan(xml)
 
     # The careplan was sent successfully and now has a _history.
-    feed = feedreader.parser.from_string(result)
-    assert careplan.url in feed.entries[0].content.find(
-        'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
-        'fhir:data', namespaces=koppeltaal.NS).find(
-        'fhir:reference', namespaces=koppeltaal.NS).get('value')
+    assert careplan.url in parse_result(result).reference
 
     # Assert there is a message in the mailbox for this patient.
     messages_for_pat = list(parse_messages(
@@ -138,8 +133,7 @@ def test_update_existing_care_plan(
     Update an existing careplan, the history identifier is taken into account.
     """
     from koppeltaal.activity_definition import parse
-    from koppeltaal.create_or_update_care_plan import generate
-    import feedreader.parser
+    from koppeltaal.create_or_update_care_plan import generate, parse_result
     from koppeltaal.message import parse_messages
 
     # A random activity, could be anything.
@@ -154,11 +148,7 @@ def test_update_existing_care_plan(
     result = connector.create_or_update_care_plan(xml)
 
     # The careplan was sent successfully and now has a _history.
-    feed = feedreader.parser.from_string(result)
-    historic_careplan_url = feed.entries[0].content.find(
-        'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
-        'fhir:data', namespaces=koppeltaal.NS).find(
-        'fhir:reference', namespaces=koppeltaal.NS).get('value')
+    historic_careplan_url = parse_result(result).reference
     assert careplan.url in historic_careplan_url
 
     # If we now create a careplan with a different practitioner, this will
@@ -177,11 +167,7 @@ def test_update_existing_care_plan(
     result = connector.create_or_update_care_plan(xml)
 
     # The careplan was sent successfully and now has a _history.
-    feed = feedreader.parser.from_string(result)
-    historic_careplan_url_2 = feed.entries[0].content.find(
-        'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
-        'fhir:data', namespaces=koppeltaal.NS).find(
-        'fhir:reference', namespaces=koppeltaal.NS).get('value')
+    historic_careplan_url_2 = parse_result(result).reference
     # Using string comparison on date strings is ok here. The second careplan
     # accepted by the server has a later dt than the first one.
     assert historic_careplan_url_2 > historic_careplan_url
@@ -192,8 +178,6 @@ def test_update_existing_care_plan(
     now_url = '{}/{}'.format(
         '/'.join(historic_careplan_url_2.split('/')[:-1]),
         datetime.datetime.utcnow().isoformat())
-    # Just to be sure this is a 'newer' date.
-    assert now_url > historic_careplan_url_2
     careplan.url = now_url
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
     with pytest.raises(requests.HTTPError) as excinfo:
@@ -210,12 +194,11 @@ def test_send_incorrect_careplan_expect_failure(
     the server should return an error.'''
     from koppeltaal.activity_definition import parse
     from koppeltaal.create_or_update_care_plan import generate
-    import feedreader.parser
-    from koppeltaal.message import parse_messages
+    from koppeltaal import KoppeltaalException
 
     first_activity = list(parse(connector.activity_definition()))[0]
     # Unknown activity, should fail.
     first_activity['identifier'] = 'foobar'
     xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
-    with pytest.raises(KoppeltaalException) as cm:
+    with pytest.raises(KoppeltaalException):
         connector.create_or_update_care_plan(xml)

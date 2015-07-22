@@ -1,7 +1,7 @@
 """
 FHIR-like models.
+XXX Cross-reference with http://www.hl7.org/fhir/resourcelist.html
 """
-
 
 class Name(object):
     given = family = None
@@ -36,3 +36,9 @@ class Message(object):
     def __init__(self, id, status):
         self.id = id
         self.status = status
+
+
+class CarePlanResult(object):
+
+    def __init__(self, reference):
+        self.reference = reference
