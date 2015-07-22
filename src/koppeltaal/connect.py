@@ -13,9 +13,6 @@ ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
 MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
 OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
 
-# XXX Request pool, take into account multiple apps may be using this same
-# piece of code.
-
 
 class Connector(object):
     server = None
