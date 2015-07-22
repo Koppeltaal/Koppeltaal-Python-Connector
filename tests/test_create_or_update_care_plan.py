@@ -98,24 +98,20 @@ def test_create_or_update_care_plan():
 
 
 def test_send_care_plan_to_server(
-        connector, patient, practitioner, careplan):
+        connector, patient, practitioner, careplan, activity):
     """
     Send a careplan to the server and check that there is a message in the
     mailbox.
     """
-    from koppeltaal.activity_definition import parse
     from koppeltaal.create_or_update_care_plan import generate, parse_result
     from koppeltaal.message import parse_messages
-
-    # A random activity, could be anything.
-    first_activity = list(parse(connector.activity_definition()))[0]
 
     # Before the careplan is sent, there are no messages for the patient.
     messages_for_pat = list(parse_messages(
         connector.messages(patient_url=patient.url)))
     assert len(messages_for_pat) == 0
 
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, patient, careplan, practitioner)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -128,23 +124,19 @@ def test_send_care_plan_to_server(
 
 
 def test_update_existing_care_plan(
-        connector, patient, practitioner, practitioner2, careplan):
+        connector, patient, practitioner, practitioner2, careplan, activity):
     """
     Update an existing careplan, the history identifier is taken into account.
     """
-    from koppeltaal.activity_definition import parse
     from koppeltaal.create_or_update_care_plan import generate, parse_result
     from koppeltaal.message import parse_messages
-
-    # A random activity, could be anything.
-    first_activity = list(parse(connector.activity_definition()))[0]
 
     # Before the careplan is sent, there are no messages for the patient.
     messages_for_pat = list(parse_messages(
         connector.messages(patient_url=patient.url)))
     assert len(messages_for_pat) == 0
 
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, patient, careplan, practitioner)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -153,7 +145,7 @@ def test_update_existing_care_plan(
 
     # If we now create a careplan with a different practitioner, this will
     # yield an error, because we are not injecting the historic information.
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner2)
+    xml = generate(connector.domain, activity, patient, careplan, practitioner2)
     # XXX This should be a Koppeltaal Exception, and on the server this should
     # be a 400 instead of a 500, because the request is wrong.
     with pytest.raises(requests.HTTPError) as excinfo:
@@ -163,7 +155,7 @@ def test_update_existing_care_plan(
     # When setting the care plan url from the server to the current careplan,
     # we can generate the XML properly.
     careplan.url = historic_careplan_url
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner2)
+    xml = generate(connector.domain, activity, patient, careplan, practitioner2)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -179,7 +171,7 @@ def test_update_existing_care_plan(
         '/'.join(historic_careplan_url_2.split('/')[:-1]),
         datetime.datetime.utcnow().isoformat())
     careplan.url = now_url
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, patient, careplan, practitioner)
     with pytest.raises(requests.HTTPError) as excinfo:
         connector.post_message(xml)
     assert "Message Version mismatch: Please retrieve the latest version" in excinfo.value.response.text
@@ -196,9 +188,9 @@ def test_send_incorrect_careplan_expect_failure(
     from koppeltaal.create_or_update_care_plan import generate
     from koppeltaal import KoppeltaalException
 
-    first_activity = list(parse(connector.activity_definition()))[0]
+    funky_activity = list(parse(connector.activity_definition()))[0]
     # Unknown activity, should fail.
-    first_activity['identifier'] = 'foobar'
-    xml = generate(connector.domain, first_activity, patient, careplan, practitioner)
+    funky_activity['identifier'] = 'foobar'
+    xml = generate(connector.domain, funky_activity, patient, careplan, practitioner)
     with pytest.raises(KoppeltaalException):
         connector.post_message(xml)

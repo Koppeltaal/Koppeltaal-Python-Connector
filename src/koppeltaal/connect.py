@@ -92,7 +92,7 @@ class Connector(object):
                 'client_id': activity_id,
                 'patient': patient_url,
                 'user': user_url,
-                'resource': activity_id
+                'resource': activity_id  # XXX Not to sure about this.
             },
             allow_redirects=False)
         assert response.is_redirect
