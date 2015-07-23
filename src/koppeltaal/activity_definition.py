@@ -12,6 +12,8 @@ def parse(xml):
     """
     feed = feedreader.parser.from_string(xml)
     for entry in feed.entries:
+        # The raw element. We may want to remove this at some point in
+        # the future.
         node = entry._xml.content.find(
             'fhir:Other', namespaces=koppeltaal.NS)
         # Make 'useful' attributes accessible here.
@@ -33,7 +35,7 @@ def parse(xml):
                 namespaces=koppeltaal.NS).get('value')
             }
 
-        yield koppeltaal.model.Activity(identifier, name, kind)
+        yield koppeltaal.model.Activity(node, identifier, name, kind)
 
 
 def activity_info(xml, activity_id):

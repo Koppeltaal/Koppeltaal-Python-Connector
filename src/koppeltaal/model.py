@@ -46,7 +46,8 @@ class CarePlanResult(object):
 
 class Activity(object):
 
-    def __init__(self, id, name, kind):
+    def __init__(self, node, id, name, kind):
+        self.node = node
         self.id = id
         self.name = name
         self.kind = kind
