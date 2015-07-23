@@ -14,7 +14,7 @@ def test_parse_activities():
     activity_infos = list(parse(sample_feed))
     assert len(activity_infos) == 3
     ad1 = activity_infos[0]
-    assert ad1.node
+    assert ad1.node is not None
     assert ad1.id == 'AD1'
     assert ad1.name == 'Game AD1'
 
