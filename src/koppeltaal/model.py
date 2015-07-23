@@ -44,7 +44,7 @@ class CarePlanResult(object):
         self.reference = reference
 
 
-class ActivityDefinition(object):
+class Activity(object):
 
     def __init__(self, id, name, kind):
         self.id = id

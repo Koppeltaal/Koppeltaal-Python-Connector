@@ -33,7 +33,7 @@ def parse(xml):
                 namespaces=koppeltaal.NS).get('value')
             }
 
-        yield koppeltaal.model.ActivityDefinition(identifier, name, kind)
+        yield koppeltaal.model.Activity(identifier, name, kind)
 
 
 def activity_info(xml, activity_id):
