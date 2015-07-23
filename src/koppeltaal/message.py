@@ -45,7 +45,7 @@ def parse_messages(xml):
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCode', namespaces=koppeltaal.NS).get('value')
 
-        yield koppeltaal.model.Message(entry, message_id, processing_status)
+        yield koppeltaal.model.Message(message_id, processing_status)
 
 
 def process(connector, id, action=None, status=None):
