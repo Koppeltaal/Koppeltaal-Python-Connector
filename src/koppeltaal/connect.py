@@ -13,9 +13,6 @@ ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
 MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
 OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
 
-# XXX Request pool, take into account multiple apps may be using this same
-# piece of code.
-
 
 class Connector(object):
     server = None
@@ -92,7 +89,7 @@ class Connector(object):
                 'client_id': activity_id,
                 'patient': patient_url,
                 'user': user_url,
-                'resource': activity_id
+                'resource': activity_id  # XXX Not to sure about this.
             },
             allow_redirects=False)
         assert response.is_redirect
@@ -123,7 +120,7 @@ class Connector(object):
             self,
             patient_url=None,
             processing_status=None,
-            summary=None,
+            summary=False,
             count=None):
         """
         https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_summary=true&_count=[X]
@@ -138,9 +135,9 @@ class Connector(object):
         Filters on the message type ProcessingStatus: Filters on the
         ProcessingStatus (New|Claimed|Success|Failed).
         """
+        # XXX Make more Pythonic.
         params = {
-            # Get all messages if no count is given.
-            '_count': count if count is not None else 5000
+            '_count': count if count else 5000
         }
         if patient_url:
             params['Patient'] = patient_url
