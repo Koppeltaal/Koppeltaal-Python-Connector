@@ -34,8 +34,7 @@ class Practitioner(object):
 
 class Message(object):
 
-    def __init__(self, entry, id, status):
-        self.entry = entry
+    def __init__(self, id, status):
         self.id = id
         self.status = status
 
@@ -48,8 +47,7 @@ class CarePlanResult(object):
 
 class Activity(object):
 
-    def __init__(self, node, id, name, kind):
-        self.node = node
+    def __init__(self, id, name, kind):
         self.id = id
         self.name = name
         self.kind = kind
