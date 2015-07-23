@@ -40,7 +40,7 @@ def activity_info(xml, activity_id):
     '''Given an XML feed of Activities, return the info about the one with the
     given activity_id.'''
     for info in parse(xml):
-        if info['identifier'] == activity_id:
+        if info.id == activity_id:
             return info
     # Raise an error in case of unknown activity id.
     raise koppeltaal.KoppeltaalException(
