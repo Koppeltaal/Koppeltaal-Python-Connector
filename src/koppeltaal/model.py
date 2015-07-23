@@ -34,7 +34,8 @@ class Practitioner(object):
 
 class Message(object):
 
-    def __init__(self, id, status):
+    def __init__(self, entry, id, status):
+        self.entry = entry
         self.id = id
         self.status = status
 
