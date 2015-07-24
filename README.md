@@ -61,6 +61,14 @@ $ bin/koppeltaal https://testconnectors.vhscloud.nl test_authentication  # uses 
 $ bin/koppeltaal https://testconnectors.vhscloud.nl --username=foo --password=bar test_authentication  # Returns 1
 ```
 
+### Metadata / Conformance statement
+
+To retrieve the Conformance statement from the server:
+
+```sh
+$ bin/koppeltaal  https://testconnectors.vhscloud.nl  metadata
+```
+
 ### Activity definition
 
 To get the activity definition from the server:
