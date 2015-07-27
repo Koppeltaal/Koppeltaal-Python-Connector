@@ -144,7 +144,7 @@ def generate(domain, activity, patient, careplan, practitioner):
             'url': '{koppeltaal}/CarePlan#ActivityDefinition'.format(**koppeltaal.NS)
         })
     lxml.etree.SubElement(
-        activity_definition, 'valueString', attrib={'value': activity['identifier']})
+        activity_definition, 'valueString', attrib={'value': activity.id})
 
     activity_kind = lxml.etree.SubElement(
         activity_el,
@@ -159,10 +159,10 @@ def generate(domain, activity, patient, careplan, practitioner):
     })
     # From activity kind information.
     lxml.etree.SubElement(value_coding, 'code', attrib={
-        'value': activity['ActivityKind']['code']
+        'value': activity.kind['code']
     })
     lxml.etree.SubElement(value_coding, 'display', attrib={
-        'value': activity['ActivityKind']['display']
+        'value': activity.kind['display']
     })
     # prohibited is required by the schema.
     lxml.etree.SubElement(activity_el, 'prohibited', attrib={'value': 'false'})

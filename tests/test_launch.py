@@ -3,7 +3,7 @@ import selenium.webdriver
 
 
 def test_launch_patient(connector, activity, careplan_on_server, patient):
-    launch_url = connector.launch(activity['identifier'], patient.url, patient.url)
+    launch_url = connector.launch(activity.id, patient.url, patient.url)
 
     # The launch URL points to the game location, with a iss= query parameter
     # pointing back to the koppeltaal server.

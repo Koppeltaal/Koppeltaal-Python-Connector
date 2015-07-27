@@ -190,7 +190,7 @@ def test_send_incorrect_careplan_expect_failure(
 
     funky_activity = list(parse(connector.activity_definition()))[0]
     # Unknown activity, should fail.
-    funky_activity['identifier'] = 'foobar'
+    funky_activity.id = 'foobar'
     xml = generate(connector.domain, funky_activity, patient, careplan, practitioner)
     with pytest.raises(KoppeltaalException):
         connector.post_message(xml)

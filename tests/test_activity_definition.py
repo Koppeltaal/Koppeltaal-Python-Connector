@@ -14,12 +14,11 @@ def test_parse_activities():
     activity_infos = list(parse(sample_feed))
     assert len(activity_infos) == 3
     ad1 = activity_infos[0]
-    assert 'node' in ad1
-    assert ad1['identifier'] == 'AD1'
-    assert ad1['ActivityName'] == 'Game AD1'
+    assert ad1.id == 'AD1'
+    assert ad1.name == 'Game AD1'
 
     ad3 = activity_infos[2]
-    assert ad3['identifier'] == 'AD3'
+    assert ad3.id == 'AD3'
 
 
 def test_activity_info():
@@ -27,9 +26,9 @@ def test_activity_info():
     From the activities feed, find the activity with the activity id.
     '''
     ad2 = activity_info(sample_feed, 'AD2')
-    assert ad2['identifier'] == 'AD2'
+    assert ad2.id == 'AD2'
 
-    assert ad2['ActivityKind'] == {
+    assert ad2.kind == {
         'code': 'Game',
         'display': 'Game'}
 
