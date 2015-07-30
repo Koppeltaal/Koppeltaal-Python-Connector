@@ -64,7 +64,6 @@ def test_messages_for_status(connector, patient, careplan, careplan_on_server):
 def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     '''Claim a specific message.'''
     from koppeltaal.message import parse_messages
-    import koppeltaal.message
 
     # Get the messages for this patient.
     messages_xml = connector.messages(patient_url=patient.url)
@@ -79,7 +78,7 @@ def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     assert patient.name.given in full_message
 
     # Now claim the message.
-    koppeltaal.message.process(connector, message_info.id, action='claim')
+    connector.message_process(message_info.id, action='claim')
 
     # The status is "Claimed".
     messages_xml = connector.messages(patient_url=patient.url)
@@ -94,7 +93,6 @@ def test_success(
         connector, patient, practitioner, careplan, careplan_on_server):
     '''Claim a specific message and mark it as a success.'''
     from koppeltaal.message import parse_messages
-    import koppeltaal.message
 
     # Get the messages for this patient.
     messages_xml = connector.messages(patient_url=patient.url)
@@ -103,8 +101,8 @@ def test_success(
     message_info = messages_for_pat[0]
 
     # Now claim the message.
-    koppeltaal.message.process(connector, message_info.id, action='claim')
-    koppeltaal.message.process(connector, message_info.id, action='success')
+    connector.message_process(message_info.id, action='claim')
+    connector.message_process(message_info.id, action='success')
 
     messages_xml = connector.messages(
         patient_url=patient.url, processing_status='New')

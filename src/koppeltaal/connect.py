@@ -2,7 +2,9 @@
 Connect to Koppeltaal server
 """
 import urlparse
+import lxml.etree
 import requests
+import feedreader.parser
 import koppeltaal
 import koppeltaal.metadata
 
@@ -115,6 +117,42 @@ class Connector(object):
         Fetches a complete Bundle for a single Message.
         """
         return self._do_message_query({'_id': id})
+
+    def message_process(self, id, action=None, status=None):
+        # Updating the ProcessingStatus for a Message - After a message
+        # has been successfully processed, the application must update its
+        # ProcessingStatus to "Success" on URL
+        # [[|https://koppelbox/FHIR/Koppeltaal/MessageHeader/[id]]] (that
+        # is, the URL returned as id link in the for the MessageHeader in
+        # the bundle.)
+        if action:
+            status = {
+                'claim': 'Claimed',
+                'success': 'Success'
+            }.get(action, None)
+        if status is None:
+            raise ValueError('Unknown status')
+
+        feed = feedreader.parser.from_string(self.message(id))
+        # XXX How can you be so sure about nr 0.?
+        message_header = feed.entries[0].content.find(
+            './/fhir:MessageHeader', namespaces=koppeltaal.NS)
+        # Parse the XML with lxml.etree and set the ProcessingStatus.
+        processing_status = message_header.find(
+            './/fhir:extension[@url="{koppeltaal}/MessageHeader#'
+            'ProcessingStatusStatus"]'.format(
+                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+            'fhir:valueCode', namespaces=koppeltaal.NS)
+        processing_status.attrib['value'] = status
+
+        response = requests.put(
+            feed.entries[0].id,
+            data=lxml.etree.tostring(message_header),
+            auth=(self.username, self.password),
+            headers={'Accept': 'application/xml'},
+            allow_redirects=False)
+        response.raise_for_status()
+        return response.content
 
     def messages(
             self,

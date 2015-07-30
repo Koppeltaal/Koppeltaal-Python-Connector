@@ -148,8 +148,8 @@ def cli():
             # XXX Can we set any message to any state freely?
             if msg.status != args.status:
                 if args.confirm:
-                    koppeltaal.message.process(
-                        connection, msg.id, status=args.status)
+                    connection.message_process(
+                        msg.id, status=args.status)
                 else:
                     print "Dry-run: not setting message with message id " \
                         "{} to status {}.".format(msg.id, args.status)
