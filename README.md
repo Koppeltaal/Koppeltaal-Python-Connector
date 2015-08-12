@@ -66,7 +66,7 @@ $ bin/koppeltaal https://testconnectors.vhscloud.nl --username=foo --password=ba
 To retrieve the Conformance statement from the server:
 
 ```sh
-$ bin/koppeltaal  https://testconnectors.vhscloud.nl  metadata
+$ bin/koppeltaal https://testconnectors.vhscloud.nl metadata
 ```
 
 ### Activity definition
