@@ -159,7 +159,7 @@ class Connector(object):
             patient_url=None,
             processing_status=None,
             summary=False,
-            count=None):
+            count=5000):
         """
         https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_summary=true&_count=[X]
 
@@ -173,10 +173,7 @@ class Connector(object):
         Filters on the message type ProcessingStatus: Filters on the
         ProcessingStatus (New|Claimed|Success|Failed).
         """
-        # XXX Make more Pythonic.
-        params = {
-            '_count': count if count else 5000
-        }
+        params = {'_count': count}
         if patient_url:
             params['Patient'] = patient_url
         if processing_status:
