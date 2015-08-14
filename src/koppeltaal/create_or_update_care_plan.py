@@ -5,6 +5,7 @@ This creates a atom feed to send to the server.
 """
 import uuid
 import datetime
+import pkg_resources
 import feedgen.feed
 import feedreader.parser
 import lxml.etree
@@ -88,12 +89,12 @@ def generate(domain, activity, patient, careplan, practitioner):
         'value': 'CreateOrUpdateCarePlan'
     })
     source = lxml.etree.SubElement(messageheader, 'source')
-    # XXX Get info about this package from setup tools here.
     lxml.etree.SubElement(source, 'software', attrib={
-        'value': 'Whatever'
+        'value': 'Koppeltaal Python Adapter version {}'.format(
+            pkg_resources.get_distribution('koppeltaal').version)
     })
     lxml.etree.SubElement(source, 'endpoint', attrib={
-        'value': 'SomeStuff'
+        'value': 'Not used'
     })
     data = lxml.etree.SubElement(messageheader, 'data')
     lxml.etree.SubElement(data, 'reference', attrib={'value': careplan.url})
