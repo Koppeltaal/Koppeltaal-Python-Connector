@@ -218,6 +218,7 @@ def generate(domain, activity, patient, careplan, practitioner):
 
 
 def parse_result(xml):
+    # Perhaps refactor this to use koppeltaal.feed.
     feed = feedreader.parser.from_string(xml)
     reference = feed.entries[0].content.find(
         'fhir:MessageHeader', namespaces=koppeltaal.NS).find(

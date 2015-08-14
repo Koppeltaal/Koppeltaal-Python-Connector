@@ -5,8 +5,7 @@ import koppeltaal.model
 
 # Move this parsing to the python package "feedreader".
 def find_link(entry):
-    # Ugly python, need to escape the {} to use .format().
-    for link in entry._xml.iterchildren(tag='{%(atom)s}link' % koppeltaal.NS):
+    for link in entry._xml.iterchildren(tag='{{{atom}}}link'.format(**koppeltaal.NS)):
         if link.attrib.get('rel') == 'self':
             return link.attrib['href']
 
@@ -17,7 +16,6 @@ RESOURCE_LOOKUP = {
 }
 
 def parse(xml):
-    # XXX total messages.
     # <totalResults xmlns="http://a9.com/-/spec/opensearch/1.1/">
     # 1</totalResults>
     feed = feedreader.parser.from_string(xml)
@@ -29,4 +27,3 @@ def parse(xml):
         factory = RESOURCE_LOOKUP.get(
             first_child.tag, koppeltaal.model.Resource)
         yield factory(find_link(entry), first_child)
-

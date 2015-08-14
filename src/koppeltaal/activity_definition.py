@@ -14,7 +14,7 @@ def parse(xml):
     for entry in feed.entries:
         # The raw element. We may want to remove this at some point in
         # the future.
-        node = entry._xml.content.find(
+        node = entry.content.find(
             'fhir:Other', namespaces=koppeltaal.NS)
         # Make 'useful' attributes accessible here.
         activity_kind_value_coding = node.find(
