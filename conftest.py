@@ -3,6 +3,7 @@ import urlparse
 import pytest
 import os.path
 import ConfigParser
+import selenium.webdriver
 import koppeltaal.connect
 import koppeltaal.model
 import koppeltaal.feed
@@ -122,3 +123,15 @@ def careplan_on_server(
         connector.domain, activity, patient, careplan, practitioner)
     connector.post_message(xml)
     # XXX Return the newly created URL including history?
+
+
+@pytest.fixture(scope='session')
+def driver(request):
+    d = selenium.webdriver.Firefox()
+    request.addfinalizer(d.quit)
+    return d
+
+@pytest.fixture
+def browser(driver, request):
+    request.addfinalizer(driver.delete_all_cookies)
+    return driver
