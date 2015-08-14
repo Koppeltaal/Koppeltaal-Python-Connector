@@ -1,6 +1,7 @@
 import urlparse
 import selenium.webdriver.support.wait
 import selenium.webdriver.support.expected_conditions as EC
+import pytest
 
 
 def wait_for_game(browser):
@@ -16,6 +17,21 @@ def login_with_oauth(browser):
         browser, 10).until(
             EC.text_to_be_present_in_element(
                 ('id', 'authorizationOutput'), 'access_token'))
+
+
+def request_care_plan(browser):
+    [b for b in browser.find_elements_by_tag_name('button') if
+        b.text == 'request care plan'][0].click()
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            EC.text_to_be_present_in_element(
+                ('id', 'carePlanOutput'), 'reference'))
+
+
+def post_sub_activities(browser):
+    [b for b in browser.find_elements_by_tag_name('button') if
+        b.text == 'post sub activities'][0].click()
+    # Wait for it, but currently there's an error in the javascript.
 
 
 def test_launch_patient(
@@ -66,4 +82,14 @@ def test_launch_practitioner(
     assert browser.find_element_by_id('userReference').text == practitioner.url
 
 
-# Send some messages from the game.
+@pytest.mark.xfail(reason='JavaScript Error when sending careplan from ranj to portal.')
+def test_send_message_from_game_to_server(
+        connector, activity, careplan_on_server, patient, browser):
+    browser.get(connector.launch(activity.id, patient.url, patient.url))
+    wait_for_game(browser)
+    login_with_oauth(browser)
+    request_care_plan(browser)
+    post_sub_activities(browser)
+    # At this point, there is an error in the console:
+    # Error: "No version specfied for the focal resource, message is rejected."
+    # import pdb ; pdb.set_trace()

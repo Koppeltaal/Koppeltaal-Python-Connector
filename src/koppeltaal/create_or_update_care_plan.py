@@ -134,12 +134,24 @@ def generate(domain, activity, patient, careplan, practitioner):
 
     # goal
     # goal id doesn't seem to be part of the schema validation.
-    goal = lxml.etree.SubElement(careplan_el, 'goal')
+    goal = lxml.etree.SubElement(careplan_el, 'goal', attrib={'id': '1'})
     lxml.etree.SubElement(goal, 'description', attrib={'value': '-'})
     lxml.etree.SubElement(goal, 'status', attrib={'value': 'in progress'})
 
     # activity
-    activity_el = lxml.etree.SubElement(careplan_el, 'activity')
+    activity_el = lxml.etree.SubElement(careplan_el, 'activity', attrib={'id': '1'})
+    # ...needs ActivityIdentifier
+    activity_identifier = lxml.etree.SubElement(
+        activity_el,
+        'extension',
+        attrib={
+            'url': '{koppeltaal}/CarePlan#ActivityIdentifier'.format(
+                **koppeltaal.NS)
+        })
+    lxml.etree.SubElement(
+        activity_identifier, 'valueString',
+        attrib={'value': '{}#a-1'.format(careplan.url)})
+    # ...needs ActivityDefinition
     activity_definition = lxml.etree.SubElement(
         activity_el,
         'extension',
@@ -149,7 +161,7 @@ def generate(domain, activity, patient, careplan, practitioner):
         })
     lxml.etree.SubElement(
         activity_definition, 'valueString', attrib={'value': activity.id})
-
+    # ...needs ActivityKind
     activity_kind = lxml.etree.SubElement(
         activity_el,
         'extension',
@@ -168,6 +180,28 @@ def generate(domain, activity, patient, careplan, practitioner):
     lxml.etree.SubElement(value_coding, 'display', attrib={
         'value': activity.kind['display']
     })
+    # Need ActivityDescription?
+    # Multiple SubActivity will be added on the other side of the connection.
+    # Need to add Participant?
+    # Need to add startDate?
+    # ...needs ActivityStatus.
+    activity_status = lxml.etree.SubElement(
+        activity_el, 'extension',
+        attrib={
+            'url': '{koppeltaal}/CarePlan#ActivityStatus'.format(
+                **koppeltaal.NS)
+        })
+    activity_status_value_coding = lxml.etree.SubElement(activity_status, 'valueCoding')
+    lxml.etree.SubElement(activity_status_value_coding, 'system', attrib={
+        'value': '{koppeltaal}/CarePlanActivityStatus'.format(**koppeltaal.NS)
+    })
+    lxml.etree.SubElement(activity_status_value_coding, 'code', attrib={
+        'value': 'Available'
+    })
+    lxml.etree.SubElement(activity_status_value_coding, 'display', attrib={
+        'value': 'Available'
+    })
+
     # prohibited is required by the schema.
     lxml.etree.SubElement(activity_el, 'prohibited', attrib={'value': 'false'})
 
