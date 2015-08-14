@@ -2,6 +2,7 @@
 FHIR-like models.
 XXX Cross-reference with http://www.hl7.org/fhir/resourcelist.html
 """
+import koppeltaal
 
 
 class Name(object):
@@ -32,11 +33,36 @@ class Practitioner(object):
         self.name = Name()
 
 
-class Message(object):
+class Resource(object):
 
-    def __init__(self, id, status):
+    id = node = None
+
+    def __init__(self, id, node):
         self.id = id
-        self.status = status
+        self.node = node
+
+
+class MessageHeader(Resource):
+
+    @property
+    def processing_status(self):
+        return self.node.find(
+            'fhir:extension['
+            '@url="{koppeltaal}/MessageHeader#ProcessingStatus"]'.format(
+                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+            'fhir:extension['
+            '@url="{koppeltaal}/MessageHeader#ProcessingStatusStatus"]'.format(
+                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+            'fhir:valueCode', namespaces=koppeltaal.NS).get('value')
+
+    @processing_status.setter
+    def processing_status(self, value):
+        # This is a mutation of the underlying node.
+        self.node.find(
+            './/fhir:extension[@url="{koppeltaal}/MessageHeader#'
+            'ProcessingStatusStatus"]'.format(
+                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+            'fhir:valueCode', namespaces=koppeltaal.NS).attrib['value'] = value
 
 
 class CarePlanResult(object):
