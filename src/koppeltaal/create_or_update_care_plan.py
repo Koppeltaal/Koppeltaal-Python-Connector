@@ -45,7 +45,8 @@ def generate(domain, activity, patient, careplan, practitioner):
     feed.title('Feed with id {}'.format(feed_id))
     # Required Koppeltaal elements.
     feed.category(
-        term='{koppeltaal}/Domain#{domain}'.format(domain=domain, **koppeltaal.NS),
+        term='{koppeltaal}/Domain#{domain}'.format(
+            domain=domain, **koppeltaal.NS),
         label=domain,
         scheme='{fhir}/tag/security'.format(**koppeltaal.NS))
     feed.category(
@@ -98,8 +99,8 @@ def generate(domain, activity, patient, careplan, practitioner):
     lxml.etree.SubElement(data, 'reference', attrib={'value': careplan.url})
 
     # Add message header to feed.
-    messageheader_entry.content(lxml.etree.tostring(messageheader), type='text/xml')
-
+    messageheader_entry.content(
+        lxml.etree.tostring(messageheader), type='text/xml')
 
     # And now for my next trick, a CarePlan!
     careplan_entry = feed.add_entry()
@@ -114,7 +115,8 @@ def generate(domain, activity, patient, careplan, practitioner):
         nsmap={None: koppeltaal.NS['fhir']})
 
     patient_el = lxml.etree.SubElement(careplan_el, 'patient')
-    lxml.etree.SubElement(patient_el, 'reference', attrib={'value': patient.url})
+    lxml.etree.SubElement(
+        patient_el, 'reference', attrib={'value': patient.url})
     lxml.etree.SubElement(careplan_el, 'status', attrib={'value': 'active'})
     participant = lxml.etree.SubElement(careplan_el, 'participant')
     role = lxml.etree.SubElement(participant, 'role')
@@ -141,7 +143,8 @@ def generate(domain, activity, patient, careplan, practitioner):
         activity_el,
         'extension',
         attrib={
-            'url': '{koppeltaal}/CarePlan#ActivityDefinition'.format(**koppeltaal.NS)
+            'url': '{koppeltaal}/CarePlan#ActivityDefinition'.format(
+                **koppeltaal.NS)
         })
     lxml.etree.SubElement(
         activity_definition, 'valueString', attrib={'value': activity.id})
@@ -186,7 +189,8 @@ def generate(domain, activity, patient, careplan, practitioner):
         'value': patient.name.family})
     lxml.etree.SubElement(patient_name, 'given', attrib={
         'value': patient.name.given})
-    patient_entry.content(lxml.etree.tostring(patient_entry_el), type='text/xml')
+    patient_entry.content(
+        lxml.etree.tostring(patient_entry_el), type='text/xml')
 
     # Add Practitioner entry.
     practitioner_entry = feed.add_entry()
@@ -200,19 +204,23 @@ def generate(domain, activity, patient, careplan, practitioner):
         attrib={'id': practitioner.id},
         nsmap={None: koppeltaal.NS['fhir']})
     practitioner_name = lxml.etree.SubElement(practitioner_entry_el, 'name')
-    lxml.etree.SubElement(practitioner_name, 'use', attrib={'value': 'official'})
+    lxml.etree.SubElement(
+        practitioner_name, 'use', attrib={'value': 'official'})
     lxml.etree.SubElement(practitioner_name, 'family', attrib={
         'value': practitioner.name.family})
     lxml.etree.SubElement(practitioner_name, 'given', attrib={
         'value': practitioner.name.given})
-    practitioner_entry.content(lxml.etree.tostring(practitioner_entry_el), type='text/xml')
+    practitioner_entry.content(
+        lxml.etree.tostring(practitioner_entry_el), type='text/xml')
 
     feed_str = feed.atom_str(pretty=True)
     # XXX Move the logging to the validation code.
     try:
         koppeltaal_schema.validate.validate(lxml.etree.fromstring(feed_str))
     except koppeltaal_schema.validate.ValidationError as err:
-        koppeltaal.logger.error('validation error: {} for message {}'.format(err.message, feed_str))
+        koppeltaal.logger.error(
+            'validation error: {} for message {}'.format(
+                err.message, feed_str))
         raise
     return feed_str
 

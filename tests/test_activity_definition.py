@@ -4,7 +4,8 @@ from koppeltaal import KoppeltaalException
 from koppeltaal.activity_definition import activity_info, parse
 
 here = py.path.local(__file__)
-sample_feed = (here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
+sample_feed = (
+    here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
 
 def test_parse_activities():

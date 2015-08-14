@@ -6,7 +6,8 @@ import koppeltaal
 import koppeltaal.feed
 
 here = py.path.local(__file__)
-sample_feed = (here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
+sample_feed = (
+    here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
 
 def test_create_or_update_care_plan():
@@ -62,9 +63,10 @@ def test_create_or_update_care_plan():
     # The message header mentions the Patient.
     assert messageheader.find(
         'fhir:extension[@url="{koppeltaal}/MessageHeader#Patient"]'.format(
-        **koppeltaal.NS), namespaces=koppeltaal.NS).find(
-            'fhir:valueResource', namespaces=koppeltaal.NS).find(
-            'fhir:reference', namespaces=koppeltaal.NS).get('value') == pat1.url
+            **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+                'fhir:valueResource', namespaces=koppeltaal.NS).find(
+                    'fhir:reference',
+                    namespaces=koppeltaal.NS).get('value') == pat1.url
 
     # inspect careplan
     assert koppeltaal.feed.find_link(feed.entries[1]) == cp2.url
@@ -89,8 +91,10 @@ def test_create_or_update_care_plan():
 
     # inspect practitioner
     assert koppeltaal.feed.find_link(feed.entries[3]) == prac_a.url
-    practitioner = node.xpath('//fhir:Practitioner', namespaces=koppeltaal.NS)[0]
-    practitioner_name = practitioner.find('fhir:name', namespaces=koppeltaal.NS)
+    practitioner = node.xpath(
+        '//fhir:Practitioner', namespaces=koppeltaal.NS)[0]
+    practitioner_name = practitioner.find(
+        'fhir:name', namespaces=koppeltaal.NS)
     assert practitioner_name.find(
         'fhir:given', namespaces=koppeltaal.NS).get('value') == 'Jozef'
     assert practitioner_name.find(
@@ -145,17 +149,21 @@ def test_update_existing_care_plan(
 
     # If we now create a careplan with a different practitioner, this will
     # yield an error, because we are not injecting the historic information.
-    xml = generate(connector.domain, activity, patient, careplan, practitioner2)
+    xml = generate(
+        connector.domain, activity, patient, careplan, practitioner2)
     # XXX This should be a Koppeltaal Exception, and on the server this should
     # be a 400 instead of a 500, because the request is wrong.
     with pytest.raises(requests.HTTPError) as excinfo:
         connector.post_message(xml)
-    assert "No version specfied for the focal resource, message is rejected." in excinfo.value.response.text
+    assert (
+        'No version specfied for the focal resource, '
+        'message is rejected') in excinfo.value.response.text
 
     # When setting the care plan url from the server to the current careplan,
     # we can generate the XML properly.
     careplan.url = historic_careplan_url
-    xml = generate(connector.domain, activity, patient, careplan, practitioner2)
+    xml = generate(
+        connector.domain, activity, patient, careplan, practitioner2)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -174,12 +182,13 @@ def test_update_existing_care_plan(
     xml = generate(connector.domain, activity, patient, careplan, practitioner)
     with pytest.raises(requests.HTTPError) as excinfo:
         connector.post_message(xml)
-    assert "Message Version mismatch: Please retrieve the latest version" in excinfo.value.response.text
+    assert "Message Version mismatch: Please retrieve the latest version" in \
+        excinfo.value.response.text
 
 
-@pytest.mark.xfail(reason=
+@pytest.mark.xfail(reason=(
     'The call to the koppeltaal server with an unknown careplan '
-    'activity id does not fail.')
+    'activity id does not fail.'))
 def test_send_incorrect_careplan_expect_failure(
         connector, patient, practitioner, careplan):
     '''When sending a careplan with a non-existing activity definition,
@@ -191,6 +200,7 @@ def test_send_incorrect_careplan_expect_failure(
     funky_activity = list(parse(connector.activity_definition()))[0]
     # Unknown activity, should fail.
     funky_activity.id = 'foobar'
-    xml = generate(connector.domain, funky_activity, patient, careplan, practitioner)
+    xml = generate(
+        connector.domain, funky_activity, patient, careplan, practitioner)
     with pytest.raises(KoppeltaalException):
         connector.post_message(xml)

@@ -3,17 +3,21 @@ import koppeltaal
 import koppeltaal.feed
 import koppeltaal.model
 
+
 # Move this parsing to the python package "feedreader".
 def find_link(entry):
-    for link in entry._xml.iterchildren(tag='{{{atom}}}link'.format(**koppeltaal.NS)):
+    for link in entry._xml.iterchildren(
+            tag='{{{atom}}}link'.format(**koppeltaal.NS)):
         if link.attrib.get('rel') == 'self':
             return link.attrib['href']
 
 
 # Ideally, a better registration mechanism here.
 RESOURCE_LOOKUP = {
-    '{{{fhir}}}MessageHeader'.format(**koppeltaal.NS): koppeltaal.model.MessageHeader
+    '{{{fhir}}}MessageHeader'.format(
+        **koppeltaal.NS): koppeltaal.model.MessageHeader
 }
+
 
 def parse(xml):
     # <totalResults xmlns="http://a9.com/-/spec/opensearch/1.1/">

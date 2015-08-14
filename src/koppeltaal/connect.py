@@ -133,7 +133,8 @@ class Connector(object):
         if status is None:
             raise ValueError('Unknown status')
         messages = list(koppeltaal.feed.parse(self.message(id)))
-        message_header = [resource for resource in messages if
+        message_header = [
+            resource for resource in messages if
             isinstance(resource, koppeltaal.model.MessageHeader)][0]
         # Set the status.
         message_header.processing_status = status

@@ -17,22 +17,25 @@ def parse(xml):
         node = entry.content.find(
             'fhir:Other', namespaces=koppeltaal.NS)
         # Make 'useful' attributes accessible here.
-        activity_kind_value_coding = node.find(
-            'fhir:extension[@url="{koppeltaal}/ActivityDefinition#ActivityKind"]'.format(
+        activity_kind_value_coding = node.find((
+            'fhir:extension[@url="{koppeltaal}'
+            '/ActivityDefinition#ActivityKind"]').format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCoding', namespaces=koppeltaal.NS)
         identifier = node.find(
             'fhir:identifier', namespaces=koppeltaal.NS).find(
                 'fhir:value', namespaces=koppeltaal.NS).get('value')
-        name = node.find(
-            'fhir:extension[@url="{koppeltaal}/ActivityDefinition#ActivityName"]'.format(
+        name = node.find((
+            'fhir:extension[@url="{koppeltaal}'
+            '/ActivityDefinition#ActivityName"]').format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
-                'fhir:valueString', namespaces=koppeltaal.NS).get('value')
+                    'fhir:valueString',
+                    namespaces=koppeltaal.NS).get('value')
         kind = {
-            'code': activity_kind_value_coding.find('fhir:code',
-                namespaces=koppeltaal.NS).get('value'),
-            'display': activity_kind_value_coding.find('fhir:display',
-                namespaces=koppeltaal.NS).get('value')
+            'code': activity_kind_value_coding.find(
+                'fhir:code', namespaces=koppeltaal.NS).get('value'),
+            'display': activity_kind_value_coding.find(
+                'fhir:display', namespaces=koppeltaal.NS).get('value')
             }
 
         yield koppeltaal.model.Activity(identifier, name, kind)
