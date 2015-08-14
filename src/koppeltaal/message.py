@@ -20,8 +20,8 @@ def parse_messages(xml):
     for entry in feed.entries:
         assert len(entry.content) == 1, \
             'there should be only one content node in {}'.format(xml)
-        first_child = content=entry.content.getchildren()[0]
-        # Ddefault value is Resource.
+        first_child = entry.content.getchildren()[0]
+        # Default value is Resource.
         factory = RESOURCE_LOOKUP.get(
             first_child.tag, koppeltaal.model.Resource)
         yield factory(koppeltaal.feed.find_link(entry), first_child)
