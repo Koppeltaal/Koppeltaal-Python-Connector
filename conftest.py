@@ -5,7 +5,7 @@ import os.path
 import ConfigParser
 import koppeltaal.connect
 import koppeltaal.model
-import koppeltaal.message
+import koppeltaal.feed
 
 
 def pytest_addoption(parser):
@@ -67,7 +67,7 @@ def patient(request, connector):
 
     def cleanup_patient_messages():
         result = connector.messages(patient_url=p.url)
-        for message in koppeltaal.message.parse_messages(result):
+        for message in koppeltaal.feed.parse(result):
             connector.message_process(message.id, action='success')
 
     request.addfinalizer(cleanup_patient_messages)

@@ -6,7 +6,7 @@ import lxml.etree
 import logging
 import koppeltaal
 import koppeltaal.connect
-import koppeltaal.message
+import koppeltaal.feed
 import koppeltaal.model
 import koppeltaal.create_or_update_care_plan
 import koppeltaal.activity_definition
@@ -126,7 +126,7 @@ def cli():
             patient_url=args.patient_url,
             processing_status=args.status,
             summary=True)
-        messages = list(koppeltaal.message.parse_messages(xml_result))
+        messages = list(koppeltaal.feed.parse(xml_result))
         if args.info_per_message:
             for msg in messages:
                 print msg.id, msg.status
@@ -142,7 +142,7 @@ def cli():
         if args.confirm is None:
             print "This is a dry-run."
         num_done = 0
-        for msg in list(koppeltaal.message.parse_messages(
+        for msg in list(koppeltaal.feed.parse(
                 connection.messages(summary=True))):
             # XXX Do something workflowy here?
             # XXX Can we set any message to any state freely?

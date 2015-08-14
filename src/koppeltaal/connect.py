@@ -5,6 +5,7 @@ import urlparse
 import lxml.etree
 import requests
 import koppeltaal
+import koppeltaal.feed
 import koppeltaal.metadata
 
 # The URLs that can't be reached from the metadata are defined as constants
@@ -131,7 +132,7 @@ class Connector(object):
             }.get(action, None)
         if status is None:
             raise ValueError('Unknown status')
-        messages = list(koppeltaal.message.parse_messages(self.message(id)))
+        messages = list(koppeltaal.feed.parse(self.message(id)))
         message_header = [resource for resource in messages if
             isinstance(resource, koppeltaal.model.MessageHeader)][0]
         # Set the status.
