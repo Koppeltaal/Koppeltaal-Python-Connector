@@ -82,7 +82,8 @@ def test_launch_practitioner(
     assert browser.find_element_by_id('userReference').text == practitioner.url
 
 
-@pytest.mark.xfail(reason='JavaScript Error when sending careplan from ranj to portal.')
+@pytest.mark.xfail(
+    reason='JavaScript Error when sending careplan from ranj to portal.')
 def test_send_message_from_game_to_server(
         connector, activity, careplan_on_server, patient, browser):
     browser.get(connector.launch(activity.id, patient.url, patient.url))

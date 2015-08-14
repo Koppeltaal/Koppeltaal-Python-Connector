@@ -71,12 +71,16 @@ def test_create_or_update_care_plan():
     # inspect careplan
     assert koppeltaal.feed.find_link(feed.entries[1]) == cp2.url
     careplan = node.xpath('//fhir:CarePlan', namespaces=koppeltaal.NS)[0]
-    activity_definition = careplan.xpath(
-        '//fhir:activity/fhir:extension[@url="{koppeltaal}/CarePlan#ActivityDefinition"]/fhir:valueString'.format(**koppeltaal.NS),
+    activity_definition = careplan.xpath((
+        '//fhir:activity/fhir:extension[@url="{koppeltaal}/'
+        'CarePlan#ActivityDefinition"]/fhir:valueString').format(
+            **koppeltaal.NS),
         namespaces=koppeltaal.NS)[0]
     assert activity_definition.get('value') == 'AD1'
-    activity_code = careplan.xpath(
-        '//fhir:activity/fhir:extension[@url="{koppeltaal}/CarePlan#ActivityKind"]/fhir:valueCoding/fhir:code'.format(**koppeltaal.NS),
+    activity_code = careplan.xpath((
+        '//fhir:activity/fhir:extension[@url="{koppeltaal}/'
+        'CarePlan#ActivityKind"]/fhir:valueCoding/fhir:code').format(
+            **koppeltaal.NS),
         namespaces=koppeltaal.NS)[0].get('value')
     assert activity_code == 'Game'
 
@@ -99,6 +103,7 @@ def test_create_or_update_care_plan():
         'fhir:given', namespaces=koppeltaal.NS).get('value') == 'Jozef'
     assert practitioner_name.find(
         'fhir:family', namespaces=koppeltaal.NS).get('value') == 'van Buuren'
+
 
 def test_send_care_plan_to_server(
         connector, patient, practitioner, careplan, activity):

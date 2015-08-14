@@ -139,7 +139,8 @@ def generate(domain, activity, patient, careplan, practitioner):
     lxml.etree.SubElement(goal, 'status', attrib={'value': 'in progress'})
 
     # activity
-    activity_el = lxml.etree.SubElement(careplan_el, 'activity', attrib={'id': '1'})
+    activity_el = lxml.etree.SubElement(
+        careplan_el, 'activity', attrib={'id': '1'})
     # ...needs ActivityIdentifier
     activity_identifier = lxml.etree.SubElement(
         activity_el,
@@ -191,7 +192,8 @@ def generate(domain, activity, patient, careplan, practitioner):
             'url': '{koppeltaal}/CarePlan#ActivityStatus'.format(
                 **koppeltaal.NS)
         })
-    activity_status_value_coding = lxml.etree.SubElement(activity_status, 'valueCoding')
+    activity_status_value_coding = lxml.etree.SubElement(
+        activity_status, 'valueCoding')
     lxml.etree.SubElement(activity_status_value_coding, 'system', attrib={
         'value': '{koppeltaal}/CarePlanActivityStatus'.format(**koppeltaal.NS)
     })
