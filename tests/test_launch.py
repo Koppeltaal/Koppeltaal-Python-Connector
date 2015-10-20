@@ -5,10 +5,16 @@ import pytest
 
 
 def wait_for_game(browser):
+    
     # wait until the page redirect dance is over.
     selenium.webdriver.support.wait.WebDriverWait(
         browser, 10).until(lambda d: 'test.html' in d.current_url)
 
+def set_domain(browser):
+    browser.find_element_by_id("domain").clear()
+    browser.find_element_by_id("domain").send_keys("MindDistrict Kickass")
+    [b for b in browser.find_elements_by_tag_name('button') if
+     b.text == 'set new domain'][0].click()
 
 def login_with_oauth(browser):
     [b for b in browser.find_elements_by_tag_name('button') if
@@ -44,6 +50,7 @@ def test_launch_patient(
     assert urlparse.parse_qs(
         parsed_launch_url.query)['iss'][0].startswith(connector.server)
 
+    print(launch_url)
     browser.get(launch_url)
     wait_for_game(browser)
 
@@ -51,7 +58,7 @@ def test_launch_patient(
     parsed_game_url = urlparse.urlparse(browser.current_url)
     assert 'ranjgames.com' in parsed_game_url.netloc
     assert 'test.html' in parsed_game_url.path
-
+    set_domain(browser)
     # There is a 'login with oauth' button in the page, let's see what that
     # does.
     assert browser.find_element_by_id('patientReference').text == ''
@@ -72,7 +79,7 @@ def test_launch_practitioner(
     parsed_game_url = urlparse.urlparse(browser.current_url)
     assert 'ranjgames.com' in parsed_game_url.netloc
     assert 'test.html' in parsed_game_url.path
-
+    set_domain(browser)
     # There is a 'login with oauth' button in the page, let's see what that
     # does.
     assert browser.find_element_by_id('patientReference').text == ''
@@ -88,6 +95,7 @@ def test_send_message_from_game_to_server(
         connector, activity, careplan_on_server, patient, browser):
     browser.get(connector.launch(activity.id, patient.url, patient.url))
     wait_for_game(browser)
+    set_domain(browser)
     login_with_oauth(browser)
     request_care_plan(browser)
     post_sub_activities(browser)

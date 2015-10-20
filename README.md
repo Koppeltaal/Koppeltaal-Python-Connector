@@ -4,18 +4,11 @@
 
 The dependencies for the koppeltaal python connector is put together using [buildout].
 
-On Linux/OSX, run:
+Run:
 
 ```sh
 $ python2.7 bootstrap.py
 $ bin/buildout
-```
-
-On Windows, run (this works best in a git shell):
-
-```sh
-$ C:\Python27\Python.exe bootstrap.py --allow-site-packages --setuptools-version=8.0
-$ bin\buildout.exe
 ```
 
 ## Tests
@@ -61,6 +54,7 @@ $ bin/koppeltaal https://testconnectors.vhscloud.nl test_authentication  # uses 
 $ bin/koppeltaal https://testconnectors.vhscloud.nl --username=foo --password=bar test_authentication  # Returns 1
 ```
 
+<<<<<<< Updated upstream
 ### Metadata / Conformance statement
 
 To retrieve the Conformance statement from the server:
@@ -69,6 +63,8 @@ To retrieve the Conformance statement from the server:
 $ bin/koppeltaal https://testconnectors.vhscloud.nl metadata
 ```
 
+=======
+>>>>>>> Stashed changes
 ### Activity definition
 
 To get the activity definition from the server:
@@ -102,7 +98,7 @@ For example:
 
 ```sh
 $ bin/koppeltaal https://testconnectors.vhscloud.nl create_or_update_care_plan \
-  RANJKA \
+  "MindDistrict Kickass" RANJKA \
   1 http://test.minddistrict.com/p/1 Claes Vries \
   7 http://test.minddistrict.com/cp/7 \
   3 http://test.minddistrict.com/pp/3 Joop Smit
@@ -135,7 +131,7 @@ from koppeltaal.create_or_update_care_plan import generate
 # Generate the XML feed to be sent to the server.
 stanza = generate(domain, activity, patient, careplan, practitioner)
 # Send to the server.
-c.post_message(stanza)
+c.create_or_update_care_plan(stanza)
 ```
 
 [buildout]: http://www.buildout.org
