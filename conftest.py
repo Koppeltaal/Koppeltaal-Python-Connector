@@ -111,7 +111,7 @@ def careplan(connector, patient):
 def activity(connector):
     from koppeltaal.activity_definition import parse
     # A random activity, could be anything.
-    return list(parse(connector.activity_definition()))[1]
+    return list(parse(connector.activity_definition()))[0]
 
 
 @pytest.fixture
