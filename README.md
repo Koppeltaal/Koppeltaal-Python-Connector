@@ -23,7 +23,7 @@ $ bin\buildout.exe
 We use the [pytest] framework. The tests are run against a Koppeltaal server, for instance:
 
 ```sh
-$ bin/py.test --server https://testconnectors.vhscloud.nl
+$ bin/py.test --server https://testkopppeltaal.vhscloud.nl
 ```
 
 ## Command line interface
@@ -37,12 +37,12 @@ $ bin/koppeltaal --help
 Arguments:
 
 The first argument to the *koppeltaal* script is the server to connect to, for
-example *https://testconnectors.vhscloud.nl*. The username, password and
+example *https://testkoppeltaal.vhscloud.nl*. The username, password and
 domain can be passed in as arguments or taken from *~/.koppeltaal.cfg*. The
 format of ~/.koppeltaal.cfg looks like this:
 
 ```
-[https://testconnectors.vhscloud.nl]
+[https://testkoppeltaal.vhscloud.nl]
 username = MindDistrict
 password = gele-haas (replace with your own)
 domain = MindDistrict Kickass
@@ -57,8 +57,8 @@ to work with, use the test_authentication command. This returns status code 1
 in case of failure, 0 in case of success.
 
 ```sh
-$ bin/koppeltaal https://testconnectors.vhscloud.nl test_authentication  # uses the values from ~/.koppeltaal.cfg
-$ bin/koppeltaal https://testconnectors.vhscloud.nl --username=foo --password=bar test_authentication  # Returns 1
+$ bin/koppeltaal https://testkoppeltaal.vhscloud.nl test_authentication  # uses the values from ~/.koppeltaal.cfg
+$ bin/koppeltaal https://testkoppeltaal.vhscloud.nl --username=foo --password=bar test_authentication  # Returns 1
 ```
 
 ### Metadata / Conformance statement
@@ -66,7 +66,7 @@ $ bin/koppeltaal https://testconnectors.vhscloud.nl --username=foo --password=ba
 To retrieve the Conformance statement from the server:
 
 ```sh
-$ bin/koppeltaal https://testconnectors.vhscloud.nl metadata
+$ bin/koppeltaal https://testkoppeltaal.vhscloud.nl metadata
 ```
 
 ### Activity definition
@@ -74,14 +74,14 @@ $ bin/koppeltaal https://testconnectors.vhscloud.nl metadata
 To get the activity definition from the server:
 
 ```sh
-$ bin/koppeltaal https://testconnectors.vhscloud.nl activity_definition
+$ bin/koppeltaal https://testkoppeltaal.vhscloud.nl activity_definition
 ```
 This returns the raw XML, not very useful.
 
 ### Create or update care plan
 
 ```sh
-$ bin/koppeltaal https://testconnectors.vhscloud.nl create_or_update_care_plan --help
+$ bin/koppeltaal https://testkoppeltaal.vhscloud.nl create_or_update_care_plan --help
 ```
 
 To send a new careplan to the server, you need these arguments:
@@ -101,7 +101,7 @@ To send a new careplan to the server, you need these arguments:
 For example:
 
 ```sh
-$ bin/koppeltaal https://testconnectors.vhscloud.nl create_or_update_care_plan \
+$ bin/koppeltaal https://testkoppeltaal.vhscloud.nl create_or_update_care_plan \
 RANJKA \
 1 http://test.minddistrict.com/p/1 Claes Vries \
 7 http://test.minddistrict.com/cp/7 \
@@ -116,7 +116,7 @@ Use the following API in your integration code to talk to a koppeltaal server:
 from koppeltaal.connect import Connector
 
 # takes server, username and password as arguments.
-c = Connector('https://testconnectors.vhscloud.nl', 'foo', 'bar')
+c = Connector('https://testkoppeltaal.vhscloud.nl', 'foo', 'bar')
 
 # metadata from the server, Conformance statement.
 c.metadata()
