@@ -12,7 +12,7 @@ def wait_for_game(browser):
 
 def set_domain(browser):
     browser.find_element_by_id("domain").clear()
-    browser.find_element_by_id("domain").send_keys("MindDistrict Kickass")
+    browser.find_element_by_id("domain").send_keys("TestConnector")
     [b for b in browser.find_elements_by_tag_name('button') if
      b.text == 'set new domain'][0].click()
 
@@ -56,7 +56,7 @@ def test_launch_patient(
 
     # After some back and forth, the browser points to the game.
     parsed_game_url = urlparse.urlparse(browser.current_url)
-    assert 'ranjgames.com' in parsed_game_url.netloc
+    assert 'koppeltaal' in parsed_game_url.netloc
     assert 'test.html' in parsed_game_url.path
     set_domain(browser)
     # There is a 'login with oauth' button in the page, let's see what that
@@ -77,7 +77,7 @@ def test_launch_practitioner(
 
     # After some back and forth, the browser points to the game.
     parsed_game_url = urlparse.urlparse(browser.current_url)
-    assert 'ranjgames.com' in parsed_game_url.netloc
+    assert 'koppeltaal' in parsed_game_url.netloc
     assert 'test.html' in parsed_game_url.path
     set_domain(browser)
     # There is a 'login with oauth' button in the page, let's see what that
