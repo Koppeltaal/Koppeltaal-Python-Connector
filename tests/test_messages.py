@@ -28,13 +28,14 @@ def test_messages_for_patient(
     assert len(list(messages)) == 1
 
 
+@pytest.mark.xfail(
+    reason='need to send a message with a reliable body to the server first.')
 def test_message_for_id(connector):
     '''Get a specific message.'''
     from koppeltaal.feed import parse
     messages = list(parse(connector.messages(summary=True, count=1)))
     message_id = messages[0].id
     message_details = connector.message(message_id)
-    print message_details
     assert "Dit is een bericht" in message_details
     assert message_id in message_details
 
