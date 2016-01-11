@@ -110,8 +110,14 @@ def careplan(connector, patient):
 @pytest.fixture
 def activity(connector):
     from koppeltaal.activity_definition import parse
-    # A random activity, could be anything.
-    return list(parse(connector.activity_definition()))[0]
+    # Highly depending on what's activated on the server.
+    for activity in parse(connector.activity_definition()):
+        if activity.kind['code'] == 'Game':
+            return activity
+        else:
+            continue
+    else:
+        raise ValueError('No activity found.')
 
 
 @pytest.fixture
