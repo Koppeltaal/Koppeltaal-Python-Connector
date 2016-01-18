@@ -102,7 +102,7 @@ For example:
 
 ```sh
 $ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl create_or_update_care_plan \
-RANJKA \
+KTSTESTGAME \
 1 http://test.minddistrict.com/p/1 Claes Vries \
 7 http://test.minddistrict.com/cp/7 \
 3 http://test.minddistrict.com/pp/3 Joop Smit
