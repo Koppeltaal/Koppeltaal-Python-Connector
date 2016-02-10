@@ -79,7 +79,10 @@ def set_domain(browser):
 def post_sub_activities(browser):
     [b for b in browser.find_elements_by_tag_name('button') if
         b.text == 'post sub activities'][0].click()
-    # Wait for it, but currently there's an error in the javascript.
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            EC.text_to_be_present_in_element(
+                ('id', 'carePlanOutput'), 'scenario_'))
 
 
 def post_update(browser):
@@ -89,12 +92,33 @@ def post_update(browser):
 
 def test_send_message_from_game_to_server(
         connector, activity, careplan_on_server, patient, browser):
-    browser.get(connector.launch(activity.id, patient.url, patient.url))
+    from koppeltaal.feed import parse
+
+    launch_url = connector.launch(activity.id, patient.url, patient.url)
+
+    # The message to koppeltaal server needs to be acked.
+    messages = list(parse(connector.messages(
+        processing_status="New", patient_url=patient.url)))
+    assert len(messages) == 1
+    old_message_id = messages[0].id
+    connector.message_process(messages[0].id, action='claim')
+    connector.message_process(messages[0].id, action='success')
+
+    # Acked indeed.
+    messages_again = list(parse(connector.messages(
+        processing_status="New", patient_url=patient.url)))
+    assert len(messages_again) == 0
+
+    browser.get(launch_url)
     wait_for_game(browser)
+    set_domain(browser)
     login_with_oauth(browser)
     request_care_plan(browser)
-    set_domain(browser)
     post_sub_activities(browser)
-    # At this point, there is an error in the console:
-    # Error: "No version specfied for the focal resource, message is rejected."
-    import pytest; pytest.set_trace()
+
+    messages_after_javascript = list(parse(connector.messages(
+        processing_status="New", patient_url=patient.url)))
+    assert len(messages_after_javascript) == 1
+
+    message_details = connector.message(messages_after_javascript[0].id)
+    assert 'CarePlan#SubActivity' in message_details
