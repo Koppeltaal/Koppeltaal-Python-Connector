@@ -115,7 +115,6 @@ def test_send_message_from_game_to_server(
     login_with_oauth(browser)
     request_care_plan(browser)
     post_sub_activities(browser)
-
     messages_after_javascript = list(parse(connector.messages(
         processing_status="New", patient_url=patient.url)))
     assert len(messages_after_javascript) == 1
