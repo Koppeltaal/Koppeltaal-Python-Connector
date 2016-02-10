@@ -128,7 +128,7 @@ def careplan_on_server(
     xml = generate(
         connector.domain, activity, patient, careplan, practitioner)
     connector.post_message(xml)
-    # XXX Return the newly created URL including history?
+    return careplan
 
 
 @pytest.fixture(scope='session')
