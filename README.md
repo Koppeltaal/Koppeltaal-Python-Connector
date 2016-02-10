@@ -23,7 +23,7 @@ $ bin\buildout.exe
 We use the [pytest] framework. The tests are run against a Koppeltaal server, for instance:
 
 ```sh
-$ bin/py.test --server https://testkopppeltaal.vhscloud.nl
+$ bin/py.test --server https://edgekoppeltaal.vhscloud.nl
 ```
 
 ## Command line interface

@@ -97,4 +97,4 @@ def test_send_message_from_game_to_server(
     post_sub_activities(browser)
     # At this point, there is an error in the console:
     # Error: "No version specfied for the focal resource, message is rejected."
-    import pytest; pytest.set_trace()
+    # import pytest; pytest.set_trace()
