@@ -1,9 +1,14 @@
 import py.path
 import pytest
+import zope.interface.verify
+import koppeltaal.interfaces
+
 from koppeltaal import KoppeltaalException
 from koppeltaal.activity_definition import activity_info, parse
 
+
 here = py.path.local(__file__)
+
 sample_feed = (
     here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
@@ -14,11 +19,19 @@ def test_parse_activities():
     '''
     activity_infos = list(parse(sample_feed))
     assert len(activity_infos) == 3
-    ad1 = activity_infos[0]
+
+    ad1, ad2, ad3 = activity_infos
+
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IActivity, ad1)
     assert ad1.id == 'AD1'
     assert ad1.name == 'Game AD1'
 
-    ad3 = activity_infos[2]
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IActivity, ad2)
+
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IActivity, ad3)
     assert ad3.id == 'AD3'
 
 
@@ -27,8 +40,9 @@ def test_activity_info():
     From the activities feed, find the activity with the activity id.
     '''
     ad2 = activity_info(sample_feed, 'AD2')
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IActivity, ad2)
     assert ad2.id == 'AD2'
-
     assert ad2.kind == {
         'code': 'Game',
         'display': 'Game'}

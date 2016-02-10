@@ -1,14 +1,15 @@
-"""
-FHIR-like models.
-XXX Cross-reference with http://www.hl7.org/fhir/resourcelist.html
-"""
+"""FHIR-like models."""
+import zope.interface
 import koppeltaal
+import koppeltaal.interfaces
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IName)
 class Name(object):
     given = family = None
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IPatient)
 class Patient(object):
 
     def __init__(self, id, url):
@@ -17,14 +18,7 @@ class Patient(object):
         self.name = Name()
 
 
-class CarePlan(object):
-
-    def __init__(self, id, url, patient):
-        self.id = id
-        self.url = url
-        self.patient = patient
-
-
+@zope.interface.implementer(koppeltaal.interfaces.IPractioner)
 class Practitioner(object):
 
     def __init__(self, id, url):
@@ -33,6 +27,16 @@ class Practitioner(object):
         self.name = Name()
 
 
+@zope.interface.implementer(koppeltaal.interfaces.ICarePlan)
+class CarePlan(object):
+
+    def __init__(self, id, url, patient):
+        self.id = id
+        self.url = url
+        self.patient = patient
+
+
+@zope.interface.implementer(koppeltaal.interfaces.IResource)
 class Resource(object):
 
     id = node = None
@@ -42,6 +46,7 @@ class Resource(object):
         self.node = node
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IMessageHeader)
 class MessageHeader(Resource):
 
     @property
@@ -65,12 +70,14 @@ class MessageHeader(Resource):
             'fhir:valueCode', namespaces=koppeltaal.NS).attrib['value'] = value
 
 
+@zope.interface.implementer(koppeltaal.interfaces.ICarePlanResult)
 class CarePlanResult(object):
 
     def __init__(self, reference):
         self.reference = reference
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IActivity)
 class Activity(object):
 
     def __init__(self, id, name, kind):

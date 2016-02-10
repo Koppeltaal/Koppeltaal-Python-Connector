@@ -1,11 +1,16 @@
 import lxml.etree
-import pytest
 import requests
+import pytest
 import py.path
+import zope.interface.verify
 import koppeltaal
+import koppeltaal.interfaces
 import koppeltaal.feed
 
+
 here = py.path.local(__file__)
+
+
 sample_feed = (
     here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 

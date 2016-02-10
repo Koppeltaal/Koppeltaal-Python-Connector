@@ -15,6 +15,7 @@ setup(
         'koppeltaal_schema',
         'lxml',
         'requests',
+        'zope.interface >= 3.7.0',
         ],
     entry_points={
         'console_scripts': [
