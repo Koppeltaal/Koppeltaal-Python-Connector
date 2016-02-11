@@ -125,8 +125,7 @@ def careplan_on_server(
         connector, activity, patient, practitioner, careplan):
     from koppeltaal.create_or_update_care_plan import generate
 
-    xml = generate(
-        connector.domain, activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, careplan, practitioner)
     connector.post_message(xml)
     return careplan
 
