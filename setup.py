@@ -14,7 +14,7 @@ setup(
         'feedreader',
         'koppeltaal_schema',
         'lxml',
-        'requests',
+        'requests >= 2.5.1',
         'zope.interface >= 3.7.0',
         ],
     entry_points={
