@@ -14,14 +14,9 @@ import koppeltaal.model
 import koppeltaal_schema.validate
 
 
-def generate(domain, activity, patient, careplan, practitioner):
+def generate(domain, activity, careplan, practitioner):
     '''
     activity is an info dict as defined by koppeltaal.activity_definition
-
-    patient is an object with information about the patient:
-      id
-      url
-      name = object with attributes 'given' and 'family'
 
     careplan is an object with information about the careplan:
       id
@@ -35,6 +30,7 @@ def generate(domain, activity, patient, careplan, practitioner):
     '''
     assert domain
     now = datetime.datetime.utcnow().isoformat()
+    patient = careplan.patient
 
     # Create the feed envelope.
     feed = feedgen.feed.FeedGenerator()
@@ -235,7 +231,6 @@ def generate(domain, activity, patient, careplan, practitioner):
     practitioner_entry.title(
         'Practitioner resource with id {}'.format(practitioner.id))
     practitioner_entry.link(rel='self', href=practitioner.url)
-
     practitioner_entry_el = lxml.etree.Element(
         'Practitioner',
         attrib={'id': practitioner.id},
