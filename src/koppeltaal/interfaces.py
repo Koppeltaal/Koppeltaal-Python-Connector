@@ -74,7 +74,7 @@ class IPatient(IEntity, INamed):
     pass
 
 
-class IPractioner(IEntity, INamed):
+class IPractitioner(IEntity, INamed):
     pass
 
 

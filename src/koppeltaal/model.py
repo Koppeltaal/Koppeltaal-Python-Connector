@@ -18,7 +18,7 @@ class Patient(object):
         self.name = Name()
 
 
-@zope.interface.implementer(koppeltaal.interfaces.IPractioner)
+@zope.interface.implementer(koppeltaal.interfaces.IPractitioner)
 class Practitioner(object):
 
     def __init__(self, id, url):
