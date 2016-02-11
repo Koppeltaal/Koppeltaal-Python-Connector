@@ -176,7 +176,7 @@ def cli():
         practitioner.name.family = args.practitioner_family_name
 
         xml = koppeltaal.create_or_update_care_plan.generate(
-            connection.domain, activity, patient, careplan, practitioner)
+            connection.domain, activity, careplan, practitioner)
         result = connection.post_message(xml)
         print lxml.etree.tostring(
             lxml.etree.fromstring(result), pretty_print=True)
