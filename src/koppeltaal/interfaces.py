@@ -25,7 +25,7 @@ class IConnector(zope.interface.Interface):
     def launch(activity_id, patient_url, user_url):
         pass
 
-    def messsage(
+    def messages(
             patient_url, processing_status=None, summary=False, count=5000):
         """Fetch messages.
 
