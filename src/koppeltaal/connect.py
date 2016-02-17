@@ -4,9 +4,12 @@ Connect to Koppeltaal server
 import urlparse
 import lxml.etree
 import requests
+import zope.interface
 import koppeltaal
+import koppeltaal.interfaces
 import koppeltaal.feed
 import koppeltaal.metadata
+
 
 # The URLs that can't be reached from the metadata are defined as constants
 # here.
@@ -16,6 +19,7 @@ MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
 OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IConnector)
 class Connector(object):
     server = None
     username = None
@@ -111,11 +115,6 @@ class Connector(object):
         return response.content
 
     def message(self, id):
-        """
-        https://koppeltaal/FHIR/Koppeltaal/MessageHeader/_search?_id=[id]
-
-        Fetches a complete Bundle for a single Message.
-        """
         return self._do_message_query({'_id': id})
 
     def message_process(self, id, action=None, status=None):
@@ -154,19 +153,6 @@ class Connector(object):
             processing_status=None,
             summary=False,
             count=5000):
-        """
-        https://koppelbox/FHIR/Koppeltaal/MessageHeader/_search?_summary=true&_count=[X]
-
-        This will return a Bundle of MessageHeaders, allowing an application
-        to browse the available messages. A pagesize can be specified in the
-        _count parameter.
-
-        The following additional query parameters can be specified:
-
-        Patient: Filters on the Patient dossier this message belongs event:
-        Filters on the message type ProcessingStatus: Filters on the
-        ProcessingStatus (New|Claimed|Success|Failed).
-        """
         params = {'_count': count}
         if patient_url:
             params['Patient'] = patient_url

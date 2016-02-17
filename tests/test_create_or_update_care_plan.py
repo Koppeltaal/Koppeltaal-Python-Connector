@@ -1,11 +1,16 @@
 import lxml.etree
-import pytest
 import requests
+import pytest
 import py.path
+import zope.interface.verify
 import koppeltaal
+import koppeltaal.interfaces
 import koppeltaal.feed
 
+
 here = py.path.local(__file__)
+
+
 sample_feed = (
     here.dirpath() / 'fixtures/sample_activity_definition.xml').read()
 
@@ -29,7 +34,7 @@ def test_create_or_update_care_plan():
     prac_a.name.given = 'Jozef'
     prac_a.name.family = 'van Buuren'
 
-    result = generate('foo', activity, pat1, cp2, prac_a)
+    result = generate('foo', activity, cp2, prac_a)
 
     node = lxml.etree.fromstring(result)
     # Validate.
@@ -119,7 +124,7 @@ def test_send_care_plan_to_server(
         connector.messages(patient_url=patient.url)))
     assert len(messages_for_pat) == 0
 
-    xml = generate(connector.domain, activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, careplan, practitioner)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -144,7 +149,7 @@ def test_update_existing_care_plan(
         connector.messages(patient_url=patient.url)))
     assert len(messages_for_pat) == 0
 
-    xml = generate(connector.domain, activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, careplan, practitioner)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -154,7 +159,7 @@ def test_update_existing_care_plan(
     # If we now create a careplan with a different practitioner, this will
     # yield an error, because we are not injecting the historic information.
     xml = generate(
-        connector.domain, activity, patient, careplan, practitioner2)
+        connector.domain, activity, careplan, practitioner2)
     # XXX This should be a Koppeltaal Exception, and on the server this should
     # be a 400 instead of a 500, because the request is wrong.
     with pytest.raises(requests.HTTPError) as excinfo:
@@ -167,7 +172,7 @@ def test_update_existing_care_plan(
     # we can generate the XML properly.
     careplan.url = historic_careplan_url
     xml = generate(
-        connector.domain, activity, patient, careplan, practitioner2)
+        connector.domain, activity, careplan, practitioner2)
     result = connector.post_message(xml)
 
     # The careplan was sent successfully and now has a _history.
@@ -183,7 +188,7 @@ def test_update_existing_care_plan(
         '/'.join(historic_careplan_url_2.split('/')[:-1]),
         datetime.datetime.utcnow().isoformat())
     careplan.url = now_url
-    xml = generate(connector.domain, activity, patient, careplan, practitioner)
+    xml = generate(connector.domain, activity, careplan, practitioner)
     with pytest.raises(requests.HTTPError) as excinfo:
         connector.post_message(xml)
     assert "Message Version mismatch: Please retrieve the latest version" in \
@@ -205,6 +210,6 @@ def test_send_incorrect_careplan_expect_failure(
     # Unknown activity, should fail.
     funky_activity.id = 'foobar'
     xml = generate(
-        connector.domain, funky_activity, patient, careplan, practitioner)
+        connector.domain, funky_activity, careplan, practitioner)
     with pytest.raises(KoppeltaalException):
         connector.post_message(xml)

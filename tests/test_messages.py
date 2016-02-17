@@ -14,7 +14,7 @@ def test_messages(connector, patient, practitioner, careplan, activity):
     # the mailbox.
     num_messages_before = get_num_messages(careplan.patient.url)
     xml = generate(
-        connector.domain, activity, patient, careplan, practitioner)
+        connector.domain, activity, careplan, practitioner)
     connector.post_message(xml)
     num_messages_after = get_num_messages(careplan.patient.url)
     assert num_messages_after == num_messages_before + 1
