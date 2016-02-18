@@ -3,7 +3,7 @@ import pytest
 import zope.interface.verify
 import koppeltaal.interfaces
 
-from koppeltaal import KoppeltaalException
+from koppeltaal.interfaces import KoppeltaalException
 from koppeltaal.activity_definition import activity_info, parse
 
 

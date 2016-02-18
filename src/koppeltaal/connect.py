@@ -7,6 +7,7 @@ import requests
 import zope.interface
 import koppeltaal
 import koppeltaal.interfaces
+import koppeltaal.logger
 import koppeltaal.feed
 import koppeltaal.metadata
 

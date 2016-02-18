@@ -1,5 +1,6 @@
 import feedreader.parser
 import koppeltaal
+import koppeltaal.interfaces
 
 
 def parse(xml):
@@ -48,5 +49,5 @@ def activity_info(xml, activity_id):
         if info.id == activity_id:
             return info
     # Raise an error in case of unknown activity id.
-    raise koppeltaal.KoppeltaalException(
+    raise koppeltaal.interfaces.KoppeltaalException(
         'Unknown activity id: "{}"'.format(activity_id))

@@ -204,7 +204,7 @@ def test_send_incorrect_careplan_expect_failure(
     the server should return an error.'''
     from koppeltaal.activity_definition import parse
     from koppeltaal.create_or_update_care_plan import generate
-    from koppeltaal import KoppeltaalException
+    from koppeltaal.interfaces import KoppeltaalException
 
     funky_activity = list(parse(connector.activity_definition()))[0]
     # Unknown activity, should fail.

@@ -10,6 +10,7 @@ import feedgen.feed
 import feedreader.parser
 import lxml.etree
 import koppeltaal
+import koppeltaal.logger
 import koppeltaal.model
 import koppeltaal_schema.validate
 
