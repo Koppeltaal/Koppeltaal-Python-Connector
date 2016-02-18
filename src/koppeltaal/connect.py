@@ -57,7 +57,6 @@ class Connector(object):
         return response.status_code == 200
 
     def activity_definition(self):
-        # XXX Cache this information?
         url = '{}/{}'.format(self.server, ACTIVITY_DEFINITION_URL)
         response = requests.get(
             url,
@@ -65,17 +64,23 @@ class Connector(object):
             headers={'Accept': 'application/xml'},
             allow_redirects=False)
         response.raise_for_status()
+
+        koppeltaal.logger.debug(
+            'Activity definition response {}'.format(response.content))
+
         return response.content
 
     def post_message(self, xml):
         # Get from the metadata definition
         mailbox_url = koppeltaal.metadata.metadata(
             self.metadata())['messaging']['endpoint']
+
         # Assert that the protocol is the same.
         assert urlparse.urlparse(mailbox_url).scheme == urlparse.urlparse(
             self.server).scheme
 
-        koppeltaal.logger.debug('Sending XML %s', xml)
+        koppeltaal.logger.debug('Post message {}'.format(xml))
+
         response = requests.post(
             mailbox_url,
             auth=(self.username, self.password),
@@ -86,6 +91,10 @@ class Connector(object):
             },
             allow_redirects=False)
         response.raise_for_status()
+
+        koppeltaal.logger.debug(
+            'Post message response {}'.format(response.content))
+
         return response.content
 
     def launch(self, activity_id, patient_url, user_url):
