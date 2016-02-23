@@ -2,7 +2,6 @@ import lxml.etree
 import requests
 import pytest
 import py.path
-import zope.interface.verify
 import koppeltaal
 import koppeltaal.interfaces
 import koppeltaal.feed

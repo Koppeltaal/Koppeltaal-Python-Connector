@@ -1,5 +1,3 @@
-import pytest
-
 def test_messages(connector, patient, practitioner, careplan, activity):
     '''Get messages from the server.'''
     from koppeltaal.feed import parse
