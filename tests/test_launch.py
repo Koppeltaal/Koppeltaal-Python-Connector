@@ -38,10 +38,6 @@ def test_launch_patient(
     browser.get(launch_url)
     wait_for_game(browser)
 
-    # After some back and forth, the browser points to the game.
-    # XXX should here be an assert of some sort?
-    # parsed_game_url = urlparse.urlparse(browser.current_url)
-
     # There is a 'login with oauth' button in the page, let's see what that
     # does.
     assert browser.find_element_by_id('patientReference').text == ''
@@ -58,10 +54,6 @@ def test_launch_practitioner(
     launch_url = connector.launch(activity.id, patient.url, practitioner.url)
     browser.get(launch_url)
     wait_for_game(browser)
-
-    # After some back and forth, the browser points to the game.
-    # XXX should here be an assert of some sort?
-    # parsed_game_url = urlparse.urlparse(browser.current_url)
 
     # There is a 'login with oauth' button in the page, let's see what that
     # does.
@@ -105,9 +97,6 @@ def test_send_message_from_game_to_server(
     messages = list(parse(connector.messages(
         processing_status="New", patient_url=patient.url)))
     assert len(messages) == 1
-
-    # XXX should old_message_id be test somehow? Is there an assert missing?
-    # old_message_id = messages[0].id
 
     connector.message_process(messages[0].id, action='claim')
     connector.message_process(messages[0].id, action='success')
