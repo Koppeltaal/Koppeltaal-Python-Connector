@@ -97,15 +97,15 @@ class Connector(object):
 
         return response.content
 
-    def launch(self, activity_id, patient_url, user_url):
+    def launch(self, activity, patient, user):
         response = requests.get(
             '{}/{}'.format(self.server, OAUTH_LAUNCH_URL),
             auth=(self.username, self.password),
             params={
-                'client_id': activity_id,
-                'patient': patient_url,
-                'user': user_url,
-                'resource': activity_id  # XXX Not to sure about this.
+                'client_id': activity.id,
+                'patient': patient.url,
+                'user': user.url,
+                'resource': activity.id  # XXX Not to sure about this.
             },
             allow_redirects=False)
         assert response.is_redirect
@@ -159,13 +159,13 @@ class Connector(object):
 
     def messages(
             self,
-            patient_url=None,
+            patient=None,
             processing_status=None,
             summary=False,
             count=5000):
         params = {'_count': count}
-        if patient_url:
-            params['Patient'] = patient_url
+        if patient:
+            params['Patient'] = patient.url
         if processing_status:
             params['ProcessingStatus'] = processing_status
         if summary:

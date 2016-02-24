@@ -119,8 +119,7 @@ def test_send_care_plan_to_server(
     from koppeltaal.feed import parse
 
     # Before the careplan is sent, there are no messages for the patient.
-    messages_for_pat = list(parse(
-        connector.messages(patient_url=patient.url)))
+    messages_for_pat = list(parse(connector.messages(patient=patient)))
     assert len(messages_for_pat) == 0
 
     xml = generate(connector.domain, activity, careplan, practitioner)
@@ -130,8 +129,7 @@ def test_send_care_plan_to_server(
     assert careplan.url in parse_result(result).reference
 
     # Assert there is a message in the mailbox for this patient.
-    messages_for_pat = list(parse(
-        connector.messages(patient_url=patient.url)))
+    messages_for_pat = list(parse(connector.messages(patient=patient)))
     assert len(messages_for_pat) == 1
 
 
@@ -144,8 +142,7 @@ def test_update_existing_care_plan(
     from koppeltaal.feed import parse
 
     # Before the careplan is sent, there are no messages for the patient.
-    messages_for_pat = list(parse(
-        connector.messages(patient_url=patient.url)))
+    messages_for_pat = list(parse(connector.messages(patient=patient)))
     assert len(messages_for_pat) == 0
 
     xml = generate(connector.domain, activity, careplan, practitioner)

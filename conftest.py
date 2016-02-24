@@ -67,7 +67,7 @@ def patient(request, connector):
     p.name.family = 'de Vries'
 
     def cleanup_patient_messages():
-        result = connector.messages(patient_url=p.url)
+        result = connector.messages(patient=p)
         for message in koppeltaal.feed.parse(result):
             connector.message_process(message.id, action='success')
 

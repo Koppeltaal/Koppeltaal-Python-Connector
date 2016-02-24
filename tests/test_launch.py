@@ -29,7 +29,7 @@ def request_care_plan(browser):
 
 def test_launch_patient(
         connector, activity, careplan_on_server, patient, browser):
-    launch_url = connector.launch(activity.id, patient.url, patient.url)
+    launch_url = connector.launch(activity, patient, patient)
 
     parsed_launch_url = urlparse.urlparse(launch_url)
     assert urlparse.parse_qs(
@@ -51,7 +51,7 @@ def test_launch_patient(
 def test_launch_practitioner(
         connector, activity, careplan_on_server, patient, practitioner,
         browser):
-    launch_url = connector.launch(activity.id, patient.url, practitioner.url)
+    launch_url = connector.launch(activity, patient, practitioner)
     browser.get(launch_url)
     wait_for_game(browser)
 
@@ -91,19 +91,19 @@ def test_send_message_from_game_to_server(
         connector, activity, careplan_on_server, patient, browser):
     from koppeltaal.feed import parse
 
-    launch_url = connector.launch(activity.id, patient.url, patient.url)
+    launch_url = connector.launch(activity, patient, patient)
 
     # The message to koppeltaal server needs to be acked.
-    messages = list(parse(connector.messages(
-        processing_status="New", patient_url=patient.url)))
+    messages = list(parse(
+        connector.messages(patient=patient, processing_status="New")))
     assert len(messages) == 1
 
     connector.message_process(messages[0].id, action='claim')
     connector.message_process(messages[0].id, action='success')
 
     # Acked indeed.
-    messages_again = list(parse(connector.messages(
-        processing_status="New", patient_url=patient.url)))
+    messages_again = list(parse(
+        connector.messages(patient=patient, processing_status="New")))
     assert len(messages_again) == 0
 
     browser.get(launch_url)
@@ -112,8 +112,8 @@ def test_send_message_from_game_to_server(
     login_with_oauth(browser)
     request_care_plan(browser)
     post_sub_activities(browser)
-    messages_after_javascript = list(parse(connector.messages(
-        processing_status="New", patient_url=patient.url)))
+    messages_after_javascript = list(parse(
+        connector.messages(patient=patient, processing_status="New")))
     assert len(messages_after_javascript) == 1
 
     message_details = connector.message(messages_after_javascript[0].id)

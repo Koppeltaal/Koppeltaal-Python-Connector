@@ -121,11 +121,12 @@ def cli():
             lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'messages':
         print "Getting messages... (a slow query)..."
+        patient = koppeltaal.model.Patient(None, args.patient_url)
         xml_result = connection.messages(
-            count=args.count,
-            patient_url=args.patient_url,
+            patient=patient,
             processing_status=args.status,
-            summary=True)
+            summary=True,
+            count=args.count)
         messages = list(koppeltaal.feed.parse(xml_result))
         if args.info_per_message:
             for msg in messages:
@@ -181,8 +182,10 @@ def cli():
         print lxml.etree.tostring(
             lxml.etree.fromstring(result), pretty_print=True)
     elif args.command == 'launch':
+        activity = koppeltaal.model.Activity(args.activity_id, None, None)
+        patient = koppeltaal.model.Patient(None, args.patient_url)
+        user = koppeltaal.model.Practitioner(None, args.user_url)
         # XXX Validate activity-id?
-        print connection.launch(
-            args.activity_id, args.patient_url, args.user_url)
+        print connection.launch(activity, patient, user)
     else:
         sys.exit('Unknown command {}'.format(args.command))
