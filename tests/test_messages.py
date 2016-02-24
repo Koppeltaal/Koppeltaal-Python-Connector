@@ -74,7 +74,7 @@ def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     assert patient.name.given in full_message
 
     # Now claim the message.
-    connector.message_process(message_info.id, action='claim')
+    connector.claim(message_info.id)
 
     # The status is "Claimed".
     messages_xml = connector.messages(patient=patient)
@@ -97,8 +97,8 @@ def test_success(
     message_info = messages_for_pat[0]
 
     # Now claim the message.
-    connector.message_process(message_info.id, action='claim')
-    connector.message_process(message_info.id, action='success')
+    connector.claim(message_info.id)
+    connector.success(message_info.id)
 
     messages_xml = connector.messages(
         patient=patient, processing_status='New')

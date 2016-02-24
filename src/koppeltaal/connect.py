@@ -71,6 +71,8 @@ class Connector(object):
         return response.content
 
     def post_message(self, xml):
+        # XXX seems only used for creating care plans so far.
+
         # Get from the metadata definition
         mailbox_url = koppeltaal.metadata.metadata(
             self.metadata())['messaging']['endpoint']
@@ -124,39 +126,6 @@ class Connector(object):
         response.raise_for_status()
         return response.content
 
-    def message(self, id):
-        return self._do_message_query({'_id': id})
-
-    def message_process(self, id, action=None, status=None):
-        # Updating the ProcessingStatus for a Message - After a message
-        # has been successfully processed, the application must update its
-        # ProcessingStatus to "Success" on URL
-        # [[|https://koppelbox/FHIR/Koppeltaal/MessageHeader/[id]]] (that
-        # is, the URL returned as id link in the for the MessageHeader in
-        # the bundle.)
-        if action:
-            status = {
-                'claim': 'Claimed',
-                'success': 'Success'
-            }.get(action, None)
-        if status is None:
-            raise ValueError('Unknown status')
-        messages = list(koppeltaal.feed.parse(self.message(id)))
-        message_header = [
-            resource for resource in messages if
-            isinstance(resource, koppeltaal.model.MessageHeader)][0]
-        # Set the status.
-        message_header.status = status
-        # Parse the XML with lxml.etree and set the ProcessingStatus.
-        response = requests.put(
-            message_header.id,
-            data=lxml.etree.tostring(message_header.node),
-            auth=(self.username, self.password),
-            headers={'Accept': 'application/xml'},
-            allow_redirects=False)
-        response.raise_for_status()
-        return response.content
-
     def messages(
             self,
             patient=None,
@@ -171,3 +140,37 @@ class Connector(object):
         if summary:
             params['_summary'] = 'true'
         return self._do_message_query(params)
+
+    def message(self, id):
+        return self._do_message_query({'_id': id})
+
+    def _process_message(self, id, action):
+        # Updating the ProcessingStatus for a Message - After a message
+        # has been successfully processed, the application must update its
+        # ProcessingStatus to "Success" on URL
+        # [[|https://koppelbox/FHIR/Koppeltaal/MessageHeader/[id]]] (that
+        # is, the URL returned as id link in the for the MessageHeader in
+        # the bundle.)
+        if action not in koppeltaal.interfaces.PROCESSING_ACTIONS:
+            raise ValueError('Action {} unkown'.format(action))
+        message_header = (
+            resource for resource in koppeltaal.feed.parse(self.message(id))
+            if isinstance(resource, koppeltaal.model.MessageHeader)).next()
+        # Set the status and set the new processing status.
+        message_header.status = action
+        response = requests.put(
+            message_header.id,
+            data=lxml.etree.tostring(message_header.node),
+            auth=(self.username, self.password),
+            headers={'Accept': 'application/xml'},
+            allow_redirects=False)
+        response.raise_for_status()
+        return response.content
+
+    def claim(self, id):
+        return self._process_message(
+            id, koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED)
+
+    def success(self, id):
+        return self._process_message(
+            id, koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS)

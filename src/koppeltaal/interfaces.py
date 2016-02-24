@@ -7,6 +7,19 @@ NS = {
     }
 
 
+PROCESSING_STATUS_CLAIMED = 'Claimed'
+PROCESSING_STATUS_FAILED = 'Failed'
+PROCESSING_STATUS_NEW = 'New'
+PROCESSING_STATUS_SUCCESS = 'Success'
+
+
+PROCESSING_ACTIONS = (
+    PROCESSING_STATUS_CLAIMED,
+    PROCESSING_STATUS_FAILED,
+    PROCESSING_STATUS_SUCCESS
+    )
+
+
 class KoppeltaalException(Exception):
     def __init__(self, message):
         self.message = message
@@ -58,7 +71,10 @@ class IConnector(zope.interface.Interface):
     def message(id):
         """Fetch single message."""
 
-    def message_process(id, action=None, status=None):
+    def claim(id):
+        pass
+
+    def success(id):
         pass
 
 

@@ -145,12 +145,9 @@ def cli():
         num_done = 0
         for msg in list(koppeltaal.feed.parse(
                 connection.messages(summary=True))):
-            # XXX Do something workflowy here?
-            # XXX Can we set any message to any state freely?
             if msg.status != args.status:
                 if args.confirm:
-                    connection.message_process(
-                        msg.id, status=args.status)
+                    connection._process_message(msg.id, status=args.status)
                 else:
                     print "Dry-run: not setting message with message id " \
                         "{} to status {}.".format(msg.id, args.status)

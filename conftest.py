@@ -69,7 +69,7 @@ def patient(request, connector):
     def cleanup_patient_messages():
         result = connector.messages(patient=p)
         for message in koppeltaal.feed.parse(result):
-            connector.message_process(message.id, action='success')
+            connector.success(message.id)
 
     request.addfinalizer(cleanup_patient_messages)
     return p

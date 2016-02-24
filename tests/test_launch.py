@@ -98,8 +98,8 @@ def test_send_message_from_game_to_server(
         connector.messages(patient=patient, processing_status="New")))
     assert len(messages) == 1
 
-    connector.message_process(messages[0].id, action='claim')
-    connector.message_process(messages[0].id, action='success')
+    connector.claim(messages[0].id)
+    connector.success(messages[0].id)
 
     # Acked indeed.
     messages_again = list(parse(
