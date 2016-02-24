@@ -50,7 +50,7 @@ class Resource(object):
 class MessageHeader(Resource):
 
     @property
-    def processing_status(self):
+    def status(self):
         return self.node.find(
             'fhir:extension['
             '@url="{koppeltaal}/MessageHeader#ProcessingStatus"]'.format(
@@ -60,8 +60,8 @@ class MessageHeader(Resource):
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCode', namespaces=koppeltaal.NS).get('value')
 
-    @processing_status.setter
-    def processing_status(self, value):
+    @status.setter
+    def status(self, value):
         # This is a mutation of the underlying node.
         self.node.find(
             './/fhir:extension[@url="{koppeltaal}/MessageHeader#'

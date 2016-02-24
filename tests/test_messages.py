@@ -42,7 +42,7 @@ def test_messages_for_status(connector, patient, careplan, careplan_on_server):
     from koppeltaal.feed import parse
     messages = list(parse(connector.messages(patient=careplan.patient)))
     assert len(messages) == 1
-    id, status = messages[0].id, messages[0].processing_status
+    id, status = messages[0].id, messages[0].status
     assert status == "New"  # Because not claimed yet.
 
     messages2 = list(parse(
@@ -67,7 +67,7 @@ def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     assert len(messages_for_pat) == 1
     message_info = messages_for_pat[0]
     assert message_info.id is not None
-    assert message_info.processing_status == 'New'
+    assert message_info.status == 'New'
 
     full_message = connector.message(message_info.id)
     # Smoke test.
@@ -82,7 +82,7 @@ def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     assert len(messages_for_pat) == 1
     message_info = messages_for_pat[0]
     assert message_info.id is not None
-    assert message_info.processing_status == 'Claimed'
+    assert message_info.status == 'Claimed'
 
 
 def test_success(

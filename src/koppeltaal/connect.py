@@ -146,7 +146,7 @@ class Connector(object):
             resource for resource in messages if
             isinstance(resource, koppeltaal.model.MessageHeader)][0]
         # Set the status.
-        message_header.processing_status = status
+        message_header.status = status
         # Parse the XML with lxml.etree and set the ProcessingStatus.
         response = requests.put(
             message_header.id,

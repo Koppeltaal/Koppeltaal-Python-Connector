@@ -103,7 +103,7 @@ class IResource(zope.interface.Interface):
 
 class IMessageHeader(IResource):
 
-    processing_status = zope.interface.Attribute('processing status')
+    status = zope.interface.Attribute('processing status')
 
 
 class ICarePlanResult(zope.interface.Interface):
