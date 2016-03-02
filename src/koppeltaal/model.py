@@ -27,15 +27,6 @@ class Practitioner(object):
         self.name = Name()
 
 
-@zope.interface.implementer(koppeltaal.interfaces.ICarePlan)
-class CarePlan(object):
-
-    def __init__(self, id, url, patient):
-        self.id = id
-        self.url = url
-        self.patient = patient
-
-
 @zope.interface.implementer(koppeltaal.interfaces.IResource)
 class Resource(object):
 
@@ -68,6 +59,16 @@ class MessageHeader(Resource):
             'ProcessingStatusStatus"]'.format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
             'fhir:valueCode', namespaces=koppeltaal.NS).attrib['value'] = value
+
+
+@zope.interface.implementer(koppeltaal.interfaces.ICarePlan)
+class CarePlan(object):
+
+    def __init__(self, id, url, node, patient):
+        self.id = id
+        self.url = url
+        self.node = node
+        self.patient = patient
 
 
 @zope.interface.implementer(koppeltaal.interfaces.ICarePlanResult)

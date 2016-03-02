@@ -105,11 +105,6 @@ class IPractitioner(IEntity, INamed):
     pass
 
 
-class ICarePlan(IEntity):
-
-    patient = zope.interface.Attribute('IPatient')
-
-
 class IResource(zope.interface.Interface):
 
     id = zope.interface.Attribute('id')
@@ -120,6 +115,11 @@ class IResource(zope.interface.Interface):
 class IMessageHeader(IResource):
 
     status = zope.interface.Attribute('processing status')
+
+
+class ICarePlan(IEntity, IResource):
+
+    patient = zope.interface.Attribute('IPatient')
 
 
 class ICarePlanResult(zope.interface.Interface):
