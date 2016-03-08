@@ -4,14 +4,46 @@ import pytest
 import os.path
 import ConfigParser
 import selenium.webdriver
+import koppeltaal.configuration
 import koppeltaal.connect
-import koppeltaal.model
 import koppeltaal.feed
+import koppeltaal.model
 
 
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
     parser.addoption('--server', help='Koppeltaal server URL')
+
+
+@pytest.fixture(scope='session', autouse=True)
+def _config_identity():
+    """Identity function in the context of the test runs."""
+
+    def identity_function(context):
+        # We cannot use id(context) as that id might be reused for objects
+        # that have a non-overlapping life-cycle. We store a identity on the
+        # object and reuse that one.
+        id = getattr(context, '__identity__', None)
+        if id is None:
+            id = context.__identity__ = str(uuid.uuid4())
+        return id
+
+    koppeltaal.configuration.set_identity_function(identity_function)
+
+
+@pytest.fixture(scope='session', autouse=True)
+def _config_url():
+    """URL function in the context of the test runs."""
+
+    def url_function(context):
+        version = getattr(context, '__version__', None)
+        if version is not None:
+            return version
+
+        return 'https://example.com/{}/{}'.format(
+            context.__class__.__name__.lower(), koppeltaal.identity(context))
+
+    koppeltaal.configuration.set_url_function(url_function)
 
 
 @pytest.fixture(scope='session')
@@ -53,23 +85,16 @@ def connector(request):
     return connector
 
 
-def random_id():
-    # Max 36 chars.
-    return 'py-{}'.format(str(uuid.uuid4()).replace('-', ''))
-
-
 @pytest.fixture
 def patient(request, connector):
-    id = random_id()
-    p = koppeltaal.model.Patient(
-        id, 'http://example.com/patient/{}'.format(id))
+    p = koppeltaal.model.Patient()
     p.name.given = 'Claes'
     p.name.family = 'de Vries'
 
     def cleanup_patient_messages():
         result = connector.messages(patient=p)
         for message in koppeltaal.feed.parse(result):
-            connector.success(message.id)
+            connector.success(message.__version__)
 
     request.addfinalizer(cleanup_patient_messages)
     return p
@@ -77,9 +102,7 @@ def patient(request, connector):
 
 @pytest.fixture
 def practitioner():
-    id = random_id()
-    p = koppeltaal.model.Practitioner(
-        id, 'http://example.com/practitioner/{}'.format(id))
+    p = koppeltaal.model.Practitioner()
     p.name.given = 'Jozef'
     p.name.family = 'van Buuren'
     return p
@@ -87,9 +110,7 @@ def practitioner():
 
 @pytest.fixture
 def practitioner2():
-    id = random_id()
-    p = koppeltaal.model.Practitioner(
-        id, 'http://example.com/practitioner/{}'.format(id))
+    p = koppeltaal.model.Practitioner()
     p.name.given = 'Hank'
     p.name.family = 'Schrader'
     return p
@@ -97,14 +118,7 @@ def practitioner2():
 
 @pytest.fixture
 def careplan(connector, patient):
-    id = random_id()
-    return koppeltaal.model.CarePlan(
-        id,
-        'http://example.com/patient/{p.id}/careplan/{id}'.format(
-            id=id,
-            p=patient),
-        patient
-    )
+    return koppeltaal.model.CarePlan(patient)
 
 
 @pytest.fixture
@@ -124,7 +138,6 @@ def activity(connector):
 def careplan_on_server(
         connector, activity, patient, practitioner, careplan):
     from koppeltaal.create_or_update_care_plan import generate
-
     xml = generate(connector.domain, activity, careplan, practitioner)
     connector.post_message(xml)
     return careplan
@@ -135,6 +148,7 @@ def driver(request):
     d = selenium.webdriver.Firefox()
     request.addfinalizer(d.quit)
     return d
+
 
 @pytest.fixture
 def browser(driver, request):
