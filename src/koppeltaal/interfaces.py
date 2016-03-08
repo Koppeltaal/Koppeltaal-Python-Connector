@@ -27,6 +27,9 @@ class KoppeltaalException(Exception):
 
 # XXX Cross-reference with http://www.hl7.org/fhir/resourcelist.html
 
+# XXX (jw) I'd really would like to integrate the SMART-on-FHIR fhirclient
+# Python library for realizing data into FHIR model objects. This would mean
+# using JSON as transportation format though. Not a big deal perhaps?
 
 class IConnector(zope.interface.Interface):
 
@@ -85,52 +88,52 @@ class IName(zope.interface.Interface):
     family = zope.interface.Attribute('familiy name')
 
 
-class IEntity(zope.interface.Interface):
-
-    id = zope.interface.Attribute('id')
-
-    url = zope.interface.Attribute('URL')
-
-
 class INamed(zope.interface.Interface):
 
     name = zope.interface.Attribute('IName')
 
 
-class IPatient(IEntity, INamed):
+class IFHIRResource(zope.interface.Interface):
+    """Marker interface for a resource that is defined in "standard" FHIR.
+
+    """
+
+
+class IResource(IFHIRResource):
+
+    __node__ = zope.interface.Attribute(
+        'XML node representing this resource. Can be ``None``.')
+
+    __version__ = zope.interface.Attribute(
+        'Koppeltaal version specifier for this resource. Can be ``None``.')
+
+
+class IPatient(IResource, INamed):
     pass
 
 
-class IPractitioner(IEntity, INamed):
+class IPractitioner(IResource, INamed):
     pass
-
-
-class IResource(zope.interface.Interface):
-
-    id = zope.interface.Attribute('id')
-
-    node = zope.interface.Attribute('node')
 
 
 class IMessageHeader(IResource):
 
     status = zope.interface.Attribute('processing status')
 
+    reference = zope.interface.Attribute(
+        'focal resource reference, with version')
 
-class ICarePlan(IEntity, IResource):
+
+class ICarePlan(IResource):
 
     patient = zope.interface.Attribute('IPatient')
 
 
-class ICarePlanResult(zope.interface.Interface):
+class IActivity(IResource):
 
-    reference = zope.interface.Attribute('reference')
+    identifier = zope.interface.Attribute(
+        'ActivityDefinition#ActivityDefinitionIdentifier')
 
+    name = zope.interface.Attribute('ActivityDefinition#ActivityName')
 
-class IActivity(zope.interface.Interface):
-
-    id = zope.interface.Attribute('id')
-
-    name = zope.interface.Attribute('name')
-
-    kind = zope.interface.Attribute('kind')
+    kind = zope.interface.Attribute('ActivityDefinition#ActivityKind')

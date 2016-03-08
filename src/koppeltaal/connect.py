@@ -104,10 +104,10 @@ class Connector(object):
             '{}/{}'.format(self.server, OAUTH_LAUNCH_URL),
             auth=(self.username, self.password),
             params={
-                'client_id': activity.id,
-                'patient': patient.url,
-                'user': user.url,
-                'resource': activity.id  # XXX Not to sure about this.
+                'client_id': activity.identifier,  # XXX weird...
+                'patient': koppeltaal.url(patient),
+                'user': koppeltaal.url(user),
+                'resource': activity.identifier  # XXX Not to sure about this.
             },
             allow_redirects=False)
         assert response.is_redirect
@@ -134,7 +134,7 @@ class Connector(object):
             count=5000):
         params = {'_count': count}
         if patient:
-            params['Patient'] = patient.url
+            params['Patient'] = koppeltaal.url(patient)
         if processing_status:
             params['ProcessingStatus'] = processing_status
         if summary:
@@ -159,8 +159,8 @@ class Connector(object):
         # Set the status and set the new processing status.
         message_header.status = action
         response = requests.put(
-            message_header.id,
-            data=lxml.etree.tostring(message_header.node),
+            message_header.__version__,
+            data=lxml.etree.tostring(message_header.__node__),
             auth=(self.username, self.password),
             headers={'Accept': 'application/xml'},
             allow_redirects=False)
