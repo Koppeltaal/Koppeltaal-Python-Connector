@@ -10,40 +10,77 @@ import koppeltaal.feed
 import koppeltaal.model
 
 
+try:
+    import zope.component
+
+    class URLAdapter(object):
+        def __init__(self, context):
+            self.context = context
+
+        def __call__(self, *args, **kw):
+            version = getattr(self.context, '__version__', None)
+            if version is not None:
+                return version
+
+            return 'https://example.com/{}/{}'.format(
+                self.context.__class__.__name__.lower(),
+                koppeltaal.identity(self.context))
+
+    class IDAdapter(object):
+        def __init__(self, context):
+            self.context = context
+
+        def __call__(self, *args, **kw):
+            id = getattr(self.context, '__identity__', None)
+            if id is None:
+                id = self.context.__identity__ = str(uuid.uuid4())
+            return id
+
+    zope.component.provideAdapter(
+        URLAdapter,
+        adapts=(zope.interface.Interface,),
+        provides=koppeltaal.interfaces.IURL)
+
+    zope.component.provideAdapter(
+        IDAdapter,
+        adapts=(zope.interface.Interface,),
+        provides=koppeltaal.interfaces.IID)
+
+except ImportError:
+    @pytest.fixture(scope='session', autouse=True)
+    def _config_identity():
+        """Identity function in the context of the test runs."""
+
+        def identity_function(context):
+            # We cannot use id(context) as that id might be reused for objects
+            # that have a non-overlapping life-cycle. We store a identity on
+            # the object and reuse that one.
+            id = getattr(context, '__identity__', None)
+            if id is None:
+                id = context.__identity__ = str(uuid.uuid4())
+            return id
+
+        koppeltaal.configuration.set_identity_function(identity_function)
+
+    @pytest.fixture(scope='session', autouse=True)
+    def _config_url():
+        """URL function in the context of the test runs."""
+
+        def url_function(context):
+            version = getattr(context, '__version__', None)
+            if version is not None:
+                return version
+
+            return 'https://example.com/{}/{}'.format(
+                context.__class__.__name__.lower(),
+                koppeltaal.identity(context))
+
+        koppeltaal.configuration.set_url_function(url_function)
+
+
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
     parser.addoption('--server', help='Koppeltaal server URL')
-
-
-@pytest.fixture(scope='session', autouse=True)
-def _config_identity():
-    """Identity function in the context of the test runs."""
-
-    def identity_function(context):
-        # We cannot use id(context) as that id might be reused for objects
-        # that have a non-overlapping life-cycle. We store a identity on the
-        # object and reuse that one.
-        id = getattr(context, '__identity__', None)
-        if id is None:
-            id = context.__identity__ = str(uuid.uuid4())
-        return id
-
-    koppeltaal.configuration.set_identity_function(identity_function)
-
-
-@pytest.fixture(scope='session', autouse=True)
-def _config_url():
-    """URL function in the context of the test runs."""
-
-    def url_function(context):
-        version = getattr(context, '__version__', None)
-        if version is not None:
-            return version
-
-        return 'https://example.com/{}/{}'.format(
-            context.__class__.__name__.lower(), koppeltaal.identity(context))
-
-    koppeltaal.configuration.set_url_function(url_function)
 
 
 @pytest.fixture(scope='session')

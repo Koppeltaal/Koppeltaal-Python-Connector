@@ -81,6 +81,18 @@ class IConnector(zope.interface.Interface):
         pass
 
 
+class IURL(zope.interface.Interface):
+
+    def __call__(context, *args, **kw):
+        pass
+
+
+class IID(zope.interface.Interface):
+
+    def __call__(context, *args, **kw):
+        pass
+
+
 class IName(zope.interface.Interface):
 
     given = zope.interface.Attribute('given name')
