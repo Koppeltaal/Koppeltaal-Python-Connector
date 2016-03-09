@@ -83,13 +83,17 @@ class IConnector(zope.interface.Interface):
 
 class IURL(zope.interface.Interface):
 
-    def __call__(context, *args, **kw):
+    context = zope.interface.Attribute('context to compute id for')
+
+    def url(*args, **kw):
         pass
 
 
 class IID(zope.interface.Interface):
 
-    def __call__(context, *args, **kw):
+    context = zope.interface.Attribute('context to compute id for')
+
+    def id(*args, **kw):
         pass
 
 

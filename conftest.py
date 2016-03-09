@@ -17,7 +17,7 @@ try:
         def __init__(self, context):
             self.context = context
 
-        def __call__(self, *args, **kw):
+        def url(self, *args, **kw):
             version = getattr(self.context, '__version__', None)
             if version is not None:
                 return version
@@ -30,7 +30,7 @@ try:
         def __init__(self, context):
             self.context = context
 
-        def __call__(self, *args, **kw):
+        def id(self, *args, **kw):
             id = getattr(self.context, '__identity__', None)
             if id is None:
                 id = self.context.__identity__ = str(uuid.uuid4())

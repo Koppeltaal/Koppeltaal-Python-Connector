@@ -3,14 +3,10 @@ try:
     import koppeltaal.interfaces
 
     def url(context, *args, **kw):
-        adapter = zope.component.getAdapter(
-            context, interface=koppeltaal.interfaces.IURL)
-        return adapter(*args, **kw)
+        return koppeltaal.interfaces.IURL(context).url(*args, **kw)
 
     def identity(context, *args, **kw):
-        adapter = zope.component.getAdapter(
-            context, interface=koppeltaal.interfaces.IID)
-        return adapter(*args, **kw)
+        return koppeltaal.interfaces.IID(context).id(*args, **kw)
 
 except ImportError:
     import threading
