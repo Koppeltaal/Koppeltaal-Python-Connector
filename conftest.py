@@ -48,21 +48,6 @@ try:
 
 except ImportError:
     @pytest.fixture(scope='session', autouse=True)
-    def _config_identity():
-        """Identity function in the context of the test runs."""
-
-        def identity_function(context):
-            # We cannot use id(context) as that id might be reused for objects
-            # that have a non-overlapping life-cycle. We store a identity on
-            # the object and reuse that one.
-            id = getattr(context, '__identity__', None)
-            if id is None:
-                id = context.__identity__ = str(uuid.uuid4())
-            return id
-
-        koppeltaal.configuration.set_identity_function(identity_function)
-
-    @pytest.fixture(scope='session', autouse=True)
     def _config_url():
         """URL function in the context of the test runs."""
 
@@ -76,6 +61,21 @@ except ImportError:
                 koppeltaal.identity(context))
 
         koppeltaal.configuration.set_url_function(url_function)
+
+    @pytest.fixture(scope='session', autouse=True)
+    def _config_identity():
+        """Identity function in the context of the test runs."""
+
+        def identity_function(context):
+            # We cannot use id(context) as that id might be reused for objects
+            # that have a non-overlapping life-cycle. We store a identity on
+            # the object and reuse that one.
+            id = getattr(context, '__identity__', None)
+            if id is None:
+                id = context.__identity__ = str(uuid.uuid4())
+            return id
+
+        koppeltaal.configuration.set_identity_function(identity_function)
 
 
 def pytest_addoption(parser):
