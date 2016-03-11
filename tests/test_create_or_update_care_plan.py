@@ -2,9 +2,6 @@ import lxml.etree
 import requests
 import pytest
 import py.path
-import koppeltaal
-import koppeltaal.interfaces
-import koppeltaal.feed
 
 
 here = py.path.local(__file__)
@@ -118,7 +115,6 @@ def test_send_care_plan_to_server(
     """Send a careplan to the server and check that there is a message in the
     mailbox.
     """
-    import koppeltaal
     from koppeltaal.create_or_update_care_plan import generate, parse_result
     from koppeltaal.feed import parse
 
