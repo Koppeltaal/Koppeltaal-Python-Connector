@@ -137,15 +137,10 @@ def generate(domain, activity, careplan, practitioner):
         member, 'reference',
         attrib={'value': koppeltaal.url(practitioner)})
 
-    # goal
-    # goal id doesn't seem to be part of the schema validation.
-    goal = lxml.etree.SubElement(careplan_el, 'goal', attrib={'id': '1'})
-    lxml.etree.SubElement(goal, 'description', attrib={'value': '-'})
-    lxml.etree.SubElement(goal, 'status', attrib={'value': 'in progress'})
-
     # activity
     activity_el = lxml.etree.SubElement(
         careplan_el, 'activity', attrib={'id': '1'})
+
     # ...needs ActivityIdentifier
     activity_identifier = lxml.etree.SubElement(
         activity_el,
@@ -156,7 +151,8 @@ def generate(domain, activity, careplan, practitioner):
         })
     lxml.etree.SubElement(
         activity_identifier, 'valueString',
-        attrib={'value': '{}#a-1'.format(koppeltaal.url(careplan))})
+        attrib={'value': koppeltaal.url(careplan)})
+
     # ...needs ActivityDefinition
     activity_definition = lxml.etree.SubElement(
         activity_el,
@@ -168,6 +164,7 @@ def generate(domain, activity, careplan, practitioner):
     lxml.etree.SubElement(
         activity_definition, 'valueString',
         attrib={'value': activity.identifier})
+
     # ...needs ActivityKind
     activity_kind = lxml.etree.SubElement(
         activity_el,
@@ -187,6 +184,7 @@ def generate(domain, activity, careplan, practitioner):
     lxml.etree.SubElement(value_coding, 'display', attrib={
         'value': activity.kind['display']
     })
+
     # Need ActivityDescription?
     # Multiple SubActivity will be added on the other side of the connection.
     # Need to add Participant?
