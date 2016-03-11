@@ -13,7 +13,6 @@ class Name(object):
 class Resource(object):
 
     __node__ = None
-
     __version__ = None
 
     def __init__(self, node=None, version=None):
@@ -77,7 +76,7 @@ class CarePlan(Resource):
 @zope.interface.implementer(koppeltaal.interfaces.IActivity)
 class Activity(Resource):
 
-    def __init__(self, identifier, name, kind):
+    def __init__(self, identifier, kind, name):
         self.identifier = identifier
         self.name = name
         self.kind = kind

@@ -29,4 +29,5 @@ def parse(xml):
         first_child = entry.content.getchildren()[0]
         factory = RESOURCE_LOOKUP.get(
             first_child.tag, koppeltaal.model.Resource)
+
         yield factory(node=first_child, version=find_link(entry))

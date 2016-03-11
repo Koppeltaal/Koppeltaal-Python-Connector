@@ -43,7 +43,7 @@ def parse(xml):
                 'fhir:display', namespaces=koppeltaal.NS).get('value')
             }
 
-        yield koppeltaal.model.Activity(identifier, name, kind)
+        yield koppeltaal.model.Activity(identifier, kind, name)
 
 
 def activity_info(xml, activity_id):

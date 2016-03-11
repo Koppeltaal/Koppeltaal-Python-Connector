@@ -1,5 +1,5 @@
 try:
-    import zope.component
+    import zope.component  # NOQA
     import koppeltaal.interfaces
 
     def url(context, *args, **kw):
