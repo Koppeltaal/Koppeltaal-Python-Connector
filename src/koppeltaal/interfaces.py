@@ -7,6 +7,12 @@ NS = {
     }
 
 
+ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
+MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
+METADATA_URL = 'FHIR/Koppeltaal/metadata'
+OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
+
+
 PROCESSING_STATUS_CLAIMED = 'Claimed'
 PROCESSING_STATUS_FAILED = 'Failed'
 PROCESSING_STATUS_NEW = 'New'
@@ -52,7 +58,7 @@ class IConnector(zope.interface.Interface):
     def launch(activity_id, patient_url, user_url):
         pass
 
-    def messsage(
+    def messages(
             patient_url, processing_status=None, summary=False, count=5000):
         """Fetch messages.
 
@@ -140,6 +146,14 @@ class IMessageHeader(IResource):
         'focal resource reference, with version')
 
 
+class IMessage(IResource):
+
+    status = zope.interface.Attribute('processing status')
+
+    reference = zope.interface.Attribute(
+        'focal resource reference, with version')
+
+
 class ICarePlan(IResource):
 
     patient = zope.interface.Attribute('IPatient')
@@ -150,6 +164,6 @@ class IActivity(IResource):
     identifier = zope.interface.Attribute(
         'ActivityDefinition#ActivityDefinitionIdentifier')
 
-    name = zope.interface.Attribute('ActivityDefinition#ActivityName')
-
     kind = zope.interface.Attribute('ActivityDefinition#ActivityKind')
+
+    name = zope.interface.Attribute('ActivityDefinition#ActivityName')

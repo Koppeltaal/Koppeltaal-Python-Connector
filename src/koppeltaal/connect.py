@@ -12,14 +12,6 @@ import koppeltaal.feed
 import koppeltaal.metadata
 
 
-# The URLs that can't be reached from the metadata are defined as constants
-# here.
-METADATA_URL = 'FHIR/Koppeltaal/metadata'
-ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
-MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
-OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
-
-
 @zope.interface.implementer(koppeltaal.interfaces.IConnector)
 class Connector(object):
     server = None
@@ -36,7 +28,7 @@ class Connector(object):
     # Some nice cache decorator here.
     def metadata(self):
         # XXX Add caching based on the 'reliableCache' information.
-        url = '{}/{}'.format(self.server, METADATA_URL)
+        url = '{}/{}'.format(self.server, koppeltaal.interfaces.METADATA_URL)
         response = requests.get(
             url,
             headers={'accept': 'application/xml'},
@@ -47,7 +39,8 @@ class Connector(object):
 
     def test_authentication(self):
         # Perhaps some other URL to test authentication?
-        url = '{}/{}'.format(self.server, ACTIVITY_DEFINITION_URL)
+        url = '{}/{}'.format(
+            self.server, koppeltaal.interfaces.ACTIVITY_DEFINITION_URL)
         koppeltaal.logger.debug('test_authentication %s', url)
         response = requests.get(
             url,
@@ -57,7 +50,8 @@ class Connector(object):
         return response.status_code == 200
 
     def activity_definition(self):
-        url = '{}/{}'.format(self.server, ACTIVITY_DEFINITION_URL)
+        url = '{}/{}'.format(
+            self.server, koppeltaal.interfaces.ACTIVITY_DEFINITION_URL)
         response = requests.get(
             url,
             auth=(self.username, self.password),
@@ -101,7 +95,8 @@ class Connector(object):
 
     def launch(self, activity, patient, user):
         response = requests.get(
-            '{}/{}'.format(self.server, OAUTH_LAUNCH_URL),
+            '{}/{}'.format(
+                self.server, koppeltaal.interfaces.OAUTH_LAUNCH_URL),
             auth=(self.username, self.password),
             params={
                 'client_id': activity.identifier,  # XXX weird...
@@ -116,7 +111,8 @@ class Connector(object):
         return response.headers.get('location')
 
     def _do_message_query(self, params):
-        url = '{}/{}/_search'.format(self.server, MESSAGE_HEADER_URL)
+        url = '{}/{}/_search'.format(
+            self.server, koppeltaal.interfaces.MESSAGE_HEADER_URL)
         response = requests.get(
             url,
             params=params,
