@@ -188,6 +188,7 @@ def get_message(conn, messageheader=None, identifier=None):
 
 def claim_message(conn, message):
     conn.claim(message.messageheader().__version__)
+    return get_message(message.messageheader().__version__)
 
 
 def success_message(conn, message):

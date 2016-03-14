@@ -113,19 +113,14 @@ def test_claim_message(
     assert message.messageheader().__version__ == header.__version__
     assert header.status() == koppeltaal.interfaces.PROCESSING_STATUS_NEW
 
-    koppeltaal.message.claim_message(connector, message)
+    claimed = koppeltaal.message.claim_message(connector, message)
     headers2 = list(
         koppeltaal.message.get_new_messageheaders(
             connector, patient=patient))
     assert len(headers2) == 0
-
-    claimed = koppeltaal.message.get_message(
-        connector, message.messageheader())
     assert claimed.messageheader().status() == \
         koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED
 
-    koppeltaal.message.success_message(connector, message)
-    successed = koppeltaal.message.get_message(
-        connector, message.messageheader())
+    successed = koppeltaal.message.success_message(connector, message)
     assert successed.messageheader().status() == \
         koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS
