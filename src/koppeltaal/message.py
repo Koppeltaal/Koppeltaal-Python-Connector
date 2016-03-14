@@ -186,10 +186,15 @@ def get_message(conn, messageheader=None, identifier=None):
     return Message.from_feed(lxml.etree.fromstring(response.content))
 
 
+# XXX this feel rather circular reasoning, but API-wise I think I'm somewhat
+# on the right track.
+
+
 def claim_message(conn, message):
     conn.claim(message.messageheader().__version__)
-    return get_message(message.messageheader().__version__)
+    return get_message(conn, message.messageheader())
 
 
 def success_message(conn, message):
     conn.success(message.messageheader().__version__)
+    return get_message(conn, message.messageheader())
