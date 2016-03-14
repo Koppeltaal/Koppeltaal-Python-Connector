@@ -15,7 +15,7 @@ import koppeltaal.model
 import koppeltaal_schema.validate
 
 
-def generate(domain, activity, careplan, practitioner):
+def generate(domain, activity, careplan, practitioner, endpoint=None):
     '''
     activity is an info dict as defined by koppeltaal.activity_definition
 
@@ -91,7 +91,7 @@ def generate(domain, activity, careplan, practitioner):
             pkg_resources.get_distribution('koppeltaal').version)
     })
     lxml.etree.SubElement(source, 'endpoint', attrib={
-        'value': 'Not used'
+        'value': 'Not used' if endpoint is None else endpoint
     })
     data = lxml.etree.SubElement(messageheader, 'data')
     lxml.etree.SubElement(

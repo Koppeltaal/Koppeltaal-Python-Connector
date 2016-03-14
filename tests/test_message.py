@@ -89,3 +89,43 @@ def test_get_message(
     message = koppeltaal.message.get_message(connector, header)
     assert message.messageheader().__version__ == header.__version__
     #assert message.careplan() == koppeltaal.url(careplan)
+
+
+def test_claim_message(
+        connector, patient, activity, careplan, practitioner):
+    import koppeltaal
+    import koppeltaal.message
+    import koppeltaal.create_or_update_care_plan
+
+    # Create a careplan, just to have a messageheader available.
+    # XXX replace API.
+    xml = koppeltaal.create_or_update_care_plan.generate(
+        connector.domain, activity, careplan, practitioner)
+    koppeltaal.create_or_update_care_plan.parse_result(
+        connector.post_message(xml), careplan)  # updates version.
+
+    # Unclaimed message
+    headers = list(
+        koppeltaal.message.get_new_messageheaders(
+            connector, patient=patient))
+    header = headers[0]
+    message = koppeltaal.message.get_message(connector, header)
+    assert message.messageheader().__version__ == header.__version__
+    assert header.status() == koppeltaal.interfaces.PROCESSING_STATUS_NEW
+
+    koppeltaal.message.claim_message(connector, message)
+    headers2 = list(
+        koppeltaal.message.get_new_messageheaders(
+            connector, patient=patient))
+    assert len(headers2) == 0
+
+    claimed = koppeltaal.message.get_message(
+        connector, message.messageheader())
+    assert claimed.messageheader().status() == \
+        koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED
+
+    koppeltaal.message.success_message(connector, message)
+    successed = koppeltaal.message.get_message(
+        connector, message.messageheader())
+    assert successed.messageheader().status() == \
+        koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS

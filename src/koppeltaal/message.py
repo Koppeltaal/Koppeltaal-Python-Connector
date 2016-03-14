@@ -80,7 +80,8 @@ class MessageHeader(koppeltaal.model.Resource):
         pass
 
     def source(self):
-        pass
+        return self.__node__.xpath(
+            './fhir:source/fhir:endpoint', namespaces=NS)[0].attrib['value']
 
     def patient(self):
         return valueresourcereference(
@@ -165,11 +166,15 @@ class Message(koppeltaal.model.Resource):
                 self.careplan_ext))
 
 
-def get_message(conn, messageheader):
+def get_message(conn, messageheader=None, identifier=None):
     start_url = '{}/{}/_search'.format(
         conn.server, koppeltaal.interfaces.MESSAGE_HEADER_URL)
     headers = {'Accept': 'application/xml'}
-    parameters = {'_id': messageheader.__version__}
+
+    if messageheader is None:
+        parameters = {'_id': identifier}
+    else:
+        parameters = {'_id': messageheader.__version__}
 
     response = requests.get(
         start_url,
@@ -179,3 +184,11 @@ def get_message(conn, messageheader):
         allow_redirects=False)
 
     return Message.from_feed(lxml.etree.fromstring(response.content))
+
+
+def claim_message(conn, message):
+    conn.claim(message.messageheader().__version__)
+
+
+def success_message(conn, message):
+    conn.success(message.messageheader().__version__)
