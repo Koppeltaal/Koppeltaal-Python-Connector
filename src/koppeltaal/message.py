@@ -1,3 +1,4 @@
+import re
 import lxml.etree
 import requests
 import feedreader
@@ -97,7 +98,7 @@ def batch_feed(xml):
     return (e._xml for e in feed.entries), link(feed._xml, rel='next')
 
 
-def get_new_messageheaders(conn, patient=None, _batchsize=1000):
+def get_new_messageheaders(conn, patient=None, filter=None, _batchsize=1000):
     start_url = '{}/{}/_search'.format(
         conn.server, koppeltaal.interfaces.MESSAGE_HEADER_URL)
     headers = {
@@ -110,6 +111,9 @@ def get_new_messageheaders(conn, patient=None, _batchsize=1000):
 
     if patient is not None:
         parameters['Patient'] = koppeltaal.url(patient)
+
+    if filter is None:
+        filter = lambda x: True
 
     def _message_headers():
         response = requests.get(
@@ -136,7 +140,7 @@ def get_new_messageheaders(conn, patient=None, _batchsize=1000):
                 headers=headers,
                 allow_redirects=False)
 
-    return iter(_message_headers())
+    return (hdr for hdr in _message_headers() if filter(hdr))
 
 
 @zope.interface.implementer(koppeltaal.interfaces.IMessage)
@@ -186,15 +190,20 @@ def get_message(conn, messageheader=None, identifier=None):
     return Message.from_feed(lxml.etree.fromstring(response.content))
 
 
-# XXX this feel rather circular reasoning, but API-wise I think I'm somewhat
-# on the right track.
+# XXX this feel rather like circular reasoning, but API-wise I think I'm
+# somewhat on the right track.
 
 
-def claim_message(conn, message):
-    conn.claim(message.messageheader().__version__)
-    return get_message(conn, message.messageheader())
+def claim_message(conn, messageheader):
+    conn.claim(messageheader.__version__)
+    return get_message(conn, messageheader)
 
 
-def success_message(conn, message):
-    conn.success(message.messageheader().__version__)
-    return get_message(conn, message.messageheader())
+def success_message(conn, messageheader):
+    conn.success(messageheader.__version__)
+    return get_message(conn, messageheader)
+
+
+def version_split(spec, expr=re.compile('^(https://.*)/(_history/.*)$')):
+    match = expr.match(spec)
+    return match.group(1, 2)  # XXX fails for non-version input. can be nicer.

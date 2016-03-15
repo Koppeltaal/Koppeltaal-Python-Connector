@@ -88,11 +88,12 @@ def test_get_message(
     header = headers[0]
     message = koppeltaal.message.get_message(connector, header)
     assert message.messageheader().__version__ == header.__version__
-    #assert message.careplan() == koppeltaal.url(careplan)
+    # assert message.careplan() == koppeltaal.url(careplan)
 
 
 def test_claim_message(
         connector, patient, activity, careplan, practitioner):
+
     import koppeltaal
     import koppeltaal.message
     import koppeltaal.create_or_update_care_plan
@@ -113,7 +114,7 @@ def test_claim_message(
     assert message.messageheader().__version__ == header.__version__
     assert header.status() == koppeltaal.interfaces.PROCESSING_STATUS_NEW
 
-    claimed = koppeltaal.message.claim_message(connector, message)
+    claimed = koppeltaal.message.claim_message(connector, header)
     headers2 = list(
         koppeltaal.message.get_new_messageheaders(
             connector, patient=patient))
@@ -121,6 +122,6 @@ def test_claim_message(
     assert claimed.messageheader().status() == \
         koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED
 
-    successed = koppeltaal.message.success_message(connector, message)
+    successed = koppeltaal.message.success_message(connector, header)
     assert successed.messageheader().status() == \
         koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS
