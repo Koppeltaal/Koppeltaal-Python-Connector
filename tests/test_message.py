@@ -4,8 +4,7 @@ def test_extract(other_node):
     from koppeltaal.message import extract
 
     other = Other.from_entry(other_node)
-    e1, e2, e3 = other.__node__.xpath(
-        './fhir:extension', namespaces=NS)[:3]
+    e1, e2, e3 = other.__node__.xpath('./fhir:extension', namespaces=NS)[:3]
 
     assert extract(e1) == (
         'https://app.minddistrict.com/c/d78827453a734023853d294e6d3385aa'

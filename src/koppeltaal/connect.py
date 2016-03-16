@@ -174,3 +174,9 @@ class Connector(object):
         # higher-level models in message.py (and other modules).
         return self._process_message(
             id, koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS)
+
+    def fail(self, id):
+        # NOTE this barebones implementation is intened to be replaced by
+        # higher-level models in message.py (and other modules).
+        return self._process_message(
+            id, koppeltaal.interfaces.PROCESSING_STATUS_FAILED)

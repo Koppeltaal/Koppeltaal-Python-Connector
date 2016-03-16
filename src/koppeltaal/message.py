@@ -35,7 +35,7 @@ def valuestring(
         node,
         _expr=lxml.etree.XPath('./fhir:valueString/@value', namespaces=NS)):
     found = _expr(node)
-    return None if not found else found[0]
+    return None if not found else unicode(found[0])
 
 
 def valueinteger(
@@ -49,7 +49,7 @@ def valuecode(
         node,
         _expr=lxml.etree.XPath('./fhir:valueCode/@value', namespaces=NS)):
     found = _expr(node)
-    return None if not found else found[0]
+    return None if not found else unicode(found[0])
 
 
 def valuecoding(
@@ -59,7 +59,7 @@ def valuecoding(
     system = coding.xpath('./fhir:system/@value', namespaces=NS)[0]
     code = coding.xpath('./fhir:code/@value', namespaces=NS)[0]
     display = coding.xpath('./fhir:display/@value', namespaces=NS)[0]
-    return (system, code, display)
+    return (unicode(system), unicode(code), unicode(display))
 
 
 def valueresourcereference(
@@ -118,7 +118,7 @@ class MessageHeader(koppeltaal.model.Resource):
             './fhir:source/fhir:endpoint', namespaces=NS)[0].attrib['value']
 
     def patient(self):
-        return valueresourcereference(
+        return valueresourcereference(  # use extract; in other places too?
             extension(self.__node__, self.patient_ext))
 
     def focal_resource(self):
@@ -131,7 +131,7 @@ def batch_feed(xml):
     return (e._xml for e in feed.entries), link(feed._xml, rel='next')
 
 
-def get_new_messageheaders(conn, patient=None, filter=None, _batchsize=1000):
+def get_new_messageheaders(conn, patient=None, filters=None, _batchsize=1000):
     start_url = '{}/{}/_search'.format(
         conn.server, koppeltaal.interfaces.MESSAGE_HEADER_URL)
     headers = {
@@ -145,8 +145,10 @@ def get_new_messageheaders(conn, patient=None, filter=None, _batchsize=1000):
     if patient is not None:
         parameters['Patient'] = koppeltaal.url(patient)
 
-    if filter is None:
-        filter = lambda x: True
+    if filters is None:
+        filters = lambda x: True
+
+    # XXX Moar logging...
 
     def _message_headers():
         response = requests.get(
@@ -173,7 +175,7 @@ def get_new_messageheaders(conn, patient=None, filter=None, _batchsize=1000):
                 headers=headers,
                 allow_redirects=False)
 
-    return (hdr for hdr in _message_headers() if filter(hdr))
+    return (hdr for hdr in _message_headers() if filters(hdr))
 
 
 @zope.interface.implementer(koppeltaal.interfaces.ICarePlan)
@@ -207,6 +209,20 @@ class Other(koppeltaal.model.Resource):
 
     # XXX probably wrong place for this model-like class.
 
+    activity_ext = (
+        '{koppeltaal}/CarePlanActivityStatus#Activity'.format(**NS))
+    activitycompleted_ext = (
+        '{koppeltaal}/CarePlanActivityStatus#PercentageCompleted'.format(**NS))
+    activitystatus_ext = (
+        '{koppeltaal}/CarePlanActivityStatus#ActivityStatus'.format(**NS))
+    subactivity_ext = (
+        '{koppeltaal}/CarePlanActivityStatus#SubActivity'.format(**NS))
+    subactivityidentifier_ext = (
+        '{koppeltaal}/CarePlanActivityStatus#SubActivityIdentifier'
+        ''.format(**NS))
+    subactivitystatus_ext = (
+        '{koppeltaal}/CarePlanActivityStatus#SubActivityStatus'.format(**NS))
+
     @classmethod
     def from_entry(cls, entry):
         return cls(
@@ -214,10 +230,8 @@ class Other(koppeltaal.model.Resource):
                 './atom:content/fhir:Other', namespaces=NS)[0],
             version=link(entry, rel='self'))
 
-    def extract_data(self, ext, node=None):
-        if node is None:
-            node = self.__node__
-        found = extensions(node, '{koppeltaal}/{}'.format(ext, **NS))
+    def extract_data(self, ext):
+        found = extensions(self.__node__, ext)
         if not found:
             return None
         return [extract(e) for e in found]
@@ -264,6 +278,8 @@ def get_message(conn, messageheader=None, identifier=None):
     else:
         parameters = {'_id': messageheader.__version__}
 
+    # XXX Moar logging...
+
     response = requests.get(
         start_url,
         auth=(conn.username, conn.password),
@@ -283,12 +299,23 @@ def get_message(conn, messageheader=None, identifier=None):
 
 
 def claim_message(conn, messageheader):
+    # XXX Moar logging...
+
     conn.claim(messageheader.__version__)
     return get_message(conn, messageheader)
 
 
 def success_message(conn, messageheader):
+    # XXX Moar logging...
+
     conn.success(messageheader.__version__)
+    return get_message(conn, messageheader)
+
+
+def fail_message(conn, messageheader):
+    # XXX Moar logging...
+
+    conn.fail(messageheader.__version__)
     return get_message(conn, messageheader)
 
 
