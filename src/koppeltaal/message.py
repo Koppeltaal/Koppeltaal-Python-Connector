@@ -230,12 +230,6 @@ class Other(koppeltaal.model.Resource):
                 './atom:content/fhir:Other', namespaces=NS)[0],
             version=link(entry, rel='self'))
 
-    def extract_data(self, ext):
-        found = extensions(self.__node__, ext)
-        if not found:
-            return None
-        return [extract(e) for e in found]
-
 
 @zope.interface.implementer(koppeltaal.interfaces.IMessage)
 class Message(koppeltaal.model.Resource):
