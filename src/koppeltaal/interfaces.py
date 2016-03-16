@@ -138,6 +138,12 @@ class IPractitioner(IResource, INamed):
     pass
 
 
+class IUser(IResource):
+    # More generic than patient or practitioner - used where a user URL needs
+    # to be computed when assembling a launch URL.
+    pass
+
+
 class IMessageHeader(IResource):
 
     status = zope.interface.Attribute('processing status')

@@ -191,3 +191,74 @@ def driver(request):
 def browser(driver, request):
     request.addfinalizer(driver.delete_all_cookies)
     return driver
+
+
+@pytest.fixture
+def other_node(request):
+    import lxml.etree
+    # flake8: noqa
+    return lxml.etree.fromstring("""
+  <entry xmlns="http://www.w3.org/2005/Atom">
+    <id>http://kickassgame.nl/FHIR/CarePlanActivityStatus/74262677</id>
+    <link rel="self" href="http://kickassgame.nl/FHIR/CarePlanActivityStatus/74262677/_history/2016-03-16T09:37:25:463.2652" />
+    <content type="text/xml">
+      <Other id="74262677" xmlns="http://hl7.org/fhir">
+        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#Activity">
+          <valueString value="https://app.minddistrict.com/c/d78827453a734023853d294e6d3385aa/remoteactivities/r.1" />
+        </extension>
+        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#PercentageCompleted">
+          <valueInteger value="0" />
+        </extension>
+        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#ActivityStatus">
+          <valueCoding>
+            <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
+            <code value="InProgress" />
+            <display value="InProgress" />
+          </valueCoding>
+        </extension>
+        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivity">
+          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityIdentifier">
+            <valueString value="scenario_5" />
+          </extension>
+          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityStatus">
+            <valueCoding>
+              <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
+              <code value="Available" />
+              <display value="Available" />
+            </valueCoding>
+          </extension>
+        </extension>
+        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivity">
+          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityIdentifier">
+            <valueString value="scenario_3" />
+          </extension>
+          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityStatus">
+            <valueCoding>
+              <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
+              <code value="Available" />
+              <display value="Available" />
+            </valueCoding>
+          </extension>
+        </extension>
+        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivity">
+          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityIdentifier">
+            <valueString value="scenario_8" />
+          </extension>
+          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityStatus">
+            <valueCoding>
+              <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
+              <code value="Available" />
+              <display value="Available" />
+            </valueCoding>
+          </extension>
+        </extension>
+        <code>
+          <coding>
+            <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage" />
+            <code value="CarePlanActivityStatus" />
+            <display value="CarePlanActivityStatus" />
+          </coding>
+        </code>
+      </Other>
+    </content>
+  </entry>""")

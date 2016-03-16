@@ -3,6 +3,9 @@ import koppeltaal
 import koppeltaal.feed
 import koppeltaal.model
 
+# NOTE this barebones implementation is intened to be replaced by higher-level
+# models in message.py (and other modules).
+
 
 # Move this parsing to the python package "feedreader".
 def find_link(entry):

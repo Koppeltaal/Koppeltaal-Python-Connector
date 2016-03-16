@@ -128,6 +128,8 @@ class Connector(object):
             processing_status=None,
             summary=False,
             count=5000):
+        # NOTE this barebones implementation is intened to be replaced by
+        # higher-level models in message.py (and other modules).
         params = {'_count': count}
         if patient:
             params['Patient'] = koppeltaal.url(patient)
@@ -138,15 +140,13 @@ class Connector(object):
         return self._do_message_query(params)
 
     def message(self, id):
+        # NOTE this barebones implementation is intened to be replaced by
+        # higher-level models in message.py (and other modules).
         return self._do_message_query({'_id': id})
 
     def _process_message(self, id, action):
-        # Updating the ProcessingStatus for a Message - After a message
-        # has been successfully processed, the application must update its
-        # ProcessingStatus to "Success" on URL
-        # [[|https://koppelbox/FHIR/Koppeltaal/MessageHeader/[id]]] (that
-        # is, the URL returned as id link in the for the MessageHeader in
-        # the bundle.)
+        # NOTE this barebones implementation is intened to be replaced by
+        # higher-level models in message.py (and other modules).
         if action not in koppeltaal.interfaces.PROCESSING_ACTIONS:
             raise ValueError('Action {} unkown'.format(action))
         message_header = (
@@ -164,9 +164,13 @@ class Connector(object):
         return response.content
 
     def claim(self, id):
+        # NOTE this barebones implementation is intened to be replaced by
+        # higher-level models in message.py (and other modules).
         return self._process_message(
             id, koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED)
 
     def success(self, id):
+        # NOTE this barebones implementation is intened to be replaced by
+        # higher-level models in message.py (and other modules).
         return self._process_message(
             id, koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS)

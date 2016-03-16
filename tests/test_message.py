@@ -1,3 +1,39 @@
+def test_extract(other_node):
+    from koppeltaal.interfaces import NS
+    from koppeltaal.message import Other
+    from koppeltaal.message import extract
+
+    other = Other.from_entry(other_node)
+    e1, e2, e3 = other.__node__.xpath(
+        './fhir:extension', namespaces=NS)[:3]
+
+    assert extract(e1) == (
+        'https://app.minddistrict.com/c/d78827453a734023853d294e6d3385aa'
+        '/remoteactivities/r.1')
+    assert extract(e2) == 0
+    assert extract(e3) == (
+        'http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus',
+        'InProgress',
+        'InProgress')
+
+
+def test_other(other_node):
+    from koppeltaal.interfaces import NS
+    from koppeltaal.message import Other
+    from koppeltaal.message import extract
+
+    other = Other.from_entry(other_node)
+    assert other.extract_data('CarePlanActivityStatus#Activity') == [
+        ('https://app.minddistrict.com/c/d78827453a734023853d294e6d3385aa'
+         '/remoteactivities/r.1')]
+    assert other.extract_data(
+        'CarePlanActivityStatus#PercentageCompleted') == [0]
+    assert other.extract_data('CarePlanActivityStatus#ActivityStatus') == [
+        ('http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus',
+         'InProgress',
+         'InProgress')]
+
+
 def test_get_new_messageheaders(
         connector, patient, activity, careplan, practitioner):
 

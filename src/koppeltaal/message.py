@@ -14,36 +14,52 @@ def link(
         node, rel='self',
         _expr=lxml.etree.XPath('./atom:link[@rel=$rel]', namespaces=NS)):
     links = _expr(node, rel=rel)
-    if not links:
-        return None
-    return links[0].attrib['href']
+    return None if not links else links[0].attrib['href']
 
 
-def extension(
+def extensions(
         node, ext,
         _expr=lxml.etree.XPath('./fhir:extension[@url=$ext]', namespaces=NS)):
-    extensions = _expr(node, ext=ext)
-    if not extensions:
+    found = _expr(node, ext=ext)
+    return None if not found else found
+
+
+def extension(node, ext):
+    found = extensions(node, ext)
+    if found is None:
         return None
-    return extensions[0]
+    return None if not found else found[0]
 
 
 def valuestring(
         node,
         _expr=lxml.etree.XPath('./fhir:valueString/@value', namespaces=NS)):
-    values = _expr(node)
-    if not values:
-        return None
-    return values[0]
+    found = _expr(node)
+    return None if not found else found[0]
+
+
+def valueinteger(
+        node,
+        _expr=lxml.etree.XPath('./fhir:valueInteger/@value', namespaces=NS)):
+    found = _expr(node)
+    return None if not found else int(found[0])
 
 
 def valuecode(
         node,
         _expr=lxml.etree.XPath('./fhir:valueCode/@value', namespaces=NS)):
-    codes = _expr(node)
-    if not codes:
-        return None
-    return codes[0]
+    found = _expr(node)
+    return None if not found else found[0]
+
+
+def valuecoding(
+        node,
+        _expr=lxml.etree.XPath('./fhir:valueCoding', namespaces=NS)):
+    coding = _expr(node)[0]
+    system = coding.xpath('./fhir:system/@value', namespaces=NS)[0]
+    code = coding.xpath('./fhir:code/@value', namespaces=NS)[0]
+    display = coding.xpath('./fhir:display/@value', namespaces=NS)[0]
+    return (system, code, display)
 
 
 def valueresourcereference(
@@ -51,9 +67,25 @@ def valueresourcereference(
         _expr=lxml.etree.XPath(
             './fhir:valueResource/fhir:reference/@value', namespaces=NS)):
     refs = _expr(node)
-    if not refs:
+    return None if not refs else refs[0]
+
+
+EXTRACTORS = {
+    '{{{fhir}}}valueCode'.format(**NS): valuecode,
+    '{{{fhir}}}valueCoding'.format(**NS): valuecoding,
+    '{{{fhir}}}valueInteger'.format(**NS): valueinteger,
+    '{{{fhir}}}valueResource'.format(**NS): valueresourcereference,
+    '{{{fhir}}}valueString'.format(**NS): valuestring,
+    }
+
+
+def extract(node):
+    childs = node.xpath('./*')
+    if not childs:
         return None
-    return refs[0]
+    child = childs[0]
+    extractor = EXTRACTORS.get(child.tag)
+    return extractor(node) if extractor else None
 
 
 @zope.interface.implementer(koppeltaal.interfaces.IMessageHeader)
@@ -78,7 +110,8 @@ class MessageHeader(koppeltaal.model.Resource):
                 self.statusstatus_ext))
 
     def event(self):
-        pass
+        return self.__node__.xpath(
+            './fhir:event/fhir:code', namespaces=NS)[0].attrib['value']
 
     def source(self):
         return self.__node__.xpath(
@@ -143,10 +176,57 @@ def get_new_messageheaders(conn, patient=None, filter=None, _batchsize=1000):
     return (hdr for hdr in _message_headers() if filter(hdr))
 
 
+@zope.interface.implementer(koppeltaal.interfaces.ICarePlan)
+class CarePlan(koppeltaal.model.Resource):
+
+    # XXX probably wrong place for this model-like class.
+
+    activityid_ext = '{koppeltaal}/CarePlan#ActivityIdentifier'.format(**NS)
+    activitystatus_ext = '{koppeltaal}/CarePlan#ActivityStatus'.format(**NS)
+    subactivity_ext = '{koppeltaal}/CarePlan#SubActivity'.format(**NS)
+
+    @classmethod
+    def from_entry(cls, entry):
+        return cls(
+            node=entry.xpath(
+                './atom:content/fhir:CarePlan', namespaces=NS)[0],
+            version=link(entry, rel='self'))
+
+    def activity_status(self):
+        return valuecoding(
+            extension(self.__node__, self.activitystatus_ext))
+
+    def sub_activities(self):
+        return [
+            valuestring(n) for n in
+            extensions(self.__node__, self.subactivity_ext)]
+
+
+@zope.interface.implementer(koppeltaal.interfaces.IResource)
+class Other(koppeltaal.model.Resource):
+
+    # XXX probably wrong place for this model-like class.
+
+    @classmethod
+    def from_entry(cls, entry):
+        return cls(
+            node=entry.xpath(
+                './atom:content/fhir:Other', namespaces=NS)[0],
+            version=link(entry, rel='self'))
+
+    def extract_data(self, ext):
+        found = extensions(self.__node__, '{koppeltaal}/{}'.format(ext, **NS))
+        if found is None:
+            return None
+        return [extract(node) for node in found]
+
+
 @zope.interface.implementer(koppeltaal.interfaces.IMessage)
 class Message(koppeltaal.model.Resource):
 
-    careplan_ext = '{koppeltaal}/CarePlan#ActivityIdentifier'.format(**NS)
+    # NOTE there is not really a message-like element in the FHIR-over-Atom
+    # modelling. For us here it is the Atom feed with MessageHeader element,
+    # CarePlan element and Patient and Practitioner elements.
 
     @classmethod
     def from_feed(cls, feed):
@@ -162,12 +242,14 @@ class Message(koppeltaal.model.Resource):
                 namespaces=NS)[0])
 
     def careplan(self):
-        return valuestring(
-            extension(
-                self.__node__.xpath(
-                    './atom:entry/atom:content/fhir:CarePlan/'
-                    'fhir:activity', namespaces=NS)[0],
-                self.careplan_ext))
+        found = self.__node__.xpath(
+            './atom:entry[./atom:content/fhir:CarePlan]', namespaces=NS)
+        return None if not found else CarePlan.from_entry(found[0])
+
+    def other(self):
+        found = self.__node__.xpath(
+            './atom:entry[./atom:content/fhir:Other]', namespaces=NS)
+        return None if not found else Other.from_entry(found[0])
 
 
 def get_message(conn, messageheader=None, identifier=None):
@@ -205,5 +287,8 @@ def success_message(conn, messageheader):
 
 
 def version_split(spec, expr=re.compile('^(https://.*)/(_history/.*)$')):
+
+    # XXX probably not the right location for this helper.
+
     match = expr.match(spec)
     return match.group(1, 2)  # XXX fails for non-version input. can be nicer.
