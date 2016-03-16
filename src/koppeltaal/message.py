@@ -214,11 +214,13 @@ class Other(koppeltaal.model.Resource):
                 './atom:content/fhir:Other', namespaces=NS)[0],
             version=link(entry, rel='self'))
 
-    def extract_data(self, ext):
-        found = extensions(self.__node__, '{koppeltaal}/{}'.format(ext, **NS))
-        if found is None:
+    def extract_data(self, ext, node=None):
+        if node is None:
+            node = self.__node__
+        found = extensions(node, '{koppeltaal}/{}'.format(ext, **NS))
+        if not found:
             return None
-        return [extract(node) for node in found]
+        return [extract(e) for e in found]
 
 
 @zope.interface.implementer(koppeltaal.interfaces.IMessage)
@@ -226,7 +228,7 @@ class Message(koppeltaal.model.Resource):
 
     # NOTE there is not really a message-like element in the FHIR-over-Atom
     # modelling. For us here it is the Atom feed with MessageHeader element,
-    # CarePlan element and Patient and Practitioner elements.
+    # an CarePlan or Other element and Patient and Practitioner elements.
 
     @classmethod
     def from_feed(cls, feed):
@@ -268,6 +270,10 @@ def get_message(conn, messageheader=None, identifier=None):
         headers=headers,
         params=parameters,
         allow_redirects=False)
+
+    # XXX there is a message(header) status that notifies of a newer version
+    # of the message. Or something like that. We need to deal with that
+    # somewhere/somehow I guess.
 
     return Message.from_feed(lxml.etree.fromstring(response.content))
 
