@@ -6,8 +6,7 @@ Changes
 
 - Nothing changed yet.
 
-
 0.1a1 (2016-06-29)
 ------------------
 
-* Initial creation.
+- Initial creation.
