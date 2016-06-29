@@ -80,10 +80,10 @@ class Connector(object):
         response = requests.post(
             mailbox_url,
             auth=(self.username, self.password),
-            data=xml,
+            data=xml.encode('utf-8'),
             headers={
                 'Accept': 'application/xml',
-                'Content-Type': 'application/xml',
+                'Content-Type': 'application/xml;charset=utf-8',
             },
             allow_redirects=False)
         response.raise_for_status()
