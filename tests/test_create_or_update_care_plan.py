@@ -1,3 +1,4 @@
+# encoding: utf-8
 import lxml.etree
 import requests
 import pytest
@@ -121,6 +122,33 @@ def test_send_care_plan_to_server(
     # Before the careplan is sent, there are no messages for the patient.
     headers1 = list(parse(connector.messages(patient=patient)))
     assert len(headers1) == 0
+
+    # The careplan was sent successfully and now has a _history.
+    xml = generate(connector.domain, activity, careplan, practitioner)
+    result = connector.post_message(xml)
+    parse_result(result, careplan)
+    assert careplan.__version__ is not None
+
+    # Assert there is a message in the mailbox for this patient.
+    headers2 = list(parse(connector.messages(patient=patient)))
+    assert len(headers2) == 1
+
+
+def test_send_non_ascii_data_in_care_plan_to_server(
+        connector, patient, practitioner, activity):
+    """Send a careplan to the server and check that there is a message in the
+    mailbox.
+    """
+    import koppeltaal.model
+    from koppeltaal.create_or_update_care_plan import generate, parse_result
+    from koppeltaal.feed import parse
+
+    # Before the careplan is sent, there are no messages for the patient.
+    headers1 = list(parse(connector.messages(patient=patient)))
+    assert len(headers1) == 0
+
+    patient.name.given = u'Cliënt cliënt'
+    careplan = koppeltaal.model.CarePlan(patient)
 
     # The careplan was sent successfully and now has a _history.
     xml = generate(connector.domain, activity, careplan, practitioner)

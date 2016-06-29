@@ -75,12 +75,13 @@ class Connector(object):
         assert urlparse.urlparse(mailbox_url).scheme == urlparse.urlparse(
             self.server).scheme
 
-        koppeltaal.logger.debug('Post message {}'.format(xml))
+        data = xml.encode('utf-8')
+        koppeltaal.logger.debug('Post message {}'.format(data))
 
         response = requests.post(
             mailbox_url,
             auth=(self.username, self.password),
-            data=xml.encode('utf-8'),
+            data=data,
             headers={
                 'Accept': 'application/xml',
                 'Content-Type': 'application/xml;charset=utf-8',
