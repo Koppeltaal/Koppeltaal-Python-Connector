@@ -1,7 +1,7 @@
 Changes
 =======
 
-0.1a1 (unreleased)
+0.1a1 (2016-06-29)
 ------------------
 
 * Initial creation.
