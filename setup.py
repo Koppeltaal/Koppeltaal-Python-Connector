@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1a1'
+version = '0.1a2.dev0'
 
 setup(
     name='koppeltaal',
