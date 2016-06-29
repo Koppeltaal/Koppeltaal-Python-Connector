@@ -10,11 +10,12 @@ import feedgen.feed
 import feedreader.parser
 import lxml.etree
 import koppeltaal
+import koppeltaal.logger
 import koppeltaal.model
 import koppeltaal_schema.validate
 
 
-def generate(domain, activity, careplan, practitioner):
+def generate(domain, activity, careplan, practitioner, endpoint=None):
     '''
     activity is an info dict as defined by koppeltaal.activity_definition
 
@@ -68,7 +69,7 @@ def generate(domain, activity, careplan, practitioner):
         })
     valueResource = lxml.etree.SubElement(extension, 'valueResource')
     lxml.etree.SubElement(valueResource, 'reference', attrib={
-        'value': patient.url
+        'value': koppeltaal.url(patient)
         })
     lxml.etree.SubElement(messageheader, 'identifier', attrib={
         'value': message_id})
@@ -90,10 +91,12 @@ def generate(domain, activity, careplan, practitioner):
             pkg_resources.get_distribution('koppeltaal').version)
     })
     lxml.etree.SubElement(source, 'endpoint', attrib={
-        'value': 'Not used'
+        'value': 'Not used' if endpoint is None else endpoint
     })
     data = lxml.etree.SubElement(messageheader, 'data')
-    lxml.etree.SubElement(data, 'reference', attrib={'value': careplan.url})
+    lxml.etree.SubElement(
+        data, 'reference',
+        attrib={'value': koppeltaal.url(careplan)})
 
     # Add message header to feed.
     messageheader_entry.content(
@@ -102,18 +105,23 @@ def generate(domain, activity, careplan, practitioner):
     # And now for my next trick, a CarePlan!
     careplan_entry = feed.add_entry()
     # Please feedgen with a id and title.
-    careplan_entry.id(careplan.id)
-    careplan_entry.title('CarePlan resource with id {}'.format(careplan.id))
-    careplan_entry.link(rel='self', href=careplan.url)
+    careplan_identity = koppeltaal.identity(careplan)
+    careplan_entry.id(careplan_identity)
+    careplan_entry.title(
+        'CarePlan resource with id {}'.format(careplan_identity))
+
+    careplan_entry.link(rel='self', href=koppeltaal.url(careplan))
 
     careplan_el = lxml.etree.Element(
         'CarePlan',
-        attrib={'id': careplan.id},
+        attrib={'id': careplan_identity},
         nsmap={None: koppeltaal.NS['fhir']})
 
     patient_el = lxml.etree.SubElement(careplan_el, 'patient')
     lxml.etree.SubElement(
-        patient_el, 'reference', attrib={'value': patient.url})
+        patient_el, 'reference',
+        attrib={'value': koppeltaal.url(patient)})
+
     lxml.etree.SubElement(careplan_el, 'status', attrib={'value': 'active'})
     participant = lxml.etree.SubElement(careplan_el, 'participant')
     role = lxml.etree.SubElement(participant, 'role')
@@ -126,17 +134,13 @@ def generate(domain, activity, careplan, practitioner):
     lxml.etree.SubElement(coding, 'display', attrib={'value': 'Requester'})
     member = lxml.etree.SubElement(participant, 'member')
     lxml.etree.SubElement(
-        member, 'reference', attrib={'value': practitioner.url})
-
-    # goal
-    # goal id doesn't seem to be part of the schema validation.
-    goal = lxml.etree.SubElement(careplan_el, 'goal', attrib={'id': '1'})
-    lxml.etree.SubElement(goal, 'description', attrib={'value': '-'})
-    lxml.etree.SubElement(goal, 'status', attrib={'value': 'in progress'})
+        member, 'reference',
+        attrib={'value': koppeltaal.url(practitioner)})
 
     # activity
     activity_el = lxml.etree.SubElement(
         careplan_el, 'activity', attrib={'id': '1'})
+
     # ...needs ActivityIdentifier
     activity_identifier = lxml.etree.SubElement(
         activity_el,
@@ -147,7 +151,8 @@ def generate(domain, activity, careplan, practitioner):
         })
     lxml.etree.SubElement(
         activity_identifier, 'valueString',
-        attrib={'value': '{}#a-1'.format(careplan.url)})
+        attrib={'value': koppeltaal.url(careplan)})
+
     # ...needs ActivityDefinition
     activity_definition = lxml.etree.SubElement(
         activity_el,
@@ -157,7 +162,9 @@ def generate(domain, activity, careplan, practitioner):
                 **koppeltaal.NS)
         })
     lxml.etree.SubElement(
-        activity_definition, 'valueString', attrib={'value': activity.id})
+        activity_definition, 'valueString',
+        attrib={'value': activity.identifier})
+
     # ...needs ActivityKind
     activity_kind = lxml.etree.SubElement(
         activity_el,
@@ -177,6 +184,7 @@ def generate(domain, activity, careplan, practitioner):
     lxml.etree.SubElement(value_coding, 'display', attrib={
         'value': activity.kind['display']
     })
+
     # Need ActivityDescription?
     # Multiple SubActivity will be added on the other side of the connection.
     # Need to add Participant?
@@ -207,14 +215,15 @@ def generate(domain, activity, careplan, practitioner):
 
     # Add Patient entry.
     patient_entry = feed.add_entry()
-    patient_entry.id(patient.id)
-    patient_entry.title('Patient resource with id {}'.format(patient.id))
-    patient_entry.link(rel='self', href=patient.url)
+    patient_identity = koppeltaal.identity(patient)
+    patient_entry.id(patient_identity)
+    patient_entry.title('Patient resource with id {}'.format(patient_identity))
+    patient_entry.link(rel='self', href=koppeltaal.url(patient))
 
     # Add patient age and gender?
     patient_entry_el = lxml.etree.Element(
         'Patient',
-        attrib={'id': patient.id},
+        attrib={'id': patient_identity},
         nsmap={None: koppeltaal.NS['fhir']})
     patient_name = lxml.etree.SubElement(patient_entry_el, 'name')
     lxml.etree.SubElement(patient_name, 'use', attrib={'value': 'official'})
@@ -227,13 +236,16 @@ def generate(domain, activity, careplan, practitioner):
 
     # Add Practitioner entry.
     practitioner_entry = feed.add_entry()
-    practitioner_entry.id(practitioner.id)
+    practitioner_identity = koppeltaal.identity(practitioner)
+    practitioner_entry.id(practitioner_identity)
     practitioner_entry.title(
-        'Practitioner resource with id {}'.format(practitioner.id))
-    practitioner_entry.link(rel='self', href=practitioner.url)
+        'Practitioner resource with id {}'.format(practitioner_identity))
+
+    practitioner_entry.link(rel='self', href=koppeltaal.url(practitioner))
+
     practitioner_entry_el = lxml.etree.Element(
         'Practitioner',
-        attrib={'id': practitioner.id},
+        attrib={'id': practitioner_identity},
         nsmap={None: koppeltaal.NS['fhir']})
     practitioner_name = lxml.etree.SubElement(practitioner_entry_el, 'name')
     lxml.etree.SubElement(
@@ -257,11 +269,12 @@ def generate(domain, activity, careplan, practitioner):
     return feed_str
 
 
-def parse_result(xml):
+def parse_result(xml, careplan):
     # Perhaps refactor this to use koppeltaal.feed.
     feed = feedreader.parser.from_string(xml)
     reference = feed.entries[0].content.find(
         'fhir:MessageHeader', namespaces=koppeltaal.NS).find(
         'fhir:data', namespaces=koppeltaal.NS).find(
         'fhir:reference', namespaces=koppeltaal.NS).get('value')
-    return koppeltaal.model.CarePlanResult(reference)
+    careplan.__version__ = reference
+    return careplan

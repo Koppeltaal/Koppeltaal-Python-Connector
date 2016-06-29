@@ -10,13 +10,18 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'feedgen == 0.3.1.dev',
+        'feedgen == 0.3.1+md.1',
         'feedreader',
         'koppeltaal_schema',
         'lxml',
         'requests >= 2.5.1',
         'zope.interface >= 3.7.0',
         ],
+    extras_require={
+        'zope.component': [
+            'zope.component',
+            ],
+        },
     entry_points={
         'console_scripts': [
             'koppeltaal = koppeltaal.cli:cli'

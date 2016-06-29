@@ -1,5 +1,6 @@
 import feedreader.parser
 import koppeltaal
+import koppeltaal.interfaces
 
 
 def parse(xml):
@@ -14,23 +15,27 @@ def parse(xml):
     for entry in feed.entries:
         # The raw element. We may want to remove this at some point in
         # the future.
-        node = entry.content.find(
-            'fhir:Other', namespaces=koppeltaal.NS)
-        # Make 'useful' attributes accessible here.
-        activity_kind_value_coding = node.find((
-            'fhir:extension[@url="{koppeltaal}'
-            '/ActivityDefinition#ActivityKind"]').format(
-                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
-            'fhir:valueCoding', namespaces=koppeltaal.NS)
+        node = entry.content.find('fhir:Other', namespaces=koppeltaal.NS)
+
+        # Make 'useful' attributes accessible here. XXX should use
+        # extension URL for getting the correct identifier.
         identifier = node.find(
             'fhir:identifier', namespaces=koppeltaal.NS).find(
                 'fhir:value', namespaces=koppeltaal.NS).get('value')
+
         name = node.find((
             'fhir:extension[@url="{koppeltaal}'
             '/ActivityDefinition#ActivityName"]').format(
                 **koppeltaal.NS), namespaces=koppeltaal.NS).find(
                     'fhir:valueString',
                     namespaces=koppeltaal.NS).get('value')
+
+        activity_kind_value_coding = node.find((
+            'fhir:extension[@url="{koppeltaal}'
+            '/ActivityDefinition#ActivityKind"]').format(
+                **koppeltaal.NS), namespaces=koppeltaal.NS).find(
+            'fhir:valueCoding', namespaces=koppeltaal.NS)
+
         kind = {
             'code': activity_kind_value_coding.find(
                 'fhir:code', namespaces=koppeltaal.NS).get('value'),
@@ -38,15 +43,15 @@ def parse(xml):
                 'fhir:display', namespaces=koppeltaal.NS).get('value')
             }
 
-        yield koppeltaal.model.Activity(identifier, name, kind)
+        yield koppeltaal.model.Activity(identifier, kind, name)
 
 
 def activity_info(xml, activity_id):
     '''Given an XML feed of Activities, return the info about the one with the
     given activity_id.'''
     for info in parse(xml):
-        if info.id == activity_id:
+        if info.identifier == activity_id:
             return info
     # Raise an error in case of unknown activity id.
-    raise koppeltaal.KoppeltaalException(
+    raise koppeltaal.interfaces.KoppeltaalException(
         'Unknown activity id: "{}"'.format(activity_id))
