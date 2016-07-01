@@ -32,12 +32,35 @@ class MessageHeader(object):
             item.uid,
             item['event']['code'],
             status('MessageHeader#ProcessingStatusStatus'),
-            status('MessageHeader#ProcessingStatusStatusLastChanged'))
+            status('MessageHeader#ProcessingStatusStatusLastChanged'),
+            item.extension('MessageHeader#Patient'))
+
+
+class Patient(object):
+
+    @classmethod
+    def unpack(self, item):
+        return koppeltaal.models.Patient(
+            item.uid,
+            item['name'][0]['family'][0],
+            item['name'][0]['given'][0])
+
+
+class Practitioner(object):
+
+    @classmethod
+    def unpack(self, item):
+        return koppeltaal.models.Practitioner(
+            item.uid,
+            item['name']['family'][0],
+            item['name']['given'][0])
 
 
 FACTORIES = {
     'ActivityDefinition': ActivityDefinition,
-    'MessageHeader': MessageHeader
+    'MessageHeader': MessageHeader,
+    'Patient': Patient,
+    'Practitioner': Practitioner
 }
 
 

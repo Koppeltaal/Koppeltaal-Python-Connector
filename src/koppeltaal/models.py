@@ -55,8 +55,8 @@ class CarePlan(object):
 class Message(object):
 
     def __init__(
-            self, uid, message_type, status, last_changed,
-            patient=None, data=None):
+            self, uid, message_type, status, last_changed, patient,
+            data=None):
         self.uid = uid
         self.message_type = message_type
         self.status = status
@@ -65,5 +65,9 @@ class Message(object):
         self.data = data
 
     def __format__(self, _):
-        return '<Message type="{}" status="{}" last_changed"{}"/>'.format(
-            self.message_type, self.status, self.last_changed)
+        return ('<Message type="{}" status="{}" last_changed"{}">'
+                '{}</Message>').format(
+                    self.message_type,
+                    self.status,
+                    self.last_changed,
+                    self.patient or "<Patient/>")
