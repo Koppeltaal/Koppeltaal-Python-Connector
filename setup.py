@@ -14,6 +14,7 @@ setup(
         'feedreader',
         'koppeltaal_schema',
         'lxml',
+        'python-dateutil',
         'requests >= 2.5.1',
         'zope.interface >= 3.7.0',
         ],
@@ -24,7 +25,7 @@ setup(
         },
     entry_points={
         'console_scripts': [
-            'koppeltaal = koppeltaal.cli:cli'
+            'koppeltaal = koppeltaal.console:cli'
             ],
         }
     )

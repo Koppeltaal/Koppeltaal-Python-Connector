@@ -103,7 +103,7 @@ def test_send_message_from_game_to_server(
     headers = list(parse(
         connector.messages(
             patient=patient,
-            processing_status=koppeltaal.interfaces.PROCESSING_STATUS_NEW)))
+            processing_status=koppeltaal.interfaces.STATUS_NEW)))
     assert len(headers) == 1
 
     connector.claim(headers[0].__version__)
@@ -113,7 +113,7 @@ def test_send_message_from_game_to_server(
     headers2 = list(parse(
         connector.messages(
             patient=patient,
-            processing_status=koppeltaal.interfaces.PROCESSING_STATUS_NEW)))
+            processing_status=koppeltaal.interfaces.STATUS_NEW)))
     assert len(headers2) == 0
 
     browser.get(launch_url)
@@ -125,7 +125,7 @@ def test_send_message_from_game_to_server(
     headers3 = list(parse(
         connector.messages(
             patient=patient,
-            processing_status=koppeltaal.interfaces.PROCESSING_STATUS_NEW)))
+            processing_status=koppeltaal.interfaces.STATUS_NEW)))
     assert len(headers3) == 1
 
     message = connector.message(headers3[0].__version__)

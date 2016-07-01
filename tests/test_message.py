@@ -45,7 +45,7 @@ def test_get_new_messageheaders(
     header = headers2[0]
     assert header.patient() == koppeltaal.url(patient)
     assert header.focal_resource() == koppeltaal.url(careplan)
-    assert header.status() == koppeltaal.interfaces.PROCESSING_STATUS_NEW
+    assert header.status() == koppeltaal.interfaces.STATUS_NEW
 
 
 def test_get_new_messageheaders_batched(
@@ -83,7 +83,7 @@ def test_get_new_messageheaders_batched(
     assert [h.focal_resource() for h in headers2] == \
         map(koppeltaal.url, [cp1, cp2, cp3, cp4])
     assert [h.status() for h in headers2] == \
-        [koppeltaal.interfaces.PROCESSING_STATUS_NEW] * 4
+        [koppeltaal.interfaces.STATUS_NEW] * 4
 
 
 def test_get_message(
@@ -130,7 +130,7 @@ def test_claim_message(
     header = headers[0]
     message = koppeltaal.message.get_message(connector, header)
     assert message.messageheader().__version__ == header.__version__
-    assert header.status() == koppeltaal.interfaces.PROCESSING_STATUS_NEW
+    assert header.status() == koppeltaal.interfaces.STATUS_NEW
 
     claimed = koppeltaal.message.claim_message(connector, header)
     headers2 = list(
@@ -138,8 +138,8 @@ def test_claim_message(
             connector, patient=patient))
     assert len(headers2) == 0
     assert claimed.messageheader().status() == \
-        koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED
+        koppeltaal.interfaces.STATUS_CLAIMED
 
     successed = koppeltaal.message.success_message(connector, header)
     assert successed.messageheader().status() == \
-        koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS
+        koppeltaal.interfaces.STATUS_SUCCESS

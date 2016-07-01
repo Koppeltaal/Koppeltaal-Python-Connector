@@ -50,7 +50,7 @@ class Connector(object):
         return response.status_code == 200
 
     def activity_definition(self):
-        url = '{}/{}'.format(
+        url = '{}{}'.format(
             self.server, koppeltaal.interfaces.ACTIVITY_DEFINITION_URL)
         response = requests.get(
             url,
@@ -96,7 +96,7 @@ class Connector(object):
 
     def launch(self, activity, patient, user):
         response = requests.get(
-            '{}/{}'.format(
+            '{}{}'.format(
                 self.server, koppeltaal.interfaces.OAUTH_LAUNCH_URL),
             auth=(self.username, self.password),
             params={
@@ -112,7 +112,7 @@ class Connector(object):
         return response.headers.get('location')
 
     def _do_message_query(self, params):
-        url = '{}/{}/_search'.format(
+        url = '{}{}/_search'.format(
             self.server, koppeltaal.interfaces.MESSAGE_HEADER_URL)
         response = requests.get(
             url,
@@ -168,16 +168,16 @@ class Connector(object):
         # NOTE this barebones implementation is intened to be replaced by
         # higher-level models in message.py (and other modules).
         return self._process_message(
-            id, koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED)
+            id, koppeltaal.interfaces.STATUS_CLAIMED)
 
     def success(self, id):
         # NOTE this barebones implementation is intened to be replaced by
         # higher-level models in message.py (and other modules).
         return self._process_message(
-            id, koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS)
+            id, koppeltaal.interfaces.STATUS_SUCCESS)
 
     def fail(self, id):
         # NOTE this barebones implementation is intened to be replaced by
         # higher-level models in message.py (and other modules).
         return self._process_message(
-            id, koppeltaal.interfaces.PROCESSING_STATUS_FAILED)
+            id, koppeltaal.interfaces.STATUS_FAILED)

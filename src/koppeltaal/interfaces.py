@@ -7,22 +7,22 @@ NS = {
     }
 
 
-ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
-MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
-METADATA_URL = 'FHIR/Koppeltaal/metadata'
-OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
+ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
+MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
+METADATA_URL = '/FHIR/Koppeltaal/metadata'
+OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
 
 
-PROCESSING_STATUS_CLAIMED = 'Claimed'
-PROCESSING_STATUS_FAILED = 'Failed'
-PROCESSING_STATUS_NEW = 'New'
-PROCESSING_STATUS_SUCCESS = 'Success'
+STATUS_CLAIMED = 'Claimed'
+STATUS_FAILED = 'Failed'
+STATUS_NEW = 'New'
+STATUS_SUCCESS = 'Success'
 
 
 PROCESSING_ACTIONS = (
-    PROCESSING_STATUS_CLAIMED,
-    PROCESSING_STATUS_FAILED,
-    PROCESSING_STATUS_SUCCESS
+    STATUS_CLAIMED,
+    STATUS_FAILED,
+    STATUS_SUCCESS
     )
 
 

@@ -37,12 +37,12 @@ def test_messages_for_status(connector, patient, careplan, careplan_on_server):
     assert len(headers) == 1
 
     header1 = headers[0]
-    assert header1.status == koppeltaal.interfaces.PROCESSING_STATUS_NEW
+    assert header1.status == koppeltaal.interfaces.STATUS_NEW
 
     headers2 = list(parse(
         connector.messages(
             patient=careplan.patient,
-            processing_status=koppeltaal.interfaces.PROCESSING_STATUS_NEW)))
+            processing_status=koppeltaal.interfaces.STATUS_NEW)))
     assert len(headers2) == 1
 
     # We're talking about the same header here. Checking the versions is
@@ -53,7 +53,7 @@ def test_messages_for_status(connector, patient, careplan, careplan_on_server):
     headers3 = list(parse(
         connector.messages(
             patient=careplan.patient,
-            processing_status=koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED))
+            processing_status=koppeltaal.interfaces.STATUS_CLAIMED))
         )
     assert len(headers3) == 0
 
@@ -83,7 +83,7 @@ def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
 
     header1 = headers[0]
     assert header1.__version__ is not None
-    assert header1.status == koppeltaal.interfaces.PROCESSING_STATUS_NEW
+    assert header1.status == koppeltaal.interfaces.STATUS_NEW
 
     # Get full message XML.
     full_message = connector.message(header1.__version__)
@@ -99,7 +99,7 @@ def test_claim(connector, patient, practitioner, careplan, careplan_on_server):
     header2 = headers2[0]
     assert header2.__version__ is not None
     assert header2.__version__ > header1.__version__
-    assert header2.status == koppeltaal.interfaces.PROCESSING_STATUS_CLAIMED
+    assert header2.status == koppeltaal.interfaces.STATUS_CLAIMED
 
 
 def test_success(
@@ -119,14 +119,14 @@ def test_success(
     headers2 = list(parse(
         connector.messages(
             patient=patient,
-            processing_status=koppeltaal.interfaces.PROCESSING_STATUS_NEW)))
+            processing_status=koppeltaal.interfaces.STATUS_NEW)))
     assert len(headers2) == 0
 
     # XXX test retrieve for status Success.
     # XXX We could parse this instead of doing a string check.
     xml = connector.message(header.__version__)
     assert '<valueCode value="{}" />'.format(
-        koppeltaal.interfaces.PROCESSING_STATUS_SUCCESS) in xml
+        koppeltaal.interfaces.STATUS_SUCCESS) in xml
 
 
 def test_cannot_finalize_non_claimed_message(connector):
