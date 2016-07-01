@@ -13,7 +13,9 @@ import koppeltaal.create_or_update_care_plan
 import koppeltaal.feed
 import koppeltaal.model
 
+import koppeltaal.interfaces
 import koppeltaal.connector
+import koppeltaal.codes
 
 
 def pretty_print(data):
@@ -75,17 +77,17 @@ def cli():
     change_messages_status.add_argument('--confirm', action='store_true')
     change_messages_status.add_argument(
         '--status',
-        choices=['New', 'Claimed', 'Success', 'Failed'])
+        choices=koppeltaal.codes.PROCESSING_STATUS)
 
     messages = subparsers.add_parser('messages')
     messages.add_argument('--count')  # How many messages to show.
     messages.add_argument('--patient_url')  # Filter on patient.
     messages.add_argument(
         '--status',
-        choices=['New', 'Claimed', 'Success', 'Failed'])
+        choices=koppeltaal.codes.PROCESSING_STATUS)
     messages.add_argument(
         '--event',
-        choices=['CreateOrUpdateCarePlan', 'UpdateCarePlanActivityStatus'])
+        choices=koppeltaal.codes.MESSAGE_EVENTS)
 
     message = subparsers.add_parser('message')
     message.add_argument('message_id')

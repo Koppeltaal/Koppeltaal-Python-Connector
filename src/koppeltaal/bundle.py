@@ -3,7 +3,6 @@ import dateutil.parser
 import koppeltaal.models
 import koppeltaal.utils
 
-NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
 MARKER = object()
 
 
@@ -72,8 +71,8 @@ class ResourceExtension(object):
         if 'extension' in content:
             for extension in content['extension']:
                 url = extension['url']
-                if url.startswith(NAMESPACE):
-                    url = extension['url'][len(NAMESPACE):]
+                if url.startswith(koppeltaal.interfaces.NAMESPACE):
+                    url = url[len(koppeltaal.interfaces.NAMESPACE):]
                 self._index[url] = extension
 
     def __call__(self, url):

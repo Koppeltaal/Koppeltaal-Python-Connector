@@ -1,17 +1,19 @@
 import zope.interface
 
-NS = {
-    'atom': 'http://www.w3.org/2005/Atom',
-    'fhir': 'http://hl7.org/fhir',
-    'koppeltaal': 'http://ggz.koppeltaal.nl/fhir/Koppeltaal',
-    }
-
+NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
 
 ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
 MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
 METADATA_URL = '/FHIR/Koppeltaal/metadata'
 OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
 
+# Old stuff
+
+NS = {
+    'atom': 'http://www.w3.org/2005/Atom',
+    'fhir': 'http://hl7.org/fhir',
+    'koppeltaal': 'http://ggz.koppeltaal.nl/fhir/Koppeltaal',
+    }
 
 STATUS_CLAIMED = 'Claimed'
 STATUS_FAILED = 'Failed'
