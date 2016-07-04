@@ -6,6 +6,7 @@ FIELD_TYPES = {
     'boolean',
     'code',
     'coding',
+    'date',
     'instant',
     'object',
     'reference',
@@ -40,7 +41,7 @@ class Field(object):
             self.url = koppeltaal.interfaces.NAMESPACE + extension
 
 
-class SubActivity(object):
+class SubActivityDefinition(object):
 
     name = Field(
         'name', 'string',
@@ -85,7 +86,7 @@ class ActivityDefinition(object):
         'subActivity', 'object',
         optional=True,
         multiple=ALL_ITEMS,
-        binding=SubActivity,
+        binding=SubActivityDefinition,
         extension='ActivityDefinition#SubActivity')
 
     performer = Field(
@@ -110,7 +111,127 @@ class ActivityDefinition(object):
         extension='ActivityDefinition#IsArchived')
 
 
+class Name(object):
+
+    given = Field(
+        'given', 'string',
+        optional=True,
+        multiple=FIRST_ITEM)
+
+    family = Field(
+        'family', 'string',
+        optional=True,
+        multiple=FIRST_ITEM)
+
+    use = Field(
+        'use', 'code',
+        binding=koppeltaal.codes.NAME_USE)
+
+
+class Patient(object):
+
+    name = Field(
+        'name', 'object',
+        binding=Name,
+        multiple=FIRST_ITEM)
+
+
+class Practitioner(object):
+
+    name = Field(
+        'name', 'object',
+        binding=Name)
+
+
+class Participant(object):
+
+    member = Field(
+        'member', 'reference')
+
+
+class Goal(object):
+
+    description = Field(
+        'description', 'string')
+
+    status = Field(
+        'status', 'code',
+        binding=koppeltaal.codes.CAREPLAN_GOAL_STATUS)
+
+    notes = Field(
+        'notes', 'string',
+        optional=True)
+
+
+class Activity(object):
+
+    cancelled = Field(
+        'cancelled', 'instant',
+        optional=True,
+        extension='CarePlan#Cancelled')
+
+    definition = Field(
+        'definition', 'string',
+        optional=True,
+        extension='CarePlan#ActivityDefinition')
+
+    description = Field(
+        'description', 'string',
+        optional=True,
+        extension='CarePlan#ActivityDescription')
+
+    finished = Field(
+        'finished', 'instant',
+        optional=True,
+        extension='CarePlan#Finished')
+
+    kind = Field(
+        'type', 'coding',
+        binding=koppeltaal.codes.ACTIVITY_KIND,
+        extension='CarePlan#ActivityKind')
+
+    notes = Field(
+        'notes', 'string',
+        optional=True)
+
+    participants = Field(
+        'participant', 'object',
+        binding=Participant,
+        optional=True,
+        multiple=ALL_ITEMS,
+        extension='CarePlan#Participant')
+
+    planned = Field(
+        'startDate', 'date',
+        optional=True,
+        extension='CarePlan#StartDate')
+
+    started = Field(
+        'started', 'instant',
+        optional=True,
+        extension='CarePlan#Started')
+
+    status = Field(
+        'status', 'coding',  # XXX should this be code? this now follow FHIR
+        binding=koppeltaal.codes.CAREPLAN_ACTIVITY_STATUS,
+        extension='CarePlan#ActivityStatus')
+
+    # subactivities = Field()
+
+
 class CarePlan(object):
+
+    activities = Field(
+        'activity', 'object',
+        binding=Activity,
+        optional=True,
+        multiple=ALL_ITEMS)
+
+    participants = Field(
+        'participant', 'object',
+        binding=Participant,
+        optional=True,
+        multiple=ALL_ITEMS)
 
     patient = Field(
         'patient', 'reference')
@@ -118,6 +239,12 @@ class CarePlan(object):
     status = Field(
         'status', 'code',
         binding=koppeltaal.codes.CAREPLAN_STATUS)
+
+    goals = Field(
+        'goal', 'object',
+        binding=Goal,
+        optional=True,
+        multiple=ALL_ITEMS)
 
 
 class ProcessingStatus(object):

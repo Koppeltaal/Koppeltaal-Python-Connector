@@ -1,12 +1,12 @@
 
-class SubActivity(object):
+class SubActivityDefinition(object):
     name = None
     identifier = None
     description = None
     active = True
 
 
-class Activity(object):
+class ActivityDefinition(object):
     uid = None
 
     identifier = None
@@ -19,13 +19,27 @@ class Activity(object):
     is_archived = False
 
     def __format__(self, _):
-        return '<Activity identifier="{}" name="{}" kind="{}"/>'.format(
-            self.identifier, self.name, self.kind)
+        return (
+            '<ActivityDefinition '
+            'identifier="{}" name="{}" kind="{}"/>').format(
+                self.identifier, self.name, self.kind)
 
 
 class Name(object):
     family = None
     given = None
+    use = None
+
+    def __format__(self, _):
+        return '{}, {} ({})'.format(self.family, self.given, self.use)
+
+
+class Participant(object):
+    member = None
+    role = None  # XXX
+
+    def __format__(self, _):
+        return '<Participant>{}</Participant>'.format(self.member)
 
 
 class Patient(object):
@@ -33,8 +47,7 @@ class Patient(object):
     name = None
 
     def __format__(self, _):
-        return '<Patient name="{} {}"/>'.format(
-            self.name.family, self.name.given)
+        return '<Patient name="{}"/>'.format(self.name)
 
 
 class Practitioner(object):
@@ -42,8 +55,31 @@ class Practitioner(object):
     name = None
 
     def __format__(self, _):
-        return '<Practitioner name="{} {}"/>'.format(
-            self.name.given, self.name.family)
+        return '<Practitioner name="{}"/>'.format(self.name)
+
+
+class Goal(object):
+    description = None
+    status = None
+    notes = None
+
+    def __format__(self, _):
+        return '<Goal status="{}">{} {}</Goal>'.format(
+            self.status, self.description, self.notes)
+
+
+class Activity(object):
+    cancelled = None
+    definition = None
+    description = None
+    finished = None
+    kind = None
+    notes = None
+    participants = None
+    planned = None
+    started = None
+    status = None
+    subactivities = None
 
 
 class CarePlan(object):
@@ -51,11 +87,15 @@ class CarePlan(object):
 
     status = None
     patient = None
+    participants = None
+    goals = None
 
     def __format__(self, _):
-        return '<CarePlan status="{}">{}</CarePlan>'.format(
+        return '<CarePlan status="{}">{} {} {}</CarePlan>'.format(
             self.status,
-            self.patient or "<Patient/>")
+            self.patient or "<Patient/>",
+            ', '.join('{}'.format(p) for p in self.participants),
+            ', '.join('{}'.format(g) for g in self.goals))
 
 
 class Status(object):

@@ -9,7 +9,7 @@ import koppeltaal
 import koppeltaal.activity_definition
 import koppeltaal.configuration
 import koppeltaal.connect
-import koppeltaal.create_or_update_care_plan
+#import koppeltaal.create_or_update_care_plan
 import koppeltaal.feed
 import koppeltaal.model
 

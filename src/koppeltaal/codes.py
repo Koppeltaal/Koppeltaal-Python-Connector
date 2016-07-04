@@ -63,6 +63,14 @@ CAREPLAN_STATUS = Code(
      'completed'],
     'http://hl7.org/fhir/care-plan-status')
 
+CAREPLAN_GOAL_STATUS = Code(
+    'CarePlanGoalStatus',
+    ['in progress',
+     'achieved',
+     'sustaining',
+     'cancelled'],
+    'http://hl7.org/fhir/care-plan-goal-status')
+
 DEVICE_KIND = Code(
     'DeviceKind',
     ['Application'])
@@ -88,6 +96,17 @@ MESSAGE_KIND = Code(
      'Message',
      'Request'])
 
+NAME_USE = Code(
+    'NameUse',
+    ['usual',
+     'official'
+     'temp',
+     'nickname',
+     'anonymous',
+     'old',
+     'maiden'],
+    'http://hl7.org/fhir/name-use')
+
 PROCESSING_STATUS = Code(
     'ProcessingStatus',
     ['New',
@@ -95,7 +114,6 @@ PROCESSING_STATUS = Code(
      'Success',
      'Failed',
      'ReplacedByNewVersion'])
-
 
 GENDER = Code(
     'AdministrativeGender',
