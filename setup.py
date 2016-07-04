@@ -10,7 +10,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'feedgen == 0.3.1+md.1',
         'feedreader',
         'koppeltaal_schema',
         'lxml',
