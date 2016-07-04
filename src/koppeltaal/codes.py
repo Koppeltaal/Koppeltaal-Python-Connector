@@ -56,6 +56,13 @@ CAREPLAN_PARTICIPANT_ROLE = Code(
      'Secretary'
      'Analyst'])
 
+CAREPLAN_STATUS = Code(
+    'CarePlanStatus',
+    ['planned',
+     'active',
+     'completed'],
+    'http://hl7.org/fhir/care-plan-status')
+
 DEVICE_KIND = Code(
     'DeviceKind',
     ['Application'])

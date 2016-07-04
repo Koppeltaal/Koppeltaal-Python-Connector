@@ -23,35 +23,39 @@ class Activity(object):
             self.identifier, self.name, self.kind)
 
 
-class Patient(object):
+class Name(object):
+    family = None
+    given = None
 
-    def __init__(self, uid, family_name, given_name):
-        self.uid = uid
-        self.family_name = family_name
-        self.given_name = given_name
+
+class Patient(object):
+    uid = None
+    name = None
 
     def __format__(self, _):
         return '<Patient name="{} {}"/>'.format(
-            self.given_name, self.family_name)
+            self.name.family, self.name.given)
 
 
 class Practitioner(object):
-
-    def __init__(self, uid, family_name, given_name):
-        self.uid = uid
-        self.family_name = family_name
-        self.given_name = given_name
+    uid = None
+    name = None
 
     def __format__(self, _):
         return '<Practitioner name="{} {}"/>'.format(
-            self.given_name, self.family_name)
+            self.name.given, self.name.family)
 
 
 class CarePlan(object):
+    uid = None
+
+    status = None
     patient = None
 
-    def __init__(self, uid):
-        self.uid = uid
+    def __format__(self, _):
+        return '<CarePlan status="{}">{}</CarePlan>'.format(
+            self.status,
+            self.patient or "<Patient/>")
 
 
 class Status(object):
@@ -78,8 +82,9 @@ class Message(object):
 
     def __format__(self, _):
         return ('<Message event="{}" status="{}" last_changed"{}">'
-                '{}</Message>').format(
+                '{}{}</Message>').format(
                     self.event,
                     self.status.status,
                     self.status.last_changed,
-                    self.patient or "<Patient/>")
+                    self.patient or "<Patient/>",
+                    self.data or "<Data/>")

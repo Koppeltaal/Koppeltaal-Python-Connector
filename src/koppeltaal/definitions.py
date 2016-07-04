@@ -110,6 +110,16 @@ class ActivityDefinition(object):
         extension='ActivityDefinition#IsArchived')
 
 
+class CarePlan(object):
+
+    patient = Field(
+        'patient', 'reference')
+
+    status = Field(
+        'status', 'code',
+        binding=koppeltaal.codes.CAREPLAN_STATUS)
+
+
 class ProcessingStatus(object):
 
     status = Field(

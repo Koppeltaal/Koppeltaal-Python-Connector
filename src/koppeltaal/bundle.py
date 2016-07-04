@@ -10,10 +10,12 @@ MARKER = object()
 TYPES = {
     'ActivityDefinition': koppeltaal.definitions.ActivityDefinition,
     'MessageHeader': koppeltaal.definitions.MessageHeader,
+    'CarePlan': koppeltaal.definitions.CarePlan,
 }
 
 FACTORIES = {
     koppeltaal.definitions.ActivityDefinition: koppeltaal.models.Activity,
+    koppeltaal.definitions.CarePlan: koppeltaal.models.CarePlan,
     koppeltaal.definitions.MessageHeader: koppeltaal.models.Message,
     koppeltaal.definitions.ProcessingStatus: koppeltaal.models.Status,
     koppeltaal.definitions.Source: koppeltaal.models.Source,
@@ -162,9 +164,9 @@ class Native(object):
                     return None
                 raise koppeltaal.interfaces.RequiredMissing(field)
             if field.multiple is koppeltaal.definitions.ALL_ITEMS:
-                return [self._unpack_value(field, v) for v in value]
+                return [self._unpack_item(field, v) for v in value]
             value = value[0]
-        return self._unpack_value(field, value)
+        return self._unpack_item(field, value)
 
 
 def unpack(item, definition, bundle):
@@ -187,7 +189,7 @@ def unpack(item, definition, bundle):
 
 
 class BundleItem(object):
-    unpacked_item = MARKER
+    _item = MARKER
 
     def __init__(self, bundle, entry):
         self._bundle = bundle
@@ -208,14 +210,16 @@ class BundleItem(object):
         return self.uids[0]
 
     def unpack(self):
-        if self.unpacked_item is MARKER:
-            definition = TYPES.get(self.resource_type)
-            if definition is None:
-                self.unpacked_item = None
-            model = unpack(self._content, definition, self._bundle)
-            model.uid = self.uid
-            self.unpacked_item = model
-        return self.unpacked_item
+        if self._item is not MARKER:
+            return self._item
+
+        self._item = None
+        definition = TYPES.get(self.resource_type)
+        if definition is not None:
+            self._item = unpack(self._content, definition, self._bundle)
+            if self._item is not None:
+                self._item.uid = self.uid
+        return self._item
 
     def __eq__(self, other):
         if isinstance(other, dict):
