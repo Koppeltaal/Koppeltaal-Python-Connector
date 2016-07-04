@@ -3,25 +3,24 @@ import koppeltaal.interfaces
 
 class Code(list):
 
-    def __init__(self, name, items):
+    def __init__(self, name, items, system=None):
         super(Code, self).__init__(items)
         self.name = name
-
-    @property
-    def fdqn(self):
-        return koppeltaal.interfaces.NAMESPACE + self.name
+        if system is None:
+            system = koppeltaal.interfaces.NAMESPACE + self.name
+        self.system = system
 
     def pack(self, value):
         if value not in self:
             raise ValueError(value)
         return {"code": value,
                 "display": value,
-                "system": self.fqdn}
+                "system": self.system}
 
     def unpack(self, package):
         value = package["code"]
         if value not in self:
-            raise ValueError(value)
+            raise koppeltaal.interfaces.InvalidValue(value, self)
         return value
 
 
@@ -89,3 +88,9 @@ PROCESSING_STATUS = Code(
      'Success',
      'Failed',
      'ReplacedByNewVersion'])
+
+
+GENDER = Code(
+    'AdministrativeGender',
+    ['F', 'M', 'UN'],
+    'http://hl7.org/fhir/v3/AdministrativeGender')

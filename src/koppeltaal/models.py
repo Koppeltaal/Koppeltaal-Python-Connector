@@ -1,20 +1,22 @@
 
+class SubActivity(object):
+    name = None
+    identifier = None
+    description = None
+    active = True
+
 
 class Activity(object):
+    uid = None
 
-    def __init__(
-            self, uid, identifier, kind, name,
-            performer="Patient", active=True,
-            domain_specific=False, launch_type="Web", archived=False):
-        self.uid = uid
-        self.identifier = identifier
-        self.name = name
-        self.kind = kind
-        self.performer = performer
-        self.active = active
-        self.domain_specific = domain_specific
-        self.launch_type = launch_type
-        self.archived = archived
+    identifier = None
+    kind = None
+    name = None
+    subactivities = None
+    description = None
+    is_active = True
+    is_domain_specific = False
+    is_archived = False
 
     def __format__(self, _):
         return '<Activity identifier="{}" name="{}" kind="{}"/>'.format(
@@ -46,28 +48,38 @@ class Practitioner(object):
 
 
 class CarePlan(object):
+    patient = None
 
-    def __init__(self, uid, patient):
+    def __init__(self, uid):
         self.uid = uid
-        self.patient = patient
+
+
+class Status(object):
+    status = None
+    last_changed = None
+    exception = None
+
+
+class Source(object):
+    name = None
+    software = None
+    version = None
+    endpoint = None
 
 
 class Message(object):
+    uid = None
 
-    def __init__(
-            self, uid, message_type, status, last_changed, patient,
-            data=None):
-        self.uid = uid
-        self.message_type = message_type
-        self.status = status
-        self.last_changed = last_changed
-        self.patient = patient
-        self.data = data
+    timestamp = None
+    data = None
+    patient = None
+    event = None
+    status = None
 
     def __format__(self, _):
-        return ('<Message type="{}" status="{}" last_changed"{}">'
+        return ('<Message event="{}" status="{}" last_changed"{}">'
                 '{}</Message>').format(
-                    self.message_type,
-                    self.status,
-                    self.last_changed,
+                    self.event,
+                    self.status.status,
+                    self.status.last_changed,
                     self.patient or "<Patient/>")

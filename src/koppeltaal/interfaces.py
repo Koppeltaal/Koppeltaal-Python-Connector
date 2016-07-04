@@ -7,6 +7,18 @@ MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
 METADATA_URL = '/FHIR/Koppeltaal/metadata'
 OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
 
+
+class InvalidValue(ValueError):
+
+    def __init__(self, field, value=None):
+        self.field = field
+        self.value = value
+
+
+class RequiredMissing(InvalidValue):
+    pass
+
+
 # Old stuff
 
 NS = {
