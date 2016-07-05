@@ -1,11 +1,11 @@
 import urlparse
 import requests
+import zope.interface
 import koppeltaal.interfaces
 import koppeltaal.bundle
 import koppeltaal.utils
 
 DEFAULT_COUNT = 100
-MAX_COUNT = 1000
 
 
 class InvalidResponse(ValueError):
@@ -62,10 +62,7 @@ class Transport(object):
         bundle = koppeltaal.bundle.Bundle()
         while next_url:
             response = self.query(next_url, next_params)
-            if response['resourceType'] != 'Bundle':
-                raise InvalidResponse(response)
-            for entry in response['entry']:
-                bundle.add(entry)
+            bundle.add_response(response)
             next_url = koppeltaal.utils.json2links(response).get('next')
             next_params = None  # Parameters are already in the next link.
         return bundle.unpack()
@@ -99,6 +96,7 @@ class Transport(object):
         return response.json()
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IConnector)
 class Connector(object):
 
     def __init__(self, server, username, password, domain=None):
@@ -114,6 +112,12 @@ class Connector(object):
             koppeltaal.interfaces.ACTIVITY_DEFINITION_URL,
             {'code': 'ActivityDefinition'})
 
+    def activity(self, identifier):
+        for activity in self.activities():
+            if activity.identifier == identifier:
+                return activity
+        return None
+
     def launch(self, activity, patient, user):
         params = {
             'client_id': activity.identifier,
@@ -125,19 +129,31 @@ class Connector(object):
             params)
 
     def fetch(
-            self, message_id=None, event=None, status=None,
-            count=DEFAULT_COUNT, summary=False):
-        if count > MAX_COUNT:
-            raise ValueError(
-                'Count cannot be larger than {}.'.format(MAX_COUNT))
-        params = {'_count': count or DEFAULT_COUNT}
+            self, message_id=None, event=None, status=None, patient=None):
+        params = {}
+        if message_id:
+            params['_id'] = message_id
+        else:
+            params['_summary'] = 'true'
+            params['_count'] = DEFAULT_COUNT
         if event:
             params['event'] = event
         if status:
             params['ProcessingStatus'] = status
-        if message_id:
-            params['_id'] = message_id
-        if summary:
-            params['_summary'] = 'true'
+        if patient:
+            params['Patient'] = patient
         return self.transport.query_bundle(
             koppeltaal.interfaces.MESSAGE_HEADER_URL, params)
+
+    def send(self, message):
+        # feed.category(
+        #     term='{koppeltaal}/Domain#{domain}'.format(
+        #         domain=domain, **koppeltaal.NS),
+        #     label=domain,
+        #     scheme='{fhir}/tag/security'.format(**koppeltaal.NS))
+        # feed.category(
+        #     term='{fhir}/tag/message'.format(**koppeltaal.NS),
+        #     scheme='{fhir}/tag'.format(**koppeltaal.NS))
+
+        # self.transport.update(message.uid_with_history, serialize(message))
+        pass

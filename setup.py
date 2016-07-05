@@ -10,9 +10,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'feedreader',
-        'koppeltaal_schema',
-        'lxml',
         'python-dateutil',
         'requests >= 2.5.1',
         'zope.interface >= 3.7.0',

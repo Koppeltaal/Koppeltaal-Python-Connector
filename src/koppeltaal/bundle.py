@@ -271,10 +271,13 @@ class Bundle(object):
     def __init__(self):
         self.items = []
 
-    def add(self, entry):
-        item = BundleEntry(self, entry)
-        print '{}'.format(item)
-        self.items.append(item)
+    def add_response(self, response):
+        if response['resourceType'] != 'Bundle':
+            raise interfaces.InvalidBundle(response)
+        for entry in response['entry']:
+            item = BundleEntry(self, entry)
+            print '{}'.format(item)
+            self.items.append(item)
 
     def find(self, reference):
         for item in self.items:

@@ -5,9 +5,8 @@ import os.path
 import ConfigParser
 import selenium.webdriver
 import koppeltaal.configuration
-import koppeltaal.connect
-import koppeltaal.feed
-import koppeltaal.model
+import koppeltaal.connector
+import koppeltaal.models
 
 
 try:
@@ -113,25 +112,19 @@ def connector(request):
     password = config.get(server, 'password')
     domain = config.get(server, 'domain')
 
-    connector = koppeltaal.connect.Connector(
+    return koppeltaal.connector.Connector(
         server, username, password, domain=domain)
-
-    # Test username+password.
-    if not connector.test_authentication():
-        raise ValueError('Wrong username/password/server combination.')
-    return connector
 
 
 @pytest.fixture
 def patient(request, connector):
-    p = koppeltaal.model.Patient()
-    p.name.given = 'Claes'
-    p.name.family = 'de Vries'
+    p = koppeltaal.models.Patient()
 
     def cleanup_patient_messages():
-        result = connector.messages(patient=p)
-        for message in koppeltaal.feed.parse(result):
-            connector.success(message.__version__)
+        # XXX Fix the URL
+        for message in connector.messages(patient='fakeurl'):
+            message.status = 'Success'
+            connector.send(message)
 
     request.addfinalizer(cleanup_patient_messages)
     return p
@@ -139,7 +132,8 @@ def patient(request, connector):
 
 @pytest.fixture
 def practitioner():
-    p = koppeltaal.model.Practitioner()
+    p = koppeltaal.models.Practitioner()
+    p.name = koppeltaal.models.Name()
     p.name.given = 'Jozef'
     p.name.family = 'van Buuren'
     return p
@@ -147,7 +141,8 @@ def practitioner():
 
 @pytest.fixture
 def practitioner2():
-    p = koppeltaal.model.Practitioner()
+    p = koppeltaal.models.Practitioner()
+    p.name = koppeltaal.models.Name()
     p.name.given = 'Hank'
     p.name.family = 'Schrader'
     return p
@@ -159,25 +154,8 @@ def careplan(connector, patient):
 
 
 @pytest.fixture
-def activity(connector):
-    from koppeltaal.activity_definition import parse
-    # Highly depending on what's activated on the server.
-    for activity in parse(connector.activity_definition()):
-        if activity.kind['code'] == 'Game':
-            return activity
-        else:
-            continue
-    else:
-        raise ValueError('No activity found.')
-
-
-@pytest.fixture
-def careplan_on_server(
-        connector, activity, patient, practitioner, careplan):
-    from koppeltaal.create_or_update_care_plan import generate
-    xml = generate(connector.domain, activity, careplan, practitioner)
-    connector.post_message(xml)
-    return careplan
+def activities(connector):
+    return connector.activities()
 
 
 @pytest.fixture(scope='session')
@@ -191,74 +169,3 @@ def driver(request):
 def browser(driver, request):
     request.addfinalizer(driver.delete_all_cookies)
     return driver
-
-
-@pytest.fixture
-def other_node(request):
-    import lxml.etree
-    # flake8: noqa
-    return lxml.etree.fromstring("""
-  <entry xmlns="http://www.w3.org/2005/Atom">
-    <id>http://kickassgame.nl/FHIR/CarePlanActivityStatus/74262677</id>
-    <link rel="self" href="http://kickassgame.nl/FHIR/CarePlanActivityStatus/74262677/_history/2016-03-16T09:37:25:463.2652" />
-    <content type="text/xml">
-      <Other id="74262677" xmlns="http://hl7.org/fhir">
-        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#Activity">
-          <valueString value="https://app.minddistrict.com/c/d78827453a734023853d294e6d3385aa/remoteactivities/r.1" />
-        </extension>
-        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#PercentageCompleted">
-          <valueInteger value="0" />
-        </extension>
-        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#ActivityStatus">
-          <valueCoding>
-            <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
-            <code value="InProgress" />
-            <display value="InProgress" />
-          </valueCoding>
-        </extension>
-        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivity">
-          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityIdentifier">
-            <valueString value="scenario_5" />
-          </extension>
-          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityStatus">
-            <valueCoding>
-              <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
-              <code value="Available" />
-              <display value="Available" />
-            </valueCoding>
-          </extension>
-        </extension>
-        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivity">
-          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityIdentifier">
-            <valueString value="scenario_3" />
-          </extension>
-          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityStatus">
-            <valueCoding>
-              <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
-              <code value="Available" />
-              <display value="Available" />
-            </valueCoding>
-          </extension>
-        </extension>
-        <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivity">
-          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityIdentifier">
-            <valueString value="scenario_8" />
-          </extension>
-          <extension url="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus#SubActivityStatus">
-            <valueCoding>
-              <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlanActivityStatus" />
-              <code value="Available" />
-              <display value="Available" />
-            </valueCoding>
-          </extension>
-        </extension>
-        <code>
-          <coding>
-            <system value="http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage" />
-            <code value="CarePlanActivityStatus" />
-            <display value="CarePlanActivityStatus" />
-          </coding>
-        </code>
-      </Other>
-    </content>
-  </entry>""")

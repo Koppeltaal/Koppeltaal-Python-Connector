@@ -3,17 +3,8 @@ import sys
 import json
 import argparse
 import ConfigParser
-import lxml.etree
 import logging
-import koppeltaal
-import koppeltaal.activity_definition
-import koppeltaal.configuration
-import koppeltaal.connect
-#import koppeltaal.create_or_update_care_plan
-import koppeltaal.feed
-import koppeltaal.model
 
-import koppeltaal.interfaces
 import koppeltaal.connector
 import koppeltaal.codes
 
@@ -80,8 +71,8 @@ def cli():
         choices=koppeltaal.codes.PROCESSING_STATUS)
 
     messages = subparsers.add_parser('messages')
-    messages.add_argument('--count')  # How many messages to show.
-    messages.add_argument('--patient_url')  # Filter on patient.
+    messages.add_argument(
+        '--patient')
     messages.add_argument(
         '--status',
         choices=koppeltaal.codes.PROCESSING_STATUS)
@@ -134,58 +125,64 @@ def cli():
             print '{}'.format(activity)
     elif args.command == 'messages':
         for message in connection.fetch(
-                event=args.event, status=args.status, count=args.count):
+                event=args.event, status=args.status, patient=args.patient):
             print '{}'.format(message)
     elif args.command == 'message':
-        for message in connection.fetch(
-                message_id=args.message_id):
+        for message in connection.fetch(message_id=args.message_id):
             print '{}'.format(message)
     elif args.command == 'change_messages_status':
         if args.confirm is None:
             print "This is a dry-run."
         num_done = 0
-        for msg in list(koppeltaal.feed.parse(
-                connection.messages(summary=True))):
-            if msg.status != args.status:
-                if args.confirm:
-                    connection._process_message(
-                        msg.__version__, status=args.status)
-                else:
-                    print "Dry-run: not setting message with message id " \
-                        "{} to status {}.".format(msg.__version__, args.status)
-            num_done += 1
-            if num_done >= args.count:
-                break
+        for message in connection.fetch():
+            if message.status == args.status:
+                print "Message {} already with the correct status.".format(
+                    message.uid)
+                continue
+            message.status = args.status
+            if args.confirm:
+                connection.send(message)
+                num_done += 1
+                if num_done >= args.count:
+                    break
+            else:
+                print "Dry-run: not setting message {} " \
+                    "{} to status {}.".format(message.uid, args.status)
         print 'The status of {} messages has been set to "{}".'.format(
             num_done, args.status)
     elif args.command == 'create_or_update_care_plan':
-        activity = koppeltaal.activity_definition.activity_info(
-            connection.activity_definition(), args.activity_id)
+        activity = connection.activity(args.activity_id)
 
-        patient = koppeltaal.model.Patient()
-        patient.__url__ = args.patient_url
-        patient.name.given = args.patient_given_name
-        patient.name.family = args.patient_family_name
+        if activity is None:
+            print "Unknown activity {}.".format(args.activity_id)
+            return
 
-        practitioner = koppeltaal.model.Practitioner()
-        practitioner.__url__ = args.practitioner_url
-        practitioner.name.given = args.practitioner_given_name
-        practitioner.name.family = args.practitioner_family_name
+        # patient = koppeltaal.model.Patient()
+        # patient.__url__ = args.patient_url
+        # patient.name.given = args.patient_given_name
+        # patient.name.family = args.patient_family_name
 
-        careplan = koppeltaal.model.CarePlan(patient)
-        xml = koppeltaal.create_or_update_care_plan.generate(
-            connection.domain, activity, careplan, practitioner)
-        result = connection.post_message(xml)
-        print lxml.etree.tostring(
-            lxml.etree.fromstring(result), pretty_print=True)
+        # practitioner = koppeltaal.model.Practitioner()
+        # practitioner.__url__ = args.practitioner_url
+        # practitioner.name.given = args.practitioner_given_name
+        # practitioner.name.family = args.practitioner_family_name
+
+        # careplan = koppeltaal.models.CarePlan()
+        message = koppeltaal.models.Message()
+        result = connection.send(message)
     elif args.command == 'launch':
-        activity = koppeltaal.model.Activity(args.activity_id, None, None)
-        patient = koppeltaal.model.Patient()
-        patient.__url__ - args.patient_url
+        activity = connection.activity(args.activity_id)
 
-        user = koppeltaal.model.Practitioner()
-        user.__url__ = args.user_url
-        # XXX Validate activity-id?
+        if activity is None:
+            print "Unknown activity {}.".format(args.activity_id)
+            return
+
+        activity = koppeltaal.model.Activity(args.activity_id, None, None)
+        patient = koppeltaal.models.Patient()
+        patient.uid = args.patient_url
+
+        user = koppeltaal.models.Practitioner()
+        user.uid = args.user_url
         print connection.launch(activity, patient, user)
     else:
         sys.exit('Unknown command {}'.format(args.command))
