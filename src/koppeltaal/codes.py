@@ -3,16 +3,20 @@ import koppeltaal.interfaces
 
 class Code(list):
 
-    def __init__(self, name, items, system=None):
+    def __init__(self, system, items):
         super(Code, self).__init__(items)
-        self.name = name
-        if system is None:
-            system = koppeltaal.interfaces.NAMESPACE + self.name
+        if not system.startswith('http:'):
+            system = koppeltaal.interfaces.NAMESPACE + system
         self.system = system
+
+    def pack_code(self, value):
+        if value not in self:
+            raise koppeltaal.interfaces.InvalidValue(self, value)
+        return value
 
     def pack_coding(self, value):
         if value not in self:
-            raise ValueError(value)
+            raise koppeltaal.interfaces.InvalidValue(self, value)
         return {"code": value,
                 "display": value,
                 "system": self.system}
@@ -36,13 +40,20 @@ ACTIVITY_KIND = Code(
     ['Game',
      'ELearning',
      'Questionnaire',
-     'Meeting'])
+     'Meeting',
+     'MultipleActivityTemplate'])
 
 ACTIVITY_PERFORMER = Code(
     'ActivityPerformer',
     ['Patient',
      'Practitioner',
      'RelatedPerson'])
+
+ACTIVITY_LAUNCH_TYPE = Code(
+    'ActivityDefinitionLaunchType',
+    ['Web',
+     'Mobile',
+     'Node'])
 
 CAREPLAN_ACTIVITY_STATUS = Code(
     'CarePlanActivityStatus',
@@ -64,19 +75,17 @@ CAREPLAN_PARTICIPANT_ROLE = Code(
      'Analyst'])
 
 CAREPLAN_STATUS = Code(
-    'CarePlanStatus',
+    'http://hl7.org/fhir/care-plan-status',
     ['planned',
      'active',
-     'completed'],
-    'http://hl7.org/fhir/care-plan-status')
+     'completed'])
 
 CAREPLAN_GOAL_STATUS = Code(
-    'CarePlanGoalStatus',
+    'http://hl7.org/fhir/care-plan-goal-status',
     ['in progress',
      'achieved',
      'sustaining',
-     'cancelled'],
-    'http://hl7.org/fhir/care-plan-goal-status')
+     'cancelled'])
 
 DEVICE_KIND = Code(
     'DeviceKind',
@@ -104,15 +113,14 @@ MESSAGE_KIND = Code(
      'Request'])
 
 NAME_USE = Code(
-    'NameUse',
+    'http://hl7.org/fhir/name-use',
     ['usual',
      'official',
      'temp',
      'nickname',
      'anonymous',
      'old',
-     'maiden'],
-    'http://hl7.org/fhir/name-use')
+     'maiden'])
 
 PROCESSING_STATUS = Code(
     'ProcessingStatus',
@@ -123,6 +131,5 @@ PROCESSING_STATUS = Code(
      'ReplacedByNewVersion'])
 
 GENDER = Code(
-    'AdministrativeGender',
-    ['F', 'M', 'UN'],
-    'http://hl7.org/fhir/v3/AdministrativeGender')
+    'http://hl7.org/fhir/v3/AdministrativeGender',
+    ['F', 'M', 'UN'])

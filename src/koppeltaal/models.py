@@ -19,6 +19,8 @@ class ActivityDefinition(object):
     name = None
     subactivities = None
     description = None
+    performer = None
+    launch_type = None
     is_active = True
     is_domain_specific = False
     is_archived = False

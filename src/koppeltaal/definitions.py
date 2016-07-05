@@ -101,6 +101,12 @@ class ActivityDefinition(zope.interface.Interface):
         binding=koppeltaal.codes.ACTIVITY_PERFORMER,
         extension='ActivityDefinition#DefaultPerformer')
 
+    launch_type = Field(
+        'launchType', 'code',
+        optional=True,
+        binding=koppeltaal.codes.ACTIVITY_LAUNCH_TYPE,
+        extension='ActivityDefinition#LaunchType')
+
     is_active = Field(
         'isActive', 'boolean',
         optional=True,
