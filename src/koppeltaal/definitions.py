@@ -13,6 +13,7 @@ FIELD_TYPES = {
     'reference',
     'string',
 }
+RESERVED_NAMES = {'extension'}
 ALL_ITEMS = object()
 FIRST_ITEM = object()
 
@@ -27,6 +28,7 @@ class Field(object):
             multiple=False,
             binding=None,
             extension=None):
+        assert name not in RESERVED_NAMES, '{} is a reserved name.'
         assert field_type in FIELD_TYPES, \
             'Unknown field type {} for {}.'.format(field_type, name)
         assert field_type not in {
