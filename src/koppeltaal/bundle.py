@@ -221,7 +221,7 @@ def unpack(item, definition, bundle):
     return model
 
 
-class BundleItem(object):
+class BundleEntry(object):
     _item = MARKER
 
     def __init__(self, bundle, entry):
@@ -260,7 +260,7 @@ class BundleItem(object):
         return NotImplemented()
 
     def __format__(self, _):
-        return '<BundleItem uids="{}" type="{}">{}</BundleItem>'.format(
+        return '<BundleEntry uids="{}" type="{}">{}</BundleEntry>'.format(
             ', '.join(self.uids),
             self.resource_type,
             json.dumps(self._content, indent=2, sort_keys=True))
@@ -272,7 +272,7 @@ class Bundle(object):
         self.items = []
 
     def add(self, entry):
-        item = BundleItem(self, entry)
+        item = BundleEntry(self, entry)
         print '{}'.format(item)
         self.items.append(item)
 
