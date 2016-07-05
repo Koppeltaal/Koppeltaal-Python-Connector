@@ -1,4 +1,8 @@
+import zope.interface
+import koppeltaal.definitions
 
+
+@zope.interface.implementer(koppeltaal.definitions.SubActivityDefinition)
 class SubActivityDefinition(object):
     name = None
     identifier = None
@@ -6,6 +10,7 @@ class SubActivityDefinition(object):
     active = True
 
 
+@zope.interface.implementer(koppeltaal.definitions.ActivityDefinition)
 class ActivityDefinition(object):
     uid = None
 
@@ -25,6 +30,7 @@ class ActivityDefinition(object):
                 self.identifier, self.name, self.kind)
 
 
+@zope.interface.implementer(koppeltaal.definitions.Name)
 class Name(object):
     family = None
     given = None
@@ -34,6 +40,7 @@ class Name(object):
         return '{}, {} ({})'.format(self.family, self.given, self.use)
 
 
+@zope.interface.implementer(koppeltaal.definitions.Participant)
 class Participant(object):
     member = None
     role = None  # XXX
@@ -42,6 +49,7 @@ class Participant(object):
         return '<Participant>{}</Participant>'.format(self.member)
 
 
+@zope.interface.implementer(koppeltaal.definitions.Patient)
 class Patient(object):
     uid = None
     name = None
@@ -50,6 +58,7 @@ class Patient(object):
         return '<Patient name="{}"/>'.format(self.name)
 
 
+@zope.interface.implementer(koppeltaal.definitions.Practitioner)
 class Practitioner(object):
     uid = None
     name = None
@@ -58,6 +67,7 @@ class Practitioner(object):
         return '<Practitioner name="{}"/>'.format(self.name)
 
 
+@zope.interface.implementer(koppeltaal.definitions.Goal)
 class Goal(object):
     description = None
     status = None
@@ -68,11 +78,13 @@ class Goal(object):
             self.status, self.description, self.notes)
 
 
+@zope.interface.implementer(koppeltaal.definitions.SubActivity)
 class SubActivity(object):
     definition = None
     status = None
 
 
+@zope.interface.implementer(koppeltaal.definitions.Activity)
 class Activity(object):
     identifier = None
     cancelled = None
@@ -88,6 +100,7 @@ class Activity(object):
     subactivities = None
 
 
+@zope.interface.implementer(koppeltaal.definitions.CarePlan)
 class CarePlan(object):
     uid = None
 
@@ -104,12 +117,14 @@ class CarePlan(object):
             ', '.join('{}'.format(g) for g in self.goals))
 
 
+@zope.interface.implementer(koppeltaal.definitions.ProcessingStatus)
 class Status(object):
     status = None
     last_changed = None
     exception = None
 
 
+@zope.interface.implementer(koppeltaal.definitions.Source)
 class Source(object):
     name = None
     software = None
@@ -117,7 +132,8 @@ class Source(object):
     endpoint = None
 
 
-class Message(object):
+@zope.interface.implementer(koppeltaal.definitions.MessageHeader)
+class MessageHeader(object):
     uid = None
 
     timestamp = None

@@ -24,7 +24,7 @@ FACTORIES = {
     definitions.ActivityDefinition: models.ActivityDefinition,
     definitions.CarePlan: models.CarePlan,
     definitions.Goal: models.Goal,
-    definitions.MessageHeader: models.Message,
+    definitions.MessageHeader: models.MessageHeader,
     definitions.Name: models.Name,
     definitions.Participant: models.Participant,
     definitions.Patient: models.Patient,
@@ -345,8 +345,7 @@ def unpack(item, definition, bundle):
 
     extension = Extension(bundle, item)
     native = Native(bundle, item)
-    for name in dir(definition):
-        field = getattr(definition, name)
+    for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):
             continue
         if field.extension is None:
@@ -360,8 +359,7 @@ def pack(model, definition, bundle):
     extension = Extension(bundle)
     native = Native(bundle)
 
-    for name in dir(definition):
-        field = getattr(definition, name)
+    for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):
             continue
         value = getattr(model, name, None)

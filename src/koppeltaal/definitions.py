@@ -1,3 +1,4 @@
+import zope.interface
 import koppeltaal.interfaces
 import koppeltaal.codes
 
@@ -18,7 +19,7 @@ ALL_ITEMS = object()
 FIRST_ITEM = object()
 
 
-class Field(object):
+class Field(zope.interface.Attribute):
 
     def __init__(
             self,
@@ -28,6 +29,7 @@ class Field(object):
             multiple=False,
             binding=None,
             extension=None):
+        super(Field, self).__init__(__name__='')
         assert name not in RESERVED_NAMES, '{} is a reserved name.'
         assert field_type in FIELD_TYPES, \
             'Unknown field type {} for {}.'.format(field_type, name)
@@ -45,7 +47,7 @@ class Field(object):
             self.url = koppeltaal.interfaces.NAMESPACE + extension
 
 
-class SubActivityDefinition(object):
+class SubActivityDefinition(zope.interface.Interface):
 
     name = Field(
         'name', 'string',
@@ -66,7 +68,7 @@ class SubActivityDefinition(object):
         extension='ActivityDefinition#SubActivityIsActive')
 
 
-class ActivityDefinition(object):
+class ActivityDefinition(zope.interface.Interface):
 
     identifier = Field(
         'identifier', 'string',
@@ -115,7 +117,7 @@ class ActivityDefinition(object):
         extension='ActivityDefinition#IsArchived')
 
 
-class Name(object):
+class Name(zope.interface.Interface):
 
     given = Field(
         'given', 'string',
@@ -132,7 +134,7 @@ class Name(object):
         binding=koppeltaal.codes.NAME_USE)
 
 
-class Patient(object):
+class Patient(zope.interface.Interface):
 
     name = Field(
         'name', 'object',
@@ -140,14 +142,14 @@ class Patient(object):
         multiple=FIRST_ITEM)
 
 
-class Practitioner(object):
+class Practitioner(zope.interface.Interface):
 
     name = Field(
         'name', 'object',
         binding=Name)
 
 
-class Participant(object):
+class Participant(zope.interface.Interface):
 
     member = Field(
         'member', 'reference')
@@ -158,7 +160,7 @@ class Participant(object):
         binding=koppeltaal.codes.CAREPLAN_PARTICIPANT_ROLE)
 
 
-class Goal(object):
+class Goal(zope.interface.Interface):
 
     description = Field(
         'description', 'string')
@@ -172,7 +174,7 @@ class Goal(object):
         optional=True)
 
 
-class SubActivity(object):
+class SubActivity(zope.interface.Interface):
 
     # Note how this definition "points" to the `identifier` one of the
     # `ActivityDefinition.subActivity`.
@@ -187,7 +189,7 @@ class SubActivity(object):
         extension='CarePlan#SubActivityStatus')
 
 
-class Activity(object):
+class Activity(zope.interface.Interface):
 
     identifier = Field(
         'identifier', 'string',
@@ -261,7 +263,7 @@ class Activity(object):
         extension='CarePlan#SubActivity')
 
 
-class CarePlan(object):
+class CarePlan(zope.interface.Interface):
 
     activities = Field(
         'activity', 'object',
@@ -289,7 +291,7 @@ class CarePlan(object):
         multiple=ALL_ITEMS)
 
 
-class ProcessingStatus(object):
+class ProcessingStatus(zope.interface.Interface):
 
     status = Field(
         'status', 'code',
@@ -307,7 +309,7 @@ class ProcessingStatus(object):
         extension='MessageHeader#ProcessingStatusException')
 
 
-class Source(object):
+class Source(zope.interface.Interface):
 
     name = Field(
         'name', 'string',
@@ -324,7 +326,7 @@ class Source(object):
         'endpoint', 'string')
 
 
-class MessageHeader(object):
+class MessageHeader(zope.interface.Interface):
 
     timestamp = Field(
         'timestamp', 'instant')
