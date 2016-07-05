@@ -14,7 +14,7 @@ FIELD_TYPES = {
     'reference',
     'string',
 }
-RESERVED_NAMES = {'extension'}
+RESERVED_NAMES = {'extension', 'text', 'language', 'id'}
 ALL_ITEMS = object()
 FIRST_ITEM = object()
 

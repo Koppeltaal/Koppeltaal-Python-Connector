@@ -121,8 +121,13 @@ def cli():
     elif args.command == 'metadata':
         pretty_print(connection.metadata())
     elif args.command == 'activities':
+        new_bundle = koppeltaal.bundle.Bundle()
         for activity in connection.activities():
             print '{}'.format(activity)
+            new_bundle.add_model(activity)
+        list(new_bundle.pack())
+        for item in new_bundle.items:
+            print '{}'.format(item)
     elif args.command == 'messages':
         for message in connection.fetch(
                 event=args.event, status=args.status, patient=args.patient):

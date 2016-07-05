@@ -1,6 +1,7 @@
 import json
 import dateutil.parser
 import datetime
+import zope.interface
 
 from koppeltaal import (
     interfaces,
@@ -174,9 +175,19 @@ class Extension(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        extension = {"url": field.url}
-        extension.update(self._pack_item(field, value))
-        self._index.setdefault(field.url, []).append(extension)
+        if value is None:
+            if not field.optional:
+                raise interfaces.InvalidValue(field, value)
+            return
+        if field.multiple is definitions.ALL_ITEMS:
+            if not isinstance(value, list):
+                raise interfaces.InvalidValue(field, value)
+        else:
+            value = [value]
+        for single_value in value:
+            extension = {"url": field.url}
+            extension.update(self._pack_item(field, single_value))
+            self._index.setdefault(field.url, []).append(extension)
 
 
 class Native(object):
@@ -359,6 +370,9 @@ def pack(model, definition, bundle):
     extension = Extension(bundle)
     native = Native(bundle)
 
+    if not definition.providedBy(model):
+        raise interfaces.InvalidValue(definition, model)
+
     for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):
             continue
@@ -374,37 +388,55 @@ def pack(model, definition, bundle):
 
 
 class BundleEntry(object):
-    _item = MARKER
+    _model = MARKER
+    _content = MARKER
+    resource_type = None
 
-    def __init__(self, bundle, entry):
+    def __init__(self, bundle, entry=None, model=None):
         self._bundle = bundle
-        self.uids = filter(
-            None,
-            [entry['id'], utils.json2links(entry).get('self')])
-        self._content = entry['content'].copy()
-        resource_type = self._content.pop('resourceType', 'Other')
-        if resource_type == 'Other':
-            assert 'code' in self._content
-            for code in self._content.pop('code').get('coding', []):
-                resource_type = code.get('code', 'Other')
-        assert resource_type != 'Other'
-        self.resource_type = resource_type
+
+        if entry is not None:
+            self.uids = filter(
+                None,
+                [entry['id'], utils.json2links(entry).get('self')])
+            self._content = entry['content'].copy()
+            resource_type = self._content.pop('resourceType', 'Other')
+            if resource_type == 'Other':
+                assert 'code' in self._content
+                for code in self._content.pop('code').get('coding', []):
+                    resource_type = code.get('code', 'Other')
+            assert resource_type != 'Other'
+            self.resource_type = resource_type
+        if model is not None:
+            self.uids = []
+            self._model = model
 
     @property
     def uid(self):
         return self.uids[0]
 
     def unpack(self):
-        if self._item is not MARKER:
-            return self._item
+        if self._model is not MARKER:
+            return self._model
 
-        self._item = None
+        self._model = None
         definition = TYPES.get(self.resource_type)
         if definition is not None:
-            self._item = unpack(self._content, definition, self._bundle)
-            if self._item is not None:
-                self._item.uid = self.uid
-        return self._item
+            self._model = unpack(self._content, definition, self._bundle)
+            if self._model is not None:
+                self._model.uid = self.uid
+        return self._model
+
+    def pack(self):
+        if self._content is not MARKER:
+            return self._content
+        definitions = [
+            d for d in zope.interface.providedBy(self._model).interfaces()
+            if d in FACTORIES]
+        if len(definitions) != 1:
+            raise interfaces.InvalidValue(None, self._model)
+        self._content = pack(self._model, definitions[0], self._bundle)
+        return self._content
 
     def __eq__(self, other):
         if isinstance(other, dict):
@@ -427,9 +459,13 @@ class Bundle(object):
         if response['resourceType'] != 'Bundle':
             raise interfaces.InvalidBundle(response)
         for entry in response['entry']:
-            item = BundleEntry(self, entry)
-            print '{}'.format(item)
-            self.items.append(item)
+            bundle_entry = BundleEntry(self, entry=entry)
+            print '{}'.format(bundle_entry)
+            self.items.append(bundle_entry)
+
+    def add_model(self, model):
+        bundle_entry = BundleEntry(self, model=model)
+        self.items.append(bundle_entry)
 
     def find(self, reference):
         for item in self.items:
@@ -437,9 +473,13 @@ class Bundle(object):
                 return item
         return None
 
-    def unpack(self):
+    def pack(self):
         for item in self.items:
             try:
-                yield item.unpack()
+                yield item.pack()
             except:
                 import pdb; pdb.post_mortem()
+
+    def unpack(self):
+        for item in self.items:
+            yield item.unpack()
