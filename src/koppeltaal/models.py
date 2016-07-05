@@ -55,6 +55,8 @@ class Participant(object):
 class Patient(object):
     uid = None
     name = None
+    age = None
+    birth_date = None
 
     def __format__(self, _):
         return '<Patient name="{}"/>'.format(self.name)

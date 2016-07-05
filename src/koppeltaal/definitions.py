@@ -9,7 +9,9 @@ FIELD_TYPES = {
     'code',
     'coding',
     'date',
+    'datetime',
     'instant',
+    'integer',
     'object',
     'reference',
     'string',
@@ -146,6 +148,15 @@ class Patient(zope.interface.Interface):
         'name', 'object',
         binding=Name,
         multiple=FIRST_ITEM)
+
+    age = Field(
+        'age', 'integer',
+        optional=True,
+        binding='Patient#Age')
+
+    birth_date = Field(
+        'birthDate', 'datetime',
+        optional=True)
 
 
 class Practitioner(zope.interface.Interface):

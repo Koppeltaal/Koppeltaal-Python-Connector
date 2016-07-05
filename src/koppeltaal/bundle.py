@@ -72,11 +72,23 @@ class Extension(object):
                 raise interfaces.InvalidValue(field, value)
             return dateutil.parser.parse(value).date()
 
+        if field.field_type == 'datetime':
+            value = extension.get('valueDateTime')
+            if not isinstance(value, unicode):
+                raise interfaces.InvalidValue(field, value)
+            return dateutil.parser.parse(value)
+
         if field.field_type == 'instant':
             value = extension.get('valueInstant')
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
             return dateutil.parser.parse(value)
+
+        if field.field_type == 'integer':
+            value = extension.get('valueInteger')
+            if not isinstance(value, int):
+                raise interfaces.InvalidValue(field, value)
+            return value
 
         if field.field_type == 'object':
             value = extension.get('extension')
@@ -147,6 +159,11 @@ class Extension(object):
                 raise interfaces.InvalidValue(field, value)
             return {'valueDate': value.isoformat()}
 
+        if field.field_type == 'datetime':
+            if not isinstance(value, datetime.datetime):
+                raise interfaces.InvalidValue(field, value)
+            return {'valueDateTime': value.isoformat()}
+
         if field.field_type == 'instant':
             if not isinstance(value, datetime.datetime):
                 raise interfaces.InvalidValue(field, value)
@@ -155,6 +172,11 @@ class Extension(object):
                 # XXX maybe automatically add UTC.
                 raise interfaces.InvalidValue(field, value)
             return {'valueInstant': value.isoformat()}
+
+        if field.field_type == 'integer':
+            if not isinstance(value, int):
+                raise interfaces.InvalidValue(field, value)
+            return {'valueInteger': value}
 
         if field.field_type == 'object':
             if not isinstance(value, object):
@@ -232,10 +254,20 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return dateutil.parser.parse(value).date()
 
+        if field.field_type == 'datetime':
+            if not isinstance(value, unicode):
+                raise interfaces.InvalidValue(field, value)
+            return dateutil.parser.parse(value)
+
         if field.field_type == 'instant':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
             return dateutil.parser.parse(value)
+
+        if field.field_type == 'integer':
+            if not isinstance(value, int):
+                raise interfaces.InvalidValue(field, value)
+            return value
 
         if field.field_type == 'object':
             if not isinstance(value, dict):
@@ -304,6 +336,11 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return value.isoformat()
 
+        if field.field_type == 'datetime':
+            if not isinstance(value, datetime.datetime):
+                raise interfaces.InvalidValue(field, value)
+            return value.isoformat()
+
         if field.field_type == 'instant':
             if not isinstance(value, datetime.datetime):
                 raise interfaces.InvalidValue(field, value)
@@ -312,6 +349,11 @@ class Native(object):
                 # XXX maybe automatically add UTC.
                 raise interfaces.InvalidValue(field, value)
             return value.isoformat()
+
+        if field.field_type == 'integer':
+            if not isinstance(value, int):
+                raise interfaces.InvalidValue(field, value)
+            return value
 
         if field.field_type == 'object':
             if not isinstance(value, object):
