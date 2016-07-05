@@ -4,6 +4,7 @@ import koppeltaal.codes
 
 FIELD_TYPES = {
     'boolean',
+    'codable',
     'code',
     'coding',
     'date',
@@ -28,7 +29,8 @@ class Field(object):
             extension=None):
         assert field_type in FIELD_TYPES, \
             'Unknown field type {} for {}.'.format(field_type, name)
-        assert field_type not in {'object', 'coding'} or binding, \
+        assert field_type not in {
+            'object', 'codeable', 'code', 'coding'} or binding, \
             'Missing binding for {}.'.format(name)
         self.field_type = field_type
         self.name = name
@@ -148,6 +150,11 @@ class Participant(object):
     member = Field(
         'member', 'reference')
 
+    role = Field(
+        'role', 'codable',
+        optional=True,
+        binding=koppeltaal.codes.CAREPLAN_PARTICIPANT_ROLE)
+
 
 class Goal(object):
 
@@ -163,13 +170,35 @@ class Goal(object):
         optional=True)
 
 
+class SubActivity(object):
+
+    # Note how this definition "points" to the `identifier` one of the
+    # `ActivityDefinition.subActivity`.
+    definition = Field(
+        'identifier', 'string',
+        extension='CarePlan#SubActivityIdentifier')
+
+    status = Field(
+        'status', 'code',
+        binding=koppeltaal.codes.CAREPLAN_ACTIVITY_STATUS,
+        optional=True,
+        extension='CarePlan#SubActivityStatus')
+
+
 class Activity(object):
+
+    identifier = Field(
+        'identifier', 'string',
+        optional=True,
+        extension='CarePlan#ActivityIdentifier')
 
     cancelled = Field(
         'cancelled', 'instant',
         optional=True,
         extension='CarePlan#Cancelled')
 
+    # Note how this definition "points" to the `identifier` one of the
+    # `ActivityDefinition`.
     definition = Field(
         'definition', 'string',
         optional=True,
@@ -185,6 +214,8 @@ class Activity(object):
         optional=True,
         extension='CarePlan#Finished')
 
+    # Note the `kind` should match the `kind` of the `ActivityDefinition`
+    # we're pointing to.
     kind = Field(
         'type', 'coding',
         binding=koppeltaal.codes.ACTIVITY_KIND,
@@ -211,12 +242,21 @@ class Activity(object):
         optional=True,
         extension='CarePlan#Started')
 
+    # This is the older version of the `status`. KT 1.1.1 uses a `code` and
+    # points to the http://hl7.org/fhir/care-plan-activity-status value set.
+    # Perhaps we can update it and still be compatible with Kickass Game and
+    # more importantly, with KT 1.1.1.
     status = Field(
-        'status', 'coding',  # XXX should this be code? this now follow FHIR
+        'status', 'coding',
         binding=koppeltaal.codes.CAREPLAN_ACTIVITY_STATUS,
         extension='CarePlan#ActivityStatus')
 
-    # subactivities = Field()
+    subactivities = Field(
+        'subactivity', 'object',
+        binding=SubActivity,
+        optional=True,
+        multiple=ALL_ITEMS,
+        extension='CarePlan#SubActivity')
 
 
 class CarePlan(object):

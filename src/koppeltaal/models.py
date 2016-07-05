@@ -68,7 +68,13 @@ class Goal(object):
             self.status, self.description, self.notes)
 
 
+class SubActivity(object):
+    definition = None
+    status = None
+
+
 class Activity(object):
+    identifier = None
     cancelled = None
     definition = None
     description = None

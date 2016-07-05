@@ -10,17 +10,24 @@ class Code(list):
             system = koppeltaal.interfaces.NAMESPACE + self.name
         self.system = system
 
-    def pack(self, value):
+    def pack_coding(self, value):
         if value not in self:
             raise ValueError(value)
         return {"code": value,
                 "display": value,
                 "system": self.system}
 
-    def unpack(self, package):
-        value = package["code"]
+    def unpack_code(self, code):
+        if code not in self:
+            raise koppeltaal.interfaces.InvalidValue(self, code)
+        return code
+
+    def unpack_coding(self, coding):
+        value = coding["code"]
+        if coding.get('system') != self.system:
+            raise koppeltaal.interfaces.InvalidValue(self, value)
         if value not in self:
-            raise koppeltaal.interfaces.InvalidValue(value, self)
+            raise koppeltaal.interfaces.InvalidValue(self, value)
         return value
 
 
@@ -49,11 +56,11 @@ CAREPLAN_ACTIVITY_STATUS = Code(
 
 CAREPLAN_PARTICIPANT_ROLE = Code(
     'CarePlanParticipantRole',
-    ['Requester'
-     'Supervisor'
-     'Thirdparty'
-     'Caregiver'
-     'Secretary'
+    ['Requester',
+     'Supervisor',
+     'Thirdparty',
+     'Caregiver',
+     'Secretary',
      'Analyst'])
 
 CAREPLAN_STATUS = Code(
@@ -99,7 +106,7 @@ MESSAGE_KIND = Code(
 NAME_USE = Code(
     'NameUse',
     ['usual',
-     'official'
+     'official',
      'temp',
      'nickname',
      'anonymous',

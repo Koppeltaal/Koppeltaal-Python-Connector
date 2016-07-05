@@ -29,6 +29,7 @@ FACTORIES = {
     definitions.Practitioner: models.Practitioner,
     definitions.ProcessingStatus: models.Status,
     definitions.Source: models.Source,
+    definitions.SubActivity: models.SubActivity,
     definitions.SubActivityDefinition: models.SubActivityDefinition,
 }
 
@@ -54,15 +55,13 @@ class Extension(object):
             value = extension.get('valueCode')
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
-            if field.binding and value not in field.binding:
-                raise interfaces.InvalidValue(field, value)
-            return value
+            return field.binding.unpack_code(value)
 
         if field.field_type == 'coding':
             value = extension.get('valueCoding')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            return field.binding.unpack(value)
+            return field.binding.unpack_coding(value)
 
         if field.field_type == 'date':
             value = extension.get('valueDate')
@@ -130,15 +129,26 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return value
 
+        if field.field_type == 'codable':
+            if not isinstance(value, dict):
+                raise interfaces.InvalidValue(field, value)
+            if 'coding' not in value:
+                raise interfaces.InvalidValue(field, value)
+            if not isinstance(value['coding'], list):
+                raise interfaces.InvalidValue(field, value)
+            if len(value['coding']) != 1:
+                raise interfaces.InvalidValue(field, value)
+            return field.binding.unpack_coding(value['coding'][0])
+
         if field.field_type == 'code':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
-            return value
+            return field.binding.unpack_code(value)
 
         if field.field_type == 'coding':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            return field.binding.unpack(value)
+            return field.binding.unpack_coding(value)
 
         if field.field_type == 'date':
             if not isinstance(value, unicode):
