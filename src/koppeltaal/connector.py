@@ -25,7 +25,7 @@ class FHIRLinkGenerator(object):
 
     def __call__(self, model, resource_type):
         return '{}/{}/{}'.format(
-            self.base_url, resource_type, self.model_id(model))
+            self.endpoint, resource_type, self.model_id(model))
 
 
 @zope.interface.implementer(interfaces.IConnector)

@@ -31,7 +31,22 @@ class RequiredMissing(InvalidValue):
     pass
 
 
+class IFHIRResource(zope.interface.Interface):
+    """A resource that can be sent to the koppeltaal server.
+    """
+
+    fhir_link = zope.interface.Attribute(
+        'Link to resource containing resource type, id and version')
+
+
+class IIdentifiedFHIRResource(IFHIRResource):
+    """A resource that can be identified.
+    """
+
+
 class IConnector(zope.interface.Interface):
+    """Connector to interact with the koppeltaal server.
+    """
 
     transport = zope.interface.Attribute('server base URL')
 

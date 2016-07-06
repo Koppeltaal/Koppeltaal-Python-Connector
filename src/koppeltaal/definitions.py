@@ -1,6 +1,6 @@
 import zope.interface
-import koppeltaal.interfaces
-import koppeltaal.codes
+
+from koppeltaal import (interfaces, codes)
 
 
 FIELD_TYPES = {
@@ -52,22 +52,17 @@ class Field(zope.interface.Attribute):
         self.extension = extension
         self.url = None
         if extension:
-            self.url = koppeltaal.interfaces.NAMESPACE + extension
+            self.url = interfaces.NAMESPACE + extension
 
 
 def resource_type(name, non_standard=False):
 
     def resource_iface(cls):
-        assert issubclass(cls, FHIRResource)
+        assert issubclass(cls, interfaces.IFHIRResource)
         cls.setTaggedValue('resource type', (name, non_standard))
         return cls
 
     return resource_iface
-
-
-class FHIRResource(zope.interface.Interface):
-    fhir_link = zope.interface.Attribute(
-        'Link to resource containing resource type, id and version')
 
 
 class SubActivityDefinition(zope.interface.Interface):
@@ -92,7 +87,7 @@ class SubActivityDefinition(zope.interface.Interface):
 
 
 @resource_type('ActivityDefinition', True)
-class ActivityDefinition(FHIRResource):
+class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     identifier = Field(
         'identifier', 'string',
@@ -100,7 +95,7 @@ class ActivityDefinition(FHIRResource):
 
     kind = Field(
         'type', 'coding',
-        binding=koppeltaal.codes.ACTIVITY_KIND,
+        binding=codes.ACTIVITY_KIND,
         extension='ActivityDefinition#ActivityKind')
 
     name = Field(
@@ -122,13 +117,13 @@ class ActivityDefinition(FHIRResource):
     performer = Field(
         'defaultPerformer', 'coding',
         optional=True,
-        binding=koppeltaal.codes.ACTIVITY_PERFORMER,
+        binding=codes.ACTIVITY_PERFORMER,
         extension='ActivityDefinition#DefaultPerformer')
 
     launch_type = Field(
         'launchType', 'code',
         optional=True,
-        binding=koppeltaal.codes.ACTIVITY_LAUNCH_TYPE,
+        binding=codes.ACTIVITY_LAUNCH_TYPE,
         extension='ActivityDefinition#LaunchType')
 
     is_active = Field(
@@ -161,11 +156,11 @@ class Name(zope.interface.Interface):
 
     use = Field(
         'use', 'code',
-        binding=koppeltaal.codes.NAME_USE)
+        binding=codes.NAME_USE)
 
 
 @resource_type('Patient')
-class Patient(FHIRResource):
+class Patient(interfaces.IIdentifiedFHIRResource):
 
     name = Field(
         'name', 'object',
@@ -183,7 +178,7 @@ class Patient(FHIRResource):
 
 
 @resource_type('Practitioner')
-class Practitioner(FHIRResource):
+class Practitioner(interfaces.IIdentifiedFHIRResource):
 
     name = Field(
         'name', 'object',
@@ -198,7 +193,7 @@ class Participant(zope.interface.Interface):
     role = Field(
         'role', 'codable',
         optional=True,
-        binding=koppeltaal.codes.CAREPLAN_PARTICIPANT_ROLE)
+        binding=codes.CAREPLAN_PARTICIPANT_ROLE)
 
 
 class Goal(zope.interface.Interface):
@@ -208,7 +203,7 @@ class Goal(zope.interface.Interface):
 
     status = Field(
         'status', 'code',
-        binding=koppeltaal.codes.CAREPLAN_GOAL_STATUS)
+        binding=codes.CAREPLAN_GOAL_STATUS)
 
     notes = Field(
         'notes', 'string',
@@ -225,7 +220,7 @@ class SubActivity(zope.interface.Interface):
 
     status = Field(
         'status', 'code',
-        binding=koppeltaal.codes.CAREPLAN_ACTIVITY_STATUS,
+        binding=codes.CAREPLAN_ACTIVITY_STATUS,
         optional=True,
         extension='CarePlan#SubActivityStatus')
 
@@ -263,7 +258,7 @@ class Activity(zope.interface.Interface):
     # we're pointing to.
     kind = Field(
         'type', 'coding',
-        binding=koppeltaal.codes.ACTIVITY_KIND,
+        binding=codes.ACTIVITY_KIND,
         extension='CarePlan#ActivityKind')
 
     notes = Field(
@@ -293,7 +288,7 @@ class Activity(zope.interface.Interface):
     # more importantly, with KT 1.1.1.
     status = Field(
         'status', 'coding',
-        binding=koppeltaal.codes.CAREPLAN_ACTIVITY_STATUS,
+        binding=codes.CAREPLAN_ACTIVITY_STATUS,
         extension='CarePlan#ActivityStatus')
 
     subactivities = Field(
@@ -305,7 +300,7 @@ class Activity(zope.interface.Interface):
 
 
 @resource_type('CarePlan')
-class CarePlan(FHIRResource):
+class CarePlan(interfaces.IIdentifiedFHIRResource):
 
     activities = Field(
         'activity', 'object',
@@ -324,7 +319,7 @@ class CarePlan(FHIRResource):
 
     status = Field(
         'status', 'code',
-        binding=koppeltaal.codes.CAREPLAN_STATUS)
+        binding=codes.CAREPLAN_STATUS)
 
     goals = Field(
         'goal', 'object',
@@ -338,7 +333,7 @@ class ProcessingStatus(zope.interface.Interface):
     status = Field(
         'status', 'code',
         optional=True,
-        binding=koppeltaal.codes.PROCESSING_STATUS,
+        binding=codes.PROCESSING_STATUS,
         extension='MessageHeader#ProcessingStatusStatus')
 
     last_changed = Field(
@@ -369,7 +364,7 @@ class Source(zope.interface.Interface):
 
 
 @resource_type('MessageHeader')
-class MessageHeader(FHIRResource):
+class MessageHeader(interfaces.IFHIRResource):
 
     identifier = Field(
         'identifier', 'string')
@@ -389,7 +384,7 @@ class MessageHeader(FHIRResource):
 
     event = Field(
         'event', 'coding',
-        binding=koppeltaal.codes.MESSAGE_EVENTS)
+        binding=codes.MESSAGE_EVENTS)
 
     status = Field(
         'processingStatus', 'object',

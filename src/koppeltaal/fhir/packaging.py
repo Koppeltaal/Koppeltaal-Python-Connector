@@ -103,11 +103,13 @@ class Extension(object):
         return self._unpack_item(field, extensions[0])
 
     @property
-    def content(self):
+    def payload(self):
         all_extensions = []
         for extensions in self._index.values():
             all_extensions.extend(extensions)
-        return {"extension": all_extensions}
+        if all_extensions:
+            return {"extension": all_extensions}
+        return {}
 
     def _pack_item(self, field, value):
         if field.field_type == 'boolean':
@@ -157,8 +159,10 @@ class Extension(object):
         if field.field_type == 'reference':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            raise NotImplementedError()
-            self._bundle.pack(value)
+            # XXX This only works because of the order of things ...
+            entry = self._bundle.add_model(value)
+            entry.pack()
+            return {'valueResource': {'reference': entry.fhir_link}}
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):
@@ -190,7 +194,7 @@ class Native(object):
         self._content = content or {}
 
     @property
-    def content(self):
+    def payload(self):
         return self._content.copy()
 
     def _unpack_item(self, field, value):
@@ -334,8 +338,10 @@ class Native(object):
         if field.field_type == 'reference':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            raise NotImplementedError()
-            self._bundle.pack(value)
+            # XXX This only works because of the order of things ...
+            entry = self._bundle.add_model(value)
+            entry.pack()
+            return {'reference': entry.fhir_link}
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):
@@ -361,13 +367,13 @@ class Native(object):
         self._content[field.name] = item
 
 
-def unpack(item, definition, bundle):
+def unpack(payload, definition, bundle):
     factory = fhir.REGISTRY.model_for_definition(definition)
     if factory is None:
         return None
 
-    extension = Extension(bundle, item)
-    native = Native(bundle, item)
+    extension = Extension(bundle, payload)
+    native = Native(bundle, payload)
     data = {}
     for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):
@@ -394,7 +400,7 @@ def pack(model, definition, bundle):
             native.pack(field, value)
         else:
             extension.pack(field, value)
-    item = {}
-    item.update(extension.content)
-    item.update(native.content)
-    return item
+    payload = {}
+    payload.update(extension.payload)
+    payload.update(native.payload)
+    return payload

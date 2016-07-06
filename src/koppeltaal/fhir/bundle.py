@@ -76,17 +76,20 @@ class BundleEntry(object):
                     self._model, self.resource_type)
 
         entry = {
-            "id": utils.strip_history_from_link(self.fhir_link),
-            "links": [{"rel": "self",
-                       "url": self.fhir_link}],
-            "content": self._content
-        }
+            "content": self._content}
+        if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
+            entry.update({
+                "id": utils.strip_history_from_link(self.fhir_link),
+                "links": [{"rel": "self",
+                           "url": self.fhir_link}]})
         return entry
 
     def __eq__(self, other):
         if isinstance(other, dict):
             return other.get('reference', None) in (
                 self.fhir_link, self.fhir_unversioned_link)
+        if interfaces.IFHIRResource.providedBy(other):
+            return other.fhir_link == self.fhir_link
         return NotImplemented()
 
     def __format__(self, _):
@@ -112,21 +115,24 @@ class Bundle(object):
             self.items.append(bundle_entry)
 
     def add_model(self, model):
-        bundle_entry = BundleEntry(self, model=model)
-        self.items.append(bundle_entry)
+        assert interfaces.IFHIRResource.providedBy(model), \
+            'Can only add resources to a bundle'
+        entry = self.find(model)
+        if entry is None:
+            entry = BundleEntry(self, model=model)
+            self.items.append(entry)
+        return entry
 
-    def find(self, reference):
+    def find(self, entry):
         for item in self.items:
-            if reference == item:
+            if entry == item:
+                # BundleEntry provides a smart "comparison".
                 return item
         return None
 
     def pack(self):
         for item in self.items:
-            try:
-                yield item.pack()
-            except:
-                import pdb; pdb.post_mortem()
+            yield item.pack()
 
     def get_payload(self):
         assert self.domain is not None, 'Domain is required to create payloads'
@@ -144,8 +150,7 @@ class Bundle(object):
                 "term": "http://hl7.org/fhir/tag/message",
                 "scheme": "http://hl7.org/fhir/tag"
             }],
-            "entry": entries
-        }
+            "entry": entries}
 
     def unpack(self):
         for item in self.items:
