@@ -133,3 +133,10 @@ PROCESSING_STATUS = Code(
 GENDER = Code(
     'http://hl7.org/fhir/v3/AdministrativeGender',
     ['F', 'M', 'UN'])
+
+OTHER_RESOURCE_USAGE = Code(
+    'OtherResourceUsage',
+    ['ActivityDefinition',
+     'UserMessage',
+     'CarePlanActivityStatus',
+     'StorageItem'])

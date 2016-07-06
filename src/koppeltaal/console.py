@@ -39,15 +39,6 @@ def get_credentials(args):
 
 
 def cli():
-    # URLs to the patient and practitioner, and other objects are provided on
-    # the command line and thus as not to be computed. We configure the URL
-    # computation hook so that is takes the URL from an annotation on the
-    # objects that we createed here.
-    def annotated_url(context):
-        return context.__url__
-
-    koppeltaal.configuration.set_url_function(annotated_url)
-
     parser = argparse.ArgumentParser(description='Koppeltaal connector')
     parser.add_argument('server', help='Koppeltaal server to connect to')
     parser.add_argument('--username')
@@ -109,8 +100,9 @@ def cli():
 
     username, password, domain = get_credentials(args)
 
+    link_generator = koppeltaal.connector.FHIRLinkGenerator()
     connection = koppeltaal.connector.Connector(
-        args.server, username, password, domain=domain)
+        args.server, username, password, domain, link_generator)
 
     if args.command == 'test_authentication':
         result = connection.test_authentication()
@@ -121,13 +113,10 @@ def cli():
     elif args.command == 'metadata':
         pretty_print(connection.metadata())
     elif args.command == 'activities':
-        new_bundle = koppeltaal.bundle.Bundle()
         for activity in connection.activities():
-            print '{}'.format(activity)
-            new_bundle.add_model(activity)
-        list(new_bundle.pack())
-        for item in new_bundle.items:
-            print '{}'.format(item)
+            print '\n\nACTIVITY:\n\n{}'.format(activity)
+            print '\n\n\nREPACKING:\n\n'
+            pretty_print(connection.send(activity))
     elif args.command == 'messages':
         for message in connection.fetch(
                 event=args.event, status=args.status, patient=args.patient):

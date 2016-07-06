@@ -17,7 +17,7 @@ def test_unpack_activities(activity_definition_response):
     """From the activities json, get a list of activity information objects.
     """
     bundle = koppeltaal.bundle.Bundle()
-    bundle.add_response(activity_definition_response)
+    bundle.add_payload(activity_definition_response)
     activities = list(bundle.unpack())
 
     assert len(activities) == 2

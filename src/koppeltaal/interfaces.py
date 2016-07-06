@@ -53,19 +53,3 @@ class IConnector(zope.interface.Interface):
     def send(message):
         """Send a message.
         """
-
-
-class IURL(zope.interface.Interface):
-
-    context = zope.interface.Attribute('context to compute id for')
-
-    def url(*args, **kw):
-        pass
-
-
-class IID(zope.interface.Interface):
-
-    context = zope.interface.Attribute('context to compute id for')
-
-    def id(*args, **kw):
-        pass

@@ -16,7 +16,13 @@ FIELD_TYPES = {
     'reference',
     'string',
 }
-RESERVED_NAMES = {'extension', 'text', 'language', 'id'}
+RESERVED_NAMES = {
+    'extension',
+    'id',
+    'language',
+    'resourceType',
+    'text',
+}
 ALL_ITEMS = object()
 FIRST_ITEM = object()
 
@@ -49,6 +55,21 @@ class Field(zope.interface.Attribute):
             self.url = koppeltaal.interfaces.NAMESPACE + extension
 
 
+def resource_type(name, non_standard=False):
+
+    def resource_iface(cls):
+        assert issubclass(cls, FHIRResource)
+        cls.setTaggedValue('resource type', (name, non_standard))
+        return cls
+
+    return resource_iface
+
+
+class FHIRResource(zope.interface.Interface):
+    fhir_link = zope.interface.Attribute(
+        'Link to resource containing resource type, id and version')
+
+
 class SubActivityDefinition(zope.interface.Interface):
 
     name = Field(
@@ -70,7 +91,8 @@ class SubActivityDefinition(zope.interface.Interface):
         extension='ActivityDefinition#SubActivityIsActive')
 
 
-class ActivityDefinition(zope.interface.Interface):
+@resource_type('ActivityDefinition', True)
+class ActivityDefinition(FHIRResource):
 
     identifier = Field(
         'identifier', 'string',
@@ -142,7 +164,8 @@ class Name(zope.interface.Interface):
         binding=koppeltaal.codes.NAME_USE)
 
 
-class Patient(zope.interface.Interface):
+@resource_type('Patient')
+class Patient(FHIRResource):
 
     name = Field(
         'name', 'object',
@@ -159,7 +182,8 @@ class Patient(zope.interface.Interface):
         optional=True)
 
 
-class Practitioner(zope.interface.Interface):
+@resource_type('Practitioner')
+class Practitioner(FHIRResource):
 
     name = Field(
         'name', 'object',
@@ -254,7 +278,7 @@ class Activity(zope.interface.Interface):
         extension='CarePlan#Participant')
 
     planned = Field(
-        'startDate', 'date',
+        'startDate', 'datetime',
         optional=True,
         extension='CarePlan#StartDate')
 
@@ -280,7 +304,8 @@ class Activity(zope.interface.Interface):
         extension='CarePlan#SubActivity')
 
 
-class CarePlan(zope.interface.Interface):
+@resource_type('CarePlan')
+class CarePlan(FHIRResource):
 
     activities = Field(
         'activity', 'object',
@@ -343,7 +368,8 @@ class Source(zope.interface.Interface):
         'endpoint', 'string')
 
 
-class MessageHeader(zope.interface.Interface):
+@resource_type('MessageHeader')
+class MessageHeader(FHIRResource):
 
     timestamp = Field(
         'timestamp', 'instant')

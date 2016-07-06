@@ -1,26 +1,58 @@
-import json
-import dateutil.parser
 import datetime
+import dateutil.parser
+import json
+import uuid
 import zope.interface
 
 from koppeltaal import (
-    interfaces,
+    codes,
     definitions,
+    interfaces,
     models,
     utils)
 
 
 MARKER = object()
 
-TYPES = {
-    'ActivityDefinition': definitions.ActivityDefinition,
-    'CarePlan': definitions.CarePlan,
-    'MessageHeader': definitions.MessageHeader,
-    'Patient': definitions.Patient,
-    'Practitioner': definitions.Practitioner,
-}
 
-FACTORIES = {
+class Registry(dict):
+
+    def definition_for_type(self, resource_type):
+        definitions = []
+        for definition in self.keys():
+            defined_type = definition.queryTaggedValue('resource type')
+            if defined_type and defined_type[0] == resource_type:
+                definitions.append(definition)
+        assert len(definitions) < 2, 'Too many definitions for resource type'
+        if definitions:
+            return definitions[0]
+        return None
+
+    def model_for_definition(self, definition):
+        return self.get(definition)
+
+    def definition_for_model(self, model):
+        definitions = [
+            d for d in zope.interface.providedBy(model).interfaces()
+            if d in self]
+        assert len(definitions) < 2, \
+            'Too many definitions implemented by model'
+        if definitions:
+            return definitions[0]
+        return None
+
+    def type_for_definition(self, definition):
+        assert definition in self, 'Unknown definition'
+        return definition.queryTaggedValue('resource type')
+
+    def type_for_model(self, model):
+        definition = self.definition_for_model()
+        if definition is None:
+            return None
+        return definition.queryTaggedValue('resource type')
+
+
+REGISTRY = Registry({
     definitions.Activity: models.Activity,
     definitions.ActivityDefinition: models.ActivityDefinition,
     definitions.CarePlan: models.CarePlan,
@@ -34,7 +66,7 @@ FACTORIES = {
     definitions.Source: models.Source,
     definitions.SubActivity: models.SubActivity,
     definitions.SubActivityDefinition: models.SubActivityDefinition,
-}
+})
 
 
 class Extension(object):
@@ -391,7 +423,7 @@ class Native(object):
 
 
 def unpack(item, definition, bundle):
-    factory = FACTORIES.get(definition)
+    factory = REGISTRY.model_for_definition(definition)
     if factory is None:
         return None
     model = factory()
@@ -433,71 +465,91 @@ class BundleEntry(object):
     _model = MARKER
     _content = MARKER
     resource_type = None
+    fhir_link = None
+    fhir_unversioned_link = None
 
     def __init__(self, bundle, entry=None, model=None):
         self._bundle = bundle
 
         if entry is not None:
-            self.uids = filter(
-                None,
-                [entry['id'], utils.json2links(entry).get('self')])
+            self.fhir_link = utils.json2links(entry).get('self')
+            self.fhir_unversioned_link = entry['id']
+
             self._content = entry['content'].copy()
-            resource_type = self._content.pop('resourceType', 'Other')
+            resource_type = self._content.get('resourceType', 'Other')
             if resource_type == 'Other':
                 assert 'code' in self._content
-                for code in self._content.pop('code').get('coding', []):
-                    resource_type = code.get('code', 'Other')
+                for code in self._content.get('code').get('coding', []):
+                    resource_type = codes.OTHER_RESOURCE_USAGE.unpack_coding(
+                        code)
             assert resource_type != 'Other'
             self.resource_type = resource_type
         if model is not None:
-            self.uids = []
             self._model = model
-
-    @property
-    def uid(self):
-        return self.uids[0]
 
     def unpack(self):
         if self._model is not MARKER:
             return self._model
 
         self._model = None
-        definition = TYPES.get(self.resource_type)
+        definition = REGISTRY.definition_for_type(self.resource_type)
         if definition is not None:
             self._model = unpack(self._content, definition, self._bundle)
             if self._model is not None:
-                self._model.uid = self.uid
+                self._model.fhir_link = self.fhir_link
         return self._model
 
     def pack(self):
-        if self._content is not MARKER:
-            return self._content
-        definitions = [
-            d for d in zope.interface.providedBy(self._model).interfaces()
-            if d in FACTORIES]
-        if len(definitions) != 1:
-            raise interfaces.InvalidValue(None, self._model)
-        self._content = pack(self._model, definitions[0], self._bundle)
-        return self._content
+        if self._content is MARKER:
+            definition = REGISTRY.definition_for_model(self._model)
+            if definition is None:
+                raise interfaces.InvalidValue(None, self._model)
+            self._content = pack(self._model, definition, self._bundle)
+            type_definition = REGISTRY.type_for_definition(definition)
+            self.resource_type = type_definition[0]
+            if type_definition[1]:
+                # This is not a standard fhir resource type.
+                self._content['resourceType'] = 'Other'
+                self._content['code'] = {
+                    'coding': [
+                        codes.OTHER_RESOURCE_USAGE.pack_coding(
+                            self.resource_type)]}
+            else:
+                self._content['resourceType'] = self.resource_type
+            self.fhir_link = self._model.fhir_link
+            if self.fhir_link is None:
+                self.fhir_link = self._bundle.link_generator(
+                    self._model, self.resource_type)
+
+        entry = {
+            "id": utils.strip_history_from_link(self.fhir_link),
+            "links": [{"rel": "self",
+                       "url": self.fhir_link}],
+            "content": self._content
+        }
+        return entry
 
     def __eq__(self, other):
         if isinstance(other, dict):
-            return other.get('reference', None) in self.uids
+            return other.get('reference', None) in (
+                self.fhir_link, self.fhir_unversioned_link)
         return NotImplemented()
 
     def __format__(self, _):
-        return '<BundleEntry uids="{}" type="{}">{}</BundleEntry>'.format(
-            ', '.join(self.uids),
+        return '<BundleEntry fhir_link="{}" type="{}">{}</BundleEntry>'.format(
+            self.fhir_link,
             self.resource_type,
             json.dumps(self._content, indent=2, sort_keys=True))
 
 
 class Bundle(object):
 
-    def __init__(self):
+    def __init__(self, domain=None, link_generator=None):
         self.items = []
+        self.domain = domain
+        self.link_generator = link_generator
 
-    def add_response(self, response):
+    def add_payload(self, response):
         if response['resourceType'] != 'Bundle':
             raise interfaces.InvalidBundle(response)
         for entry in response['entry']:
@@ -521,6 +573,16 @@ class Bundle(object):
                 yield item.pack()
             except:
                 import pdb; pdb.post_mortem()
+
+    def get_payload(self):
+        entries = list(self.pack())
+        now = datetime.datetime.utcnow()
+        return {
+            "resourceType": "Bundle",
+            "id": "urn:uuid:{}".format(uuid.uuid4()),
+            "updated": "{}Z".format(now.isoformat()),
+            "entry": entries
+        }
 
     def unpack(self):
         for item in self.items:

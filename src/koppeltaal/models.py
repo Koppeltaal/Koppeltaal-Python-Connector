@@ -12,7 +12,7 @@ class SubActivityDefinition(object):
 
 @zope.interface.implementer(koppeltaal.definitions.ActivityDefinition)
 class ActivityDefinition(object):
-    uid = None
+    fhir_link = None
 
     identifier = None
     kind = None
@@ -53,7 +53,8 @@ class Participant(object):
 
 @zope.interface.implementer(koppeltaal.definitions.Patient)
 class Patient(object):
-    uid = None
+    fhir_link = None
+
     name = None
     age = None
     birth_date = None
@@ -64,7 +65,8 @@ class Patient(object):
 
 @zope.interface.implementer(koppeltaal.definitions.Practitioner)
 class Practitioner(object):
-    uid = None
+    fhir_link = None
+
     name = None
 
     def __format__(self, _):
@@ -106,7 +108,7 @@ class Activity(object):
 
 @zope.interface.implementer(koppeltaal.definitions.CarePlan)
 class CarePlan(object):
-    uid = None
+    fhir_link = None
 
     status = None
     patient = None
@@ -138,7 +140,7 @@ class Source(object):
 
 @zope.interface.implementer(koppeltaal.definitions.MessageHeader)
 class MessageHeader(object):
-    uid = None
+    fhir_link = None
 
     timestamp = None
     data = None
