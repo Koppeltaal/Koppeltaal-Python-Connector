@@ -9,15 +9,15 @@ here = py.path.local(__file__)
 
 
 @pytest.fixture
-def activity_definition_response():
-    return json.load(here.dirpath() / 'fixtures/activity_definition.json')
+def activities_game_response():
+    return json.load(here.dirpath() / 'fixtures/activities_game.json')
 
 
-def test_unpack_activities(activity_definition_response):
+def test_unpack_activities(activities_game_response):
     """From the activities json, get a list of activity information objects.
     """
     bundle = koppeltaal.fhir.bundle.Bundle()
-    bundle.add_payload(activity_definition_response)
+    bundle.add_payload(activities_game_response)
     activities = list(bundle.unpack())
 
     assert len(activities) == 2
