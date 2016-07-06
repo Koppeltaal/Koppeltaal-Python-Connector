@@ -3,7 +3,7 @@ import py.path
 import pytest
 import zope.interface.verify
 import koppeltaal.definitions
-import koppeltaal.bundle
+import koppeltaal.fhir.bundle
 
 here = py.path.local(__file__)
 
@@ -16,7 +16,7 @@ def activity_definition_response():
 def test_unpack_activities(activity_definition_response):
     """From the activities json, get a list of activity information objects.
     """
-    bundle = koppeltaal.bundle.Bundle()
+    bundle = koppeltaal.fhir.bundle.Bundle()
     bundle.add_payload(activity_definition_response)
     activities = list(bundle.unpack())
 

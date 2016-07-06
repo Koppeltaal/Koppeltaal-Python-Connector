@@ -4,26 +4,45 @@ import koppeltaal.definitions
 
 @zope.interface.implementer(koppeltaal.definitions.SubActivityDefinition)
 class SubActivityDefinition(object):
-    name = None
-    identifier = None
-    description = None
-    active = True
+
+    def __init__(
+            self,
+            active=True,
+            description=None,
+            identifier=None,
+            name=None):
+        self.active = active
+        self.description = description
+        self.identifier = identifier
+        self.name = name
 
 
 @zope.interface.implementer(koppeltaal.definitions.ActivityDefinition)
 class ActivityDefinition(object):
     fhir_link = None
 
-    identifier = None
-    kind = None
-    name = None
-    subactivities = None
-    description = None
-    performer = None
-    launch_type = None
-    is_active = True
-    is_domain_specific = False
-    is_archived = False
+    def __init__(
+            self,
+            description=None,
+            identifier=None,
+            is_active=True,
+            is_archived=False,
+            is_domain_specific=False,
+            kind=None,
+            launch_type=None,
+            name=None,
+            performer=None,
+            subactivities=None):
+        self.description = description
+        self.identifier = identifier
+        self.is_active = is_active
+        self.is_archived = is_archived
+        self.is_domain_specific = is_domain_specific
+        self.kind = kind
+        self.launch_type = launch_type
+        self.name = name
+        self.performer = performer
+        self.subactivities = subactivities
 
     def __format__(self, _):
         return (
@@ -34,9 +53,15 @@ class ActivityDefinition(object):
 
 @zope.interface.implementer(koppeltaal.definitions.Name)
 class Name(object):
-    family = None
-    given = None
-    use = None
+
+    def __init__(
+            self,
+            family=None,
+            given=None,
+            use="official"):
+        self.family = family
+        self.given = given
+        self.use = use
 
     def __format__(self, _):
         return '{}, {} ({})'.format(self.family, self.given, self.use)
@@ -44,8 +69,13 @@ class Name(object):
 
 @zope.interface.implementer(koppeltaal.definitions.Participant)
 class Participant(object):
-    member = None
-    role = None  # XXX
+
+    def __init__(
+            self,
+            member=None,
+            role=None):
+        self.member = member
+        self.role = role
 
     def __format__(self, _):
         return '<Participant>{}</Participant>'.format(self.member)
@@ -55,9 +85,14 @@ class Participant(object):
 class Patient(object):
     fhir_link = None
 
-    name = None
-    age = None
-    birth_date = None
+    def __init__(
+            self,
+            age=None,
+            birth_date=None,
+            name=None):
+        self.name = name
+        self.age = age
+        self.birth_date = birth_date
 
     def __format__(self, _):
         return '<Patient name="{}"/>'.format(self.name)
@@ -67,7 +102,10 @@ class Patient(object):
 class Practitioner(object):
     fhir_link = None
 
-    name = None
+    def __init__(
+            self,
+            name=None):
+        self.name = name
 
     def __format__(self, _):
         return '<Practitioner name="{}"/>'.format(self.name)
@@ -75,9 +113,15 @@ class Practitioner(object):
 
 @zope.interface.implementer(koppeltaal.definitions.Goal)
 class Goal(object):
-    description = None
-    status = None
-    notes = None
+
+    def __init__(
+            self,
+            description=None,
+            notes=None,
+            status=None):
+        self.description = description
+        self.status = status
+        self.notes = notes
 
     def __format__(self, _):
         return '<Goal status="{}">{} {}</Goal>'.format(
@@ -86,34 +130,62 @@ class Goal(object):
 
 @zope.interface.implementer(koppeltaal.definitions.SubActivity)
 class SubActivity(object):
-    definition = None
-    status = None
+
+    def __init__(
+            self,
+            definition=None,
+            status=None):
+        self.definition = definition
+        self.status = status
 
 
 @zope.interface.implementer(koppeltaal.definitions.Activity)
 class Activity(object):
-    identifier = None
-    cancelled = None
-    definition = None
-    description = None
-    finished = None
-    kind = None
-    notes = None
-    participants = None
-    planned = None
-    started = None
-    status = None
-    subactivities = None
+
+    def __init__(
+            self,
+            cancelled=None,
+            definition=None,
+            description=None,
+            finished=None,
+            identifier=None,
+            kind=None,
+            notes=None,
+            participants=None,
+            planned=None,
+            started=None,
+            status=None,
+            subactivities=None):
+        self.cancelled = cancelled
+        self.definition = definition
+        self.description = description
+        self.finished = finished
+        self.identifier = identifier
+        self.kind = kind
+        self.notes = notes
+        self.participants = participants
+        self.planned = planned
+        self.started = started
+        self.status = status
+        self.subactivities = subactivities
 
 
 @zope.interface.implementer(koppeltaal.definitions.CarePlan)
 class CarePlan(object):
     fhir_link = None
 
-    status = None
-    patient = None
-    participants = None
-    goals = None
+    def __init__(
+            self,
+            activities=None,
+            goals=None,
+            participants=None,
+            patient=None,
+            status=None):
+        self.activities = activities
+        self.goals = goals
+        self.participants = participants
+        self.patient = patient
+        self.status = status
 
     def __format__(self, _):
         return '<CarePlan status="{}">{} {} {}</CarePlan>'.format(
@@ -125,28 +197,51 @@ class CarePlan(object):
 
 @zope.interface.implementer(koppeltaal.definitions.ProcessingStatus)
 class Status(object):
-    status = None
-    last_changed = None
-    exception = None
+
+    def __init__(
+            self,
+            exception=None,
+            last_changed=None,
+            status=None):
+        self.exception = exception
+        self.last_changed = last_changed
+        self.status = status
 
 
 @zope.interface.implementer(koppeltaal.definitions.Source)
 class Source(object):
-    name = None
-    software = None
-    version = None
-    endpoint = None
+
+    def __init__(self,
+                 endpoint=None,
+                 name=None,
+                 software=None,
+                 version=None):
+        self.endpoint = endpoint
+        self.name = name
+        self.software = software
+        self.version = version
 
 
 @zope.interface.implementer(koppeltaal.definitions.MessageHeader)
 class MessageHeader(object):
     fhir_link = None
 
-    timestamp = None
-    data = None
-    patient = None
-    event = None
-    status = None
+    def __init__(
+            self,
+            data=None,
+            event=None,
+            identifier=None,
+            patient=None,
+            source=None,
+            status=None,
+            timestamp=None):
+        self.data = data
+        self.event = event
+        self.identifier = identifier
+        self.patient = patient
+        self.source = source
+        self.status = status
+        self.timestamp = timestamp
 
     def __format__(self, _):
         return ('<Message event="{}" status="{}" last_changed"{}">'

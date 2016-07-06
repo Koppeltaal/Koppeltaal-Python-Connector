@@ -371,6 +371,9 @@ class Source(zope.interface.Interface):
 @resource_type('MessageHeader')
 class MessageHeader(FHIRResource):
 
+    identifier = Field(
+        'identifier', 'string')
+
     timestamp = Field(
         'timestamp', 'instant')
 
@@ -381,6 +384,7 @@ class MessageHeader(FHIRResource):
 
     patient = Field(
         'patient', 'reference',
+        optional=True,
         extension='MessageHeader#Patient')
 
     event = Field(

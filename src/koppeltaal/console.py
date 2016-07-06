@@ -38,6 +38,17 @@ def get_credentials(args):
     return username, password, domain
 
 
+class DummyResource(object):
+
+    def __new__(cls, fhir_link):
+        if fhir_link is None:
+            return None
+        return object.__new__(cls, fhir_link)
+
+    def __init__(self, fhir_link):
+        self.fhir_link = fhir_link
+
+
 def cli():
     parser = argparse.ArgumentParser(description='Koppeltaal connector')
     parser.add_argument('server', help='Koppeltaal server to connect to')
@@ -86,9 +97,9 @@ def cli():
     create_or_update_care_plan.add_argument('practitioner_family_name')
 
     launch = subparsers.add_parser('launch')
-    launch.add_argument('activity_id')
-    launch.add_argument('patient_url')
-    launch.add_argument('user_url')
+    launch.add_argument('activity')
+    launch.add_argument('patient')
+    launch.add_argument('user')
 
     args = parser.parse_args()
 
@@ -116,10 +127,13 @@ def cli():
         for activity in connection.activities():
             print '\n\nACTIVITY:\n\n{}'.format(activity)
             print '\n\n\nREPACKING:\n\n'
-            pretty_print(connection.send(activity))
+            pretty_print(connection.send(
+                'CreateOrUpdateActivityDefinition', activity, None))
     elif args.command == 'messages':
         for message in connection.fetch(
-                event=args.event, status=args.status, patient=args.patient):
+                event=args.event,
+                status=args.status,
+                patient=DummyResource(args.patient)):
             print '{}'.format(message)
     elif args.command == 'message':
         for message in connection.fetch(message_id=args.message_id):
@@ -163,20 +177,16 @@ def cli():
 
         # careplan = koppeltaal.models.CarePlan()
         message = koppeltaal.models.Message()
-        result = connection.send(message)
+        pretty_print(connection.send(message))
     elif args.command == 'launch':
-        activity = connection.activity(args.activity_id)
+        activity = connection.activity(args.activity)
 
         if activity is None:
-            print "Unknown activity {}.".format(args.activity_id)
+            print "Unknown activity {}.".format(args.activity)
             return
 
-        activity = koppeltaal.model.Activity(args.activity_id, None, None)
-        patient = koppeltaal.models.Patient()
-        patient.uid = args.patient_url
-
-        user = koppeltaal.models.Practitioner()
-        user.uid = args.user_url
+        patient = DummyResource(args.patient)
+        user = DummyResource(args.user)
         print connection.launch(activity, patient, user)
     else:
         sys.exit('Unknown command {}'.format(args.command))

@@ -100,7 +100,7 @@ MESSAGE_EVENTS = Code(
      'UpdateCarePlanActivityStatus',
      'CreateOrUpdateCarePlanActivityResult',
      'CreateOrUpdateUserMessage',
-     'CreateOrUpdateUserActivityDefinition'])
+     'CreateOrUpdateActivityDefinition'])
 
 MESSAGE_KIND = Code(
     'UserMessageKind',

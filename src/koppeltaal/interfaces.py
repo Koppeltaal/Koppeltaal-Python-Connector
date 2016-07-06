@@ -1,11 +1,19 @@
+import pkg_resources
 import zope.interface
 
 NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
+
+SOFTWARE = 'Koppeltaal python adapter'
+VERSION = pkg_resources.get_distribution('koppeltaal').version
 
 ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
 MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
 METADATA_URL = '/FHIR/Koppeltaal/metadata'
 OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
+
+
+class InvalidResponse(ValueError):
+    pass
 
 
 class InvalidBundle(ValueError):
@@ -50,6 +58,6 @@ class IConnector(zope.interface.Interface):
         """Return a list of messages matching the given criteria.
         """
 
-    def send(message):
-        """Send a message.
+    def send(event, data, patient):
+        """Send an update about event with data for patient.
         """
