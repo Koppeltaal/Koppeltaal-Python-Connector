@@ -89,6 +89,10 @@ class IConnector(zope.interface.Interface):
         to a `patient` to be used by `user`.
         """
 
+    def next_update():
+        """Context manager which fetch the next update to process.
+        """
+
     def search(message_id=None, event=None, status=None, patient=None):
         """Return a list of messages matching the given criteria.
         """

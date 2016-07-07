@@ -154,13 +154,7 @@ def cli():
     connection = connector.Connector(
         args.server, username, password, domain, configuration)
 
-    if args.command == 'test_authentication':
-        result = connection.test_authentication()
-        print "Authentication successful." if result \
-            else "Authentication unsuccessful."
-        # Exit code is the opposite of the result from the Connector.
-        sys.exit(not result)
-    elif args.command == 'metadata':
+    if args.command == 'metadata':
         print_json(connection.metadata())
     elif args.command == 'activities':
         for activity in connection.activities():
