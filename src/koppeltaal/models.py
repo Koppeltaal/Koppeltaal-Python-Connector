@@ -1,5 +1,6 @@
 import zope.interface
 import koppeltaal.definitions
+import koppeltaal.interfaces
 
 
 @zope.interface.implementer(koppeltaal.definitions.SubActivityDefinition)
@@ -44,12 +45,6 @@ class ActivityDefinition(object):
         self.performer = performer
         self.subactivities = subactivities
 
-    def __format__(self, _):
-        return (
-            '<ActivityDefinition '
-            'identifier="{}" name="{}" kind="{}"/>').format(
-                self.identifier, self.name, self.kind)
-
 
 @zope.interface.implementer(koppeltaal.definitions.Name)
 class Name(object):
@@ -63,9 +58,6 @@ class Name(object):
         self.given = given
         self.use = use
 
-    def __format__(self, _):
-        return '{}, {} ({})'.format(self.family, self.given, self.use)
-
 
 @zope.interface.implementer(koppeltaal.definitions.Participant)
 class Participant(object):
@@ -76,9 +68,6 @@ class Participant(object):
             role=None):
         self.member = member
         self.role = role
-
-    def __format__(self, _):
-        return '<Participant>{}</Participant>'.format(self.member)
 
 
 @zope.interface.implementer(koppeltaal.definitions.Patient)
@@ -94,9 +83,6 @@ class Patient(object):
         self.age = age
         self.birth_date = birth_date
 
-    def __format__(self, _):
-        return '<Patient name="{}"/>'.format(self.name)
-
 
 @zope.interface.implementer(koppeltaal.definitions.Practitioner)
 class Practitioner(object):
@@ -106,9 +92,6 @@ class Practitioner(object):
             self,
             name=None):
         self.name = name
-
-    def __format__(self, _):
-        return '<Practitioner name="{}"/>'.format(self.name)
 
 
 @zope.interface.implementer(koppeltaal.definitions.Goal)
@@ -122,10 +105,6 @@ class Goal(object):
         self.description = description
         self.status = status
         self.notes = notes
-
-    def __format__(self, _):
-        return '<Goal status="{}">{} {}</Goal>'.format(
-            self.status, self.description, self.notes)
 
 
 @zope.interface.implementer(koppeltaal.definitions.SubActivity)
@@ -187,13 +166,6 @@ class CarePlan(object):
         self.patient = patient
         self.status = status
 
-    def __format__(self, _):
-        return '<CarePlan status="{}">{} {} {}</CarePlan>'.format(
-            self.status,
-            self.patient or "<Patient/>",
-            ', '.join('{}'.format(p) for p in self.participants),
-            ', '.join('{}'.format(g) for g in self.goals))
-
 
 @zope.interface.implementer(koppeltaal.definitions.ProcessingStatus)
 class Status(object):
@@ -242,12 +214,3 @@ class MessageHeader(object):
         self.source = source
         self.status = status
         self.timestamp = timestamp
-
-    def __format__(self, _):
-        return ('<Message event="{}" status="{}" last_changed"{}">'
-                '{}{}</Message>').format(
-                    self.event,
-                    self.status.status,
-                    self.status.last_changed,
-                    self.patient or "<Patient/>",
-                    self.data or "<Data/>")

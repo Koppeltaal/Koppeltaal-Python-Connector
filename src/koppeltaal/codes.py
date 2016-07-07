@@ -124,11 +124,12 @@ NAME_USE = Code(
 
 PROCESSING_STATUS = Code(
     'ProcessingStatus',
-    ['New',
-     'Claimed',
-     'Success',
+    ['Claimed',
      'Failed',
-     'ReplacedByNewVersion'])
+     'MaximumRetriesExceeded',
+     'New',
+     'ReplacedByNewVersion',
+     'Success'])
 
 GENDER = Code(
     'http://hl7.org/fhir/v3/AdministrativeGender',

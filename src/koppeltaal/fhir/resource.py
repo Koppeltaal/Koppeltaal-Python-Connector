@@ -1,33 +1,28 @@
 
 import json
-import uuid
 
 from koppeltaal.fhir import packaging
 from koppeltaal import (
     fhir,
     codes,
-    interfaces,
-    utils)
+    interfaces)
 
 
 MARKER = object()
 
 
-class BundleEntry(object):
+class ResourceEntry(object):
     _model = MARKER
     _content = MARKER
     resource_type = None
     fhir_link = None
     fhir_unversioned_link = None
 
-    def __init__(self, bundle, entry=None, model=None):
+    def __init__(self, bundle, resource=None, model=None):
         self._bundle = bundle
 
-        if entry is not None:
-            self.fhir_link = utils.json2links(entry).get('self')
-            self.fhir_unversioned_link = entry['id']
-
-            self._content = entry['content'].copy()
+        if resource is not None:
+            self._content = resource.copy()
             resource_type = self._content.get('resourceType', 'Other')
             if resource_type == 'Other':
                 assert 'code' in self._content
@@ -76,14 +71,7 @@ class BundleEntry(object):
                 self.fhir_link = self._bundle.configuration.link(
                     self._model, self.resource_type)
 
-        entry = {
-            "content": self._content}
-        if self.fhir_link is not None:
-            entry.update({
-                "id": utils.strip_history_from_link(self.fhir_link),
-                "links": [{"rel": "self",
-                           "url": self.fhir_link}]})
-        return entry
+        return self._content
 
     def __eq__(self, other):
         if isinstance(other, dict):
@@ -94,13 +82,14 @@ class BundleEntry(object):
         return NotImplemented()
 
     def __format__(self, _):
-        return '<BundleEntry fhir_link="{}" type="{}">{}</BundleEntry>'.format(
-            self.fhir_link,
-            self.resource_type,
-            json.dumps(self._content, indent=2, sort_keys=True))
+        return ('<ResourceEntry fhir_link="{}" type="{}">'
+                '{}</ResourceEntry>'.format(
+                    self.fhir_link,
+                    self.resource_type,
+                    json.dumps(self._content, indent=2, sort_keys=True)))
 
 
-class Bundle(object):
+class Resource(object):
 
     def __init__(self, domain=None, configuration=None):
         self.items = []
@@ -108,24 +97,21 @@ class Bundle(object):
         self.configuration = configuration
 
     def add_payload(self, response):
-        if response['resourceType'] != 'Bundle':
-            raise interfaces.InvalidBundle(response)
-        for entry in response['entry']:
-            self.items.append(BundleEntry(self, entry=entry))
+        self.items.append(ResourceEntry(self, resource=response))
 
     def add_model(self, model):
         assert interfaces.IFHIRResource.providedBy(model), \
             'Can only add resources to a bundle'
         entry = self.find(model)
         if entry is None:
-            entry = BundleEntry(self, model=model)
+            entry = ResourceEntry(self, model=model)
             self.items.append(entry)
         return entry
 
     def find(self, entry):
         for item in self.items:
             if entry == item:
-                # BundleEntry provides a smart "comparison".
+                # ResourceEntry provides a smart "comparison".
                 return item
         return None
 
@@ -134,22 +120,8 @@ class Bundle(object):
             yield item.pack()
 
     def get_payload(self):
-        assert self.domain is not None, 'Domain is required to create payloads'
-        entries = list(self.pack())
-        return {
-            "resourceType": "Bundle",
-            "id": "urn:uuid:{}".format(uuid.uuid4()),
-            "updated": utils.now().isoformat(),
-            "category": [{
-                "term": "{}Domain#{}".format(
-                    interfaces.NAMESPACE, self.domain),
-                "label": self.domain,
-                "scheme": "http://hl7.org/fhir/tag/security"
-            }, {
-                "term": "http://hl7.org/fhir/tag/message",
-                "scheme": "http://hl7.org/fhir/tag"
-            }],
-            "entry": entries}
+        for payload in self.pack():
+            return payload
 
     def unpack(self):
         for item in self.items:

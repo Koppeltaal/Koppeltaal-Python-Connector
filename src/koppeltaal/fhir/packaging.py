@@ -292,7 +292,7 @@ class Native(object):
             return value
 
         if field.field_type == 'codable':
-            if isinstance(value, basestring):
+            if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return {"coding": [field.binding.pack_coding(value)]}
 

@@ -5,11 +5,55 @@ import argparse
 import ConfigParser
 import logging
 
-import koppeltaal.connector
-import koppeltaal.codes
+from koppeltaal import (connector, codes, models)
 
 
-def pretty_print(data):
+ACTIVITY_OUTPUT = """Activity: {model.identifier}
+- fhir id: {model.fhir_link}
+- name: {model.name}
+- description: {model.description}
+- kind: {model.kind}
+- performer: {model.performer}
+- active: {model.is_active}
+- domain specific: {model.is_domain_specific}
+- archived: {model.is_archived}
+"""
+
+MESSAGE_OUTPUT = """Message: {model.identifier}
+- fhir id: {model.fhir_link}
+- event: {model.event}
+- time stamp: {model.timestamp}
+- status: {model.status.status}
+"""
+
+CAREPLAN_OUTPUT = """CarePlan:
+- fhir id: {model.fhir_link}
+"""
+
+PATIENT_OUTPUT = """Patient: {model.name.family} {model.name.given}
+- fhir id: {model.fhir_link}
+"""
+
+PRACTITIONER_OUTPUT = """Practitioner: {model.name.family} {model.name.given}
+- fhir id: {model.fhir_link}
+"""
+
+OUTPUT = {
+    models.ActivityDefinition: ACTIVITY_OUTPUT,
+    models.CarePlan: CAREPLAN_OUTPUT,
+    models.MessageHeader: MESSAGE_OUTPUT,
+    models.Patient: PATIENT_OUTPUT,
+    models.Practitioner: PRACTITIONER_OUTPUT,
+}
+
+
+def print_model(model):
+    output = OUTPUT.get(model.__class__)
+    if output:
+        print output.format(model=model)
+
+
+def print_json(data):
     print json.dumps(data, indent=2, sort_keys=True)
 
 
@@ -61,29 +105,24 @@ def cli():
 
     subparsers = parser.add_subparsers(title='commands', dest='command')
 
-    # XXX Inject possible commands here. Some sort of registry.
     subparsers.add_parser('activities')
     subparsers.add_parser('metadata')
-
-    change_messages_status = subparsers.add_parser('change_messages_status')
-    change_messages_status.add_argument('--count', type=int, default=100)
-    change_messages_status.add_argument('--confirm', action='store_true')
-    change_messages_status.add_argument(
-        '--status',
-        choices=koppeltaal.codes.PROCESSING_STATUS)
 
     messages = subparsers.add_parser('messages')
     messages.add_argument(
         '--patient')
     messages.add_argument(
         '--status',
-        choices=koppeltaal.codes.PROCESSING_STATUS)
+        choices=codes.PROCESSING_STATUS)
     messages.add_argument(
         '--event',
-        choices=koppeltaal.codes.MESSAGE_EVENTS)
+        choices=codes.MESSAGE_EVENTS)
 
     message = subparsers.add_parser('message')
     message.add_argument('message_id')
+
+    next_update = subparsers.add_parser('next')
+    next_update.add_argument('--failure')
 
     create_or_update_care_plan = subparsers.add_parser(
         'create_or_update_care_plan')
@@ -111,9 +150,9 @@ def cli():
 
     username, password, domain = get_credentials(args)
 
-    link_generator = koppeltaal.connector.FHIRLinkGenerator()
-    connection = koppeltaal.connector.Connector(
-        args.server, username, password, domain, link_generator)
+    configuration = connector.FHIRConfiguration(name='Python command line')
+    connection = connector.Connector(
+        args.server, username, password, domain, configuration)
 
     if args.command == 'test_authentication':
         result = connection.test_authentication()
@@ -122,42 +161,19 @@ def cli():
         # Exit code is the opposite of the result from the Connector.
         sys.exit(not result)
     elif args.command == 'metadata':
-        pretty_print(connection.metadata())
+        print_json(connection.metadata())
     elif args.command == 'activities':
         for activity in connection.activities():
-            print '\n\nACTIVITY:\n\n{}'.format(activity)
-            print '\n\n\nREPACKING:\n\n'
-            pretty_print(connection.send(
-                'CreateOrUpdateActivityDefinition', activity, None))
+            print_model(activity)
     elif args.command == 'messages':
-        for message in connection.fetch(
+        for message in connection.search(
                 event=args.event,
                 status=args.status,
                 patient=DummyResource(args.patient)):
-            print '{}'.format(message)
+            print_model(message)
     elif args.command == 'message':
-        for message in connection.fetch(message_id=args.message_id):
-            print '{}'.format(message)
-    elif args.command == 'change_messages_status':
-        if args.confirm is None:
-            print "This is a dry-run."
-        num_done = 0
-        for message in connection.fetch():
-            if message.status == args.status:
-                print "Message {} already with the correct status.".format(
-                    message.uid)
-                continue
-            message.status = args.status
-            if args.confirm:
-                connection.send(message)
-                num_done += 1
-                if num_done >= args.count:
-                    break
-            else:
-                print "Dry-run: not setting message {} " \
-                    "{} to status {}.".format(message.uid, args.status)
-        print 'The status of {} messages has been set to "{}".'.format(
-            num_done, args.status)
+        for model in connection.search(message_id=args.message_id):
+            print_model(model)
     elif args.command == 'create_or_update_care_plan':
         activity = connection.activity(args.activity_id)
 
@@ -176,8 +192,14 @@ def cli():
         # practitioner.name.family = args.practitioner_family_name
 
         # careplan = koppeltaal.models.CarePlan()
-        message = koppeltaal.models.Message()
-        pretty_print(connection.send(message))
+        message = models.Message()
+        print_json(connection.send(message))
+    elif args.command == 'next':
+        with connection.next_update() as model:
+            print_model(model)
+            if args.failure:
+                raise ValueError(args.failure)
+            print_model(message)
     elif args.command == 'launch':
         activity = connection.activity(args.activity)
 

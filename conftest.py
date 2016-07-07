@@ -42,9 +42,10 @@ def connector(request):
     password = config.get(server, 'password')
     domain = config.get(server, 'domain')
 
-    link_generator = koppeltaal.connector.FHIRLinkGenerator()
+    configuration = koppeltaal.connector.FHIRConfiguration(
+        name='Python connector tests')
     return koppeltaal.connector.Connector(
-        server, username, password, domain, link_generator)
+        server, username, password, domain, configuration)
 
 
 @pytest.fixture

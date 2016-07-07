@@ -57,7 +57,9 @@ class Transport(object):
         response.raise_for_status()
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response.text)
-        return response.json()
+        if response.text:
+            return response.json()
+        return None
 
     def update(self, url, data):
         """Update an existing resource at the given url with JSON data.
@@ -71,4 +73,6 @@ class Transport(object):
         response.raise_for_status()
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response.text)
-        return response.json()
+        if response.text:
+            return response.json()
+        return None

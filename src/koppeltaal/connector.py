@@ -1,9 +1,11 @@
+import contextlib
 import uuid
 import zope.interface
 
-from koppeltaal.fhir import bundle
+from koppeltaal.fhir import bundle, resource
 from koppeltaal import(
     interfaces,
+    definitions,
     models,
     transport,
     utils)
@@ -11,10 +13,15 @@ from koppeltaal import(
 DEFAULT_COUNT = 100
 
 
-class FHIRLinkGenerator(object):
+@zope.interface.implementer(interfaces.IFHIRConfiguration)
+class FHIRConfiguration(object):
 
-    def __init__(self, endpoint='https://example.com/fhir/Koppeltaal'):
-        self.endpoint = endpoint
+    def __init__(
+            self,
+            name='Generic python application',
+            url='https://example.com/fhir/Koppeltaal'):
+        self.name = name
+        self.url = url
 
     def model_id(self, model):
         # You should in your implementation extend this class and
@@ -23,7 +30,7 @@ class FHIRLinkGenerator(object):
         # this simplistic default implementation.
         return id(model)
 
-    def __call__(self, model, resource_type):
+    def link(self, model, resource_type):
         return '{}/{}/{}'.format(
             self.endpoint, resource_type, self.model_id(model))
 
@@ -31,15 +38,15 @@ class FHIRLinkGenerator(object):
 @zope.interface.implementer(interfaces.IConnector)
 class Connector(object):
 
-    def __init__(self, server, username, password, domain, link_generator):
+    def __init__(self, server, username, password, domain, configuration):
         self.transport = transport.Transport(server, username, password)
         self.domain = domain
-        self.link_generator = link_generator
+        self.configuration = configuration
 
     def _fetch_bundle(self, url, params=None):
         next_url = url
         next_params = params
-        resource_bundle = bundle.Bundle(self.domain, self.link_generator)
+        resource_bundle = bundle.Bundle(self.domain, self.configuration)
         while next_url:
             response = self.transport.query(next_url, next_params)
             resource_bundle.add_payload(response)
@@ -69,7 +76,37 @@ class Connector(object):
         return self.transport.query_redirect(
             interfaces.OAUTH_LAUNCH_URL, params)
 
-    def fetch(
+    @contextlib.contextmanager
+    def next_update(self):
+        params = {'_query': 'MessageHeader.GetNextNewAndClaim'}
+        message = None
+        for model in self._fetch_bundle(
+                interfaces.MESSAGE_HEADER_URL, params):
+            if definitions.MessageHeader.providedBy(model):
+                assert message is None
+                message = model
+        try:
+            yield message.data
+        except Exception as error:
+            status, exception = 'Failed', unicode(error)
+            raise
+        else:
+            status, exception = 'Success', None
+        finally:
+            # Send back this message.
+            if message.status is None:
+                message.status = models.Status()
+            message.status.status = status
+            message.status.exception = exception
+            message.status.last_changed = utils.now()
+            message_resource = resource.Resource(
+                self.domain, self.configuration)
+            message_resource.add_model(message)
+            self.transport.update(
+                message.fhir_link,
+                message_resource.get_payload())
+
+    def search(
             self, message_id=None, event=None, status=None, patient=None):
         params = {}
         if message_id:
@@ -87,7 +124,8 @@ class Connector(object):
 
     def send(self, event, data, patient):
         source = models.Source(
-            endpoint=unicode(self.link_generator.endpoint),
+            name=unicode(self.configuration.name),
+            endpoint=unicode(self.configuration.url),
             software=unicode(interfaces.SOFTWARE),
             version=unicode(interfaces.VERSION))
         message = models.MessageHeader(
@@ -97,6 +135,6 @@ class Connector(object):
             data=data,
             source=source,
             patient=patient)
-        resource_bundle = bundle.Bundle(self.domain, self.link_generator)
+        resource_bundle = bundle.Bundle(self.domain, self.configuration)
         resource_bundle.add_model(message)
         return resource_bundle.get_payload()
