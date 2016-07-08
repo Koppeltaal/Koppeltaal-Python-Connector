@@ -32,7 +32,7 @@ class FHIRConfiguration(object):
 
     def link(self, model, resource_type):
         return '{}/{}/{}'.format(
-            self.endpoint, resource_type, self.model_id(model))
+            self.url, resource_type, self.model_id(model))
 
 
 @zope.interface.implementer(interfaces.IConnector)
