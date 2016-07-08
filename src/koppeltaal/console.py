@@ -109,14 +109,9 @@ def cli():
     subparsers.add_parser('metadata')
 
     messages = subparsers.add_parser('messages')
-    messages.add_argument(
-        '--patient')
-    messages.add_argument(
-        '--status',
-        choices=codes.PROCESSING_STATUS)
-    messages.add_argument(
-        '--event',
-        choices=codes.MESSAGE_EVENTS)
+    messages.add_argument('--patient')
+    messages.add_argument('--status', choices=codes.PROCESSING_STATUS)
+    messages.add_argument('--event', choices=codes.MESSAGE_EVENTS)
 
     message = subparsers.add_parser('message')
     message.add_argument('message_id')
@@ -124,16 +119,15 @@ def cli():
     next_update = subparsers.add_parser('next')
     next_update.add_argument('--failure')
 
-    create_or_update_care_plan = subparsers.add_parser(
-        'create_or_update_care_plan')
-    create_or_update_care_plan.add_argument('activity_id')
-    create_or_update_care_plan.add_argument('patient_url')
-    create_or_update_care_plan.add_argument('patient_given_name')
-    create_or_update_care_plan.add_argument('patient_family_name')
-    create_or_update_care_plan.add_argument('careplan_url')
-    create_or_update_care_plan.add_argument('practitioner_url')
-    create_or_update_care_plan.add_argument('practitioner_given_name')
-    create_or_update_care_plan.add_argument('practitioner_family_name')
+    care_plan = subparsers.add_parser('care_plan')
+    care_plan.add_argument('activity_id')
+    care_plan.add_argument('patient_url')
+    care_plan.add_argument('patient_given_name')
+    care_plan.add_argument('patient_family_name')
+    care_plan.add_argument('careplan_url')
+    care_plan.add_argument('practitioner_url')
+    care_plan.add_argument('practitioner_given_name')
+    care_plan.add_argument('practitioner_family_name')
 
     launch = subparsers.add_parser('launch')
     launch.add_argument('activity')
@@ -168,7 +162,7 @@ def cli():
     elif args.command == 'message':
         for model in connection.search(message_id=args.message_id):
             print_model(model)
-    elif args.command == 'create_or_update_care_plan':
+    elif args.command == 'care_plan':
         activity = connection.activity(args.activity_id)
 
         if activity is None:
