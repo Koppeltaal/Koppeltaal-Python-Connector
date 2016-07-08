@@ -5,7 +5,8 @@ import dateutil.parser
 from koppeltaal import (
     fhir,
     definitions,
-    interfaces)
+    interfaces,
+    utils)
 
 
 class Extension(object):
@@ -141,9 +142,9 @@ class Extension(object):
             if not isinstance(value, datetime.datetime):
                 raise interfaces.InvalidValue(field, value)
             if value.tzinfo is None:
-                # We need a timezone!
-                # XXX maybe automatically add UTC.
-                raise interfaces.InvalidValue(field, value)
+                # We need a timezone! We assume timezone-naive datetimes
+                # represent UTC times. So we add the UTC tzinfo here.
+                value = value.replace(tzinfo=utils.utc, microsecond=0)
             return {'valueInstant': value.isoformat()}
 
         if field.field_type == 'integer':
@@ -320,9 +321,7 @@ class Native(object):
             if not isinstance(value, datetime.datetime):
                 raise interfaces.InvalidValue(field, value)
             if value.tzinfo is None:
-                # We need a timezone!
-                # XXX maybe automatically add UTC.
-                raise interfaces.InvalidValue(field, value)
+                value = value.replace(tzinfo=utils.utc, microsecond=0)
             return value.isoformat()
 
         if field.field_type == 'integer':
