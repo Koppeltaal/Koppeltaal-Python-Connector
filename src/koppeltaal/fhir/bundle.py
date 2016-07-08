@@ -90,7 +90,11 @@ class BundleEntry(object):
             return other.get('reference', None) in (
                 self.fhir_link, self.fhir_unversioned_link)
         if interfaces.IFHIRResource.providedBy(other):
+            if self._model is not MARKER:
+                return self._model is other
+            assert self.fhir_link is not None, 'Should not happen'
             return other.fhir_link == self.fhir_link
+
         return NotImplemented()
 
     def __format__(self, _):
