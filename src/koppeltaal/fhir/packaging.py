@@ -11,8 +11,8 @@ from koppeltaal import (
 
 class Extension(object):
 
-    def __init__(self, bundle, content=None):
-        self._bundle = bundle
+    def __init__(self, resource, content=None):
+        self._resource = resource
         self._index = {}
         if content and 'extension' in content:
             for extension in content['extension']:
@@ -78,13 +78,13 @@ class Extension(object):
             value = extension.get('extension')
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
-            return unpack(extension, field.binding, self._bundle)
+            return unpack(extension, field.binding, self._resource)
 
         if field.field_type == 'reference':
             value = extension.get('valueResource')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            reference = self._bundle.find(value)
+            reference = self._resource.find(value)
             if reference:
                 return reference.unpack()
             return None
@@ -173,14 +173,12 @@ class Extension(object):
         if field.field_type == 'object':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            return pack(value, field.binding, self._bundle)
+            return pack(value, field.binding, self._resource)
 
         if field.field_type == 'reference':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            # XXX This only works because of the order of things ...
-            entry = self._bundle.add_model(value)
-            entry.pack()
+            entry = self._resource.add_model(value)
             return {'valueResource': {'reference': entry.fhir_link}}
 
         if field.field_type == 'string':
@@ -208,8 +206,8 @@ class Extension(object):
 
 class Native(object):
 
-    def __init__(self, bundle, content=None):
-        self._bundle = bundle
+    def __init__(self, resource, content=None):
+        self._resource = resource
         self._content = content or {}
 
     @property
@@ -266,12 +264,12 @@ class Native(object):
         if field.field_type == 'object':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            return unpack(value, field.binding, self._bundle)
+            return unpack(value, field.binding, self._resource)
 
         if field.field_type == 'reference':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            reference = self._bundle.find(value)
+            reference = self._resource.find(value)
             if reference is not None:
                 return reference.unpack()
             return None
@@ -350,14 +348,12 @@ class Native(object):
         if field.field_type == 'object':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            return pack(value, field.binding, self._bundle)
+            return pack(value, field.binding, self._resource)
 
         if field.field_type == 'reference':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            # XXX This only works because of the order of things ...
-            entry = self._bundle.add_model(value)
-            entry.pack()
+            entry = self._resource.add_model(value)
             return {'reference': entry.fhir_link}
 
         if field.field_type == 'string':
@@ -384,13 +380,13 @@ class Native(object):
         self._content[field.name] = item
 
 
-def unpack(payload, definition, bundle):
+def unpack(payload, definition, resource):
     factory = fhir.REGISTRY.model_for_definition(definition)
     if factory is None:
         return None
 
-    extension = Extension(bundle, payload)
-    native = Native(bundle, payload)
+    extension = Extension(resource, payload)
+    native = Native(resource, payload)
     data = {}
     for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):
@@ -402,9 +398,9 @@ def unpack(payload, definition, bundle):
     return factory(**data)
 
 
-def pack(model, definition, bundle):
-    extension = Extension(bundle)
-    native = Native(bundle)
+def pack(model, definition, resource):
+    extension = Extension(resource)
+    native = Native(resource)
 
     if not definition.providedBy(model):
         raise interfaces.InvalidValue(definition, model)

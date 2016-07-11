@@ -103,7 +103,7 @@ def cli():
         '--domain',
         help='The domain on the server to send data to.')
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('--post-mortem')
+    parser.add_argument('--post-mortem', action='store_true')
 
     subparsers = parser.add_subparsers(title='commands', dest='command')
 
