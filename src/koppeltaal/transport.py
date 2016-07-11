@@ -14,6 +14,8 @@ class Transport(object):
         self.username = username
         self.password = password
 
+        self.session = requests.Session()
+
     def absolute_url(self, url):
         # Make sure we talk to the proper server by updating the URL.
         parts = urlparse.urlparse(url)[2:]
@@ -22,7 +24,7 @@ class Transport(object):
     def query(self, url, params=None):
         """Query a url.
         """
-        response = requests.get(
+        response = self.session.get(
             self.absolute_url(url),
             params=params,
             auth=(self.username, self.password),
@@ -36,7 +38,7 @@ class Transport(object):
     def query_redirect(self, url, params=None):
         """Query a url for a redirect.
         """
-        response = requests.get(
+        response = self.session.get(
             self.absolute_url(url),
             params=params,
             auth=(self.username, self.password),
@@ -48,7 +50,7 @@ class Transport(object):
     def create(self, url, data):
         """Create a new resource at the given url with JSON data.
         """
-        response = requests.post(
+        response = self.session.post(
             self.absolute_url(url),
             auth=(self.username, self.password),
             json=data,
@@ -64,7 +66,7 @@ class Transport(object):
     def update(self, url, data):
         """Update an existing resource at the given url with JSON data.
         """
-        response = requests.put(
+        response = self.session.put(
             self.absolute_url(url),
             auth=(self.username, self.password),
             json=data,
