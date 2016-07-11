@@ -26,6 +26,18 @@ class Extension(object):
                 raise interfaces.InvalidValue(field, value)
             return value
 
+        if field.field_type == 'codeable':
+            value = extension.get('valueCodeableConcept')
+            if not isinstance(value, dict):
+                raise interfaces.InvalidValue(field, value)
+            if 'coding' not in value:
+                raise interfaces.InvalidValue(field, value)
+            if not isinstance(value['coding'], list):
+                raise interfaces.InvalidValue(field, value)
+            if len(value['coding']) != 1:
+                raise interfaces.InvalidValue(field, value)
+            return field.binding.unpack_coding(value['coding'][0])
+
         if field.field_type == 'code':
             value = extension.get('valueCode')
             if not isinstance(value, unicode):
@@ -90,7 +102,7 @@ class Extension(object):
             if field.optional:
                 if field.multiple is definitions.ALL_ITEMS:
                     return []
-                return None
+                return field.default
             raise interfaces.RequiredMissing(field)
         extensions = self._index[field.url]
         if field.multiple is definitions.ALL_ITEMS:
@@ -122,6 +134,12 @@ class Extension(object):
             if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return {'valueCode': field.binding.pack_code(value)}
+
+        if field.field_type == 'codeable':
+            if not isinstance(value, basestring):
+                raise interfaces.InvalidValue(field, value)
+            return {"valueCodeableConcept":
+                    {"coding": [field.binding.pack_coding(value)]}}
 
         if field.field_type == 'coding':
             if not isinstance(value, basestring):
@@ -204,7 +222,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return value
 
-        if field.field_type == 'codable':
+        if field.field_type == 'codeable':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
             if 'coding' not in value:
@@ -270,7 +288,7 @@ class Native(object):
             if field.optional:
                 if field.multiple is definitions.ALL_ITEMS:
                     return []
-                return None
+                return field.default
             raise interfaces.RequiredMissing(field)
 
         value = self._content[field.name]
@@ -292,7 +310,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return value
 
-        if field.field_type == 'codable':
+        if field.field_type == 'codeable':
             if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return {"coding": [field.binding.pack_coding(value)]}
@@ -394,7 +412,7 @@ def pack(model, definition, bundle):
     for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):
             continue
-        value = getattr(model, name, None)
+        value = getattr(model, name, field.default)
         if field.extension is None:
             native.pack(field, value)
         else:

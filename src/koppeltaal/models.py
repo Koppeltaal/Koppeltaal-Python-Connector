@@ -118,6 +118,17 @@ class SubActivity(object):
         self.status = status
 
 
+@zope.interface.implementer(koppeltaal.definitions.ActivityParticipant)
+class ActivityParticipant(object):
+
+    def __init__(
+            self,
+            member=None,
+            role=None):
+        self.member = member
+        self.role = role
+
+
 @zope.interface.implementer(koppeltaal.definitions.Activity)
 class Activity(object):
 
@@ -134,7 +145,8 @@ class Activity(object):
             planned=None,
             started=None,
             status=None,
-            subactivities=None):
+            subactivities=None,
+            prohibited=False):
         self.cancelled = cancelled
         self.definition = definition
         self.description = description
@@ -147,6 +159,7 @@ class Activity(object):
         self.started = started
         self.status = status
         self.subactivities = subactivities
+        self.prohibited = prohibited
 
 
 @zope.interface.implementer(koppeltaal.definitions.CarePlan)

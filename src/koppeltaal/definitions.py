@@ -5,7 +5,7 @@ from koppeltaal import (interfaces, codes)
 
 FIELD_TYPES = {
     'boolean',
-    'codable',
+    'codeable',
     'code',
     'coding',
     'date',
@@ -36,6 +36,7 @@ class Field(zope.interface.Attribute):
             optional=False,
             multiple=False,
             binding=None,
+            default=None,
             extension=None):
         super(Field, self).__init__(__name__='')
         assert name not in RESERVED_NAMES, '{} is a reserved name.'
@@ -47,6 +48,7 @@ class Field(zope.interface.Attribute):
         self.field_type = field_type
         self.name = name
         self.binding = binding
+        self.default = default
         self.optional = optional
         self.multiple = multiple
         self.extension = extension
@@ -191,7 +193,7 @@ class Participant(zope.interface.Interface):
         'member', 'reference')
 
     role = Field(
-        'role', 'codable',
+        'role', 'codeable',
         optional=True,
         binding=codes.CAREPLAN_PARTICIPANT_ROLE)
 
@@ -223,6 +225,19 @@ class SubActivity(zope.interface.Interface):
         binding=codes.CAREPLAN_ACTIVITY_STATUS,
         optional=True,
         extension='CarePlan#SubActivityStatus')
+
+
+class ActivityParticipant(zope.interface.Interface):
+
+    member = Field(
+        'member', 'reference',
+        extension='CarePlan#ParticipantMember')
+
+    role = Field(
+        'role', 'codeable',
+        optional=True,
+        binding=codes.CAREPLAN_PARTICIPANT_ROLE,
+        extension='CarePlan#ParticipantRole')
 
 
 class Activity(zope.interface.Interface):
@@ -267,7 +282,7 @@ class Activity(zope.interface.Interface):
 
     participants = Field(
         'participant', 'object',
-        binding=Participant,
+        binding=ActivityParticipant,
         optional=True,
         multiple=ALL_ITEMS,
         extension='CarePlan#Participant')
@@ -297,6 +312,11 @@ class Activity(zope.interface.Interface):
         optional=True,
         multiple=ALL_ITEMS,
         extension='CarePlan#SubActivity')
+
+    prohibited = Field(
+        'prohibited', 'boolean',
+        optional=True,
+        default=False)
 
 
 @resource_type('CarePlan')

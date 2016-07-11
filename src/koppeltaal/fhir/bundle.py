@@ -81,6 +81,7 @@ class BundleEntry(object):
         if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
             self._fhir_link = self._bundle.configuration.link(
                 self._model, self.resource_type)
+            return self._fhir_link
 
         return None
 
@@ -128,7 +129,7 @@ class BundleEntry(object):
             "content": self._content,
             "id": self.atom_id}
         if self.fhir_link is not None:
-            entry["links"] = [{"rel": "self", "url": self.fhir_link}]
+            entry["link"] = [{"rel": "self", "href": self.fhir_link}]
         return entry
 
     def __eq__(self, other):

@@ -137,11 +137,6 @@ class Connector(object):
             patient=patient)
         resource_bundle = bundle.Bundle(self.domain, self.configuration)
         resource_bundle.add_model(message)
-        try:
-            return self.transport.create(
-                interfaces.MAILBOX_URL,
-                resource_bundle.get_payload())
-        except Exception as e:
-            print e
-            import pdb; pdb.post_mortem()
-            raise
+        return self.transport.create(
+            interfaces.MAILBOX_URL,
+            resource_bundle.get_payload())
