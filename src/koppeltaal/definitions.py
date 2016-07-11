@@ -55,11 +55,11 @@ class Field(zope.interface.Attribute):
             self.url = interfaces.NAMESPACE + extension
 
 
-def resource_type(name, non_standard=False):
+def resource_type(name, standard=True):
 
     def resource_iface(cls):
         assert issubclass(cls, interfaces.IFHIRResource)
-        cls.setTaggedValue('resource type', (name, non_standard))
+        cls.setTaggedValue('resource type', (name, standard))
         return cls
 
     return resource_iface
@@ -86,7 +86,7 @@ class SubActivityDefinition(zope.interface.Interface):
         extension='ActivityDefinition#SubActivityIsActive')
 
 
-@resource_type('ActivityDefinition', True)
+@resource_type('ActivityDefinition', False)
 class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     identifier = Field(

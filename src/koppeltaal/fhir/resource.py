@@ -56,7 +56,7 @@ class ResourceEntry(object):
                 self._model, definition, self._bundle)
             type_definition = fhir.REGISTRY.type_for_definition(definition)
             self.resource_type = type_definition[0]
-            if type_definition[1]:
+            if not type_definition[1]:
                 # This is not a standard fhir resource type.
                 self._content['resourceType'] = 'Other'
                 self._content['code'] = {
@@ -76,9 +76,13 @@ class ResourceEntry(object):
     def __eq__(self, other):
         if isinstance(other, dict):
             return other.get('reference', None) in (
-                self.fhir_link, self.fhir_unversioned_link)
+                self.fhir_link, self.atom_id)
         if interfaces.IFHIRResource.providedBy(other):
+            if self._model is not MARKER:
+                return self._model is other
+            assert self.fhir_link is not None, 'Should not happen'
             return other.fhir_link == self.fhir_link
+
         return NotImplemented()
 
     def __format__(self, _):

@@ -16,85 +16,119 @@ MARKER = object()
 class BundleEntry(object):
     _model = MARKER
     _content = MARKER
-    resource_type = None
-    fhir_link = None
-    atom_id = None
+    _definition = MARKER
+    _resource_type = MARKER
+    _standard_type = MARKER
+    _fhir_link = MARKER
+    _atom_id = MARKER
 
     def __init__(self, bundle, entry=None, model=None):
         self._bundle = bundle
 
         if entry is not None:
-            self.fhir_link = utils.json2links(entry).get('self')
-            self.atom_id = entry['id']
+            self._fhir_link = utils.json2links(entry).get('self')
+            self._atom_id = entry['id']
 
             self._content = entry['content'].copy()
             resource_type = self._content.get('resourceType', 'Other')
             if resource_type == 'Other':
+                self._standard_type = False
                 assert 'code' in self._content
                 for code in self._content.get('code').get('coding', []):
                     resource_type = codes.OTHER_RESOURCE_USAGE.unpack_coding(
                         code)
             assert resource_type != 'Other'
-            self.resource_type = resource_type
+            self._resource_type = resource_type
+            self._definition = fhir.REGISTRY.definition_for_type(
+                self.resource_type)
         if model is not None:
             self._model = model
+
+    @property
+    def definition(self):
+        if self._definition is not MARKER:
+            return self._definition
+        assert self._model is not MARKER, 'Need a model.'
+        self._definition = fhir.REGISTRY.definition_for_model(self._model)
+        return self._definition
+
+    @property
+    def resource_type(self):
+        if self._resource_type is not MARKER:
+            return self._resource_type
+        self._resource_type, self._standard_type = \
+            fhir.REGISTRY.type_for_definition(self.definition)
+        return self._resource_type
+
+    @property
+    def standard_type(self):
+        if self._standard_type is not MARKER:
+            return self._standard_type
+        self._resource_type, self._standard_type = \
+            fhir.REGISTRY.type_for_definition(self.definition)
+        return self._standard_type
+
+    @property
+    def fhir_link(self):
+        if self._fhir_link is not MARKER:
+            return self._fhir_link
+        assert self._model is not MARKER, 'Need a model.'
+
+        if self._model.fhir_link is not None:
+            self._fhir_link = self._model.fhir_link
+            return self._fhir_link
+
+        if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
+            self._fhir_link = self._bundle.configuration.link(
+                self._model, self.resource_type)
+
+        return None
+
+    @property
+    def atom_id(self):
+        if self._atom_id is not MARKER:
+            return self._atom_id
+
+        if self.fhir_link is not None:
+            self._atom_id = utils.strip_history_from_link(self.fhir_link)
+        else:
+            self._atom_id = self._bundle.configuration.link(
+                self._model, self.resource_type)
+        return self._atom_id
 
     def unpack(self):
         if self._model is not MARKER:
             return self._model
 
         self._model = None
-        definition = fhir.REGISTRY.definition_for_type(self.resource_type)
-        if definition is not None:
+        if self.definition is not None:
             self._model = packaging.unpack(
-                self._content, definition, self._bundle)
+                self._content, self.definition, self._bundle)
             if self._model is not None:
                 self._model.fhir_link = self.fhir_link
         return self._model
 
     def pack(self):
         if self._content is MARKER:
-            definition = fhir.REGISTRY.definition_for_model(self._model)
-            if definition is None:
+            if self.definition is None:
                 raise interfaces.InvalidValue(None, self._model)
             self._content = packaging.pack(
-                self._model, definition, self._bundle)
-            type_definition = fhir.REGISTRY.type_for_definition(definition)
-            self.resource_type = type_definition[0]
-            if type_definition[1]:
+                self._model, self.definition, self._bundle)
+            if self.standard_type:
+                self._content['resourceType'] = self.resource_type
+            else:
                 # This is not a standard fhir resource type.
                 self._content['resourceType'] = 'Other'
                 self._content['code'] = {
                     'coding': [
                         codes.OTHER_RESOURCE_USAGE.pack_coding(
                             self.resource_type)]}
-            else:
-                self._content['resourceType'] = self.resource_type
-
-            self.fhir_link = self._model.fhir_link
-            if self.atom_id is None:
-
-                if (interfaces.IIdentifiedFHIRResource.providedBy(
-                        self._model) or self.atom_id is not None):
-                    if self.fhir_link is None:
-                        self.fhir_link = self._bundle.configuration.link(
-                            self._model, self.resource_type)
-                    self.atom_id = utils.strip_history_from_link(
-                        self.fhir_link)
-                else:
-                    self.atom_id = self._bundle.configuration.link(
-                        self._model, self.resource_type)
-            else:
-                assert self.fhir_link is not None, 'Should not happen'
 
         entry = {
             "content": self._content,
             "id": self.atom_id}
         if self.fhir_link is not None:
-            entry.update({
-                "links": [{"rel": "self",
-                           "url": self.fhir_link}]})
-
+            entry["links"] = [{"rel": "self", "url": self.fhir_link}]
         return entry
 
     def __eq__(self, other):

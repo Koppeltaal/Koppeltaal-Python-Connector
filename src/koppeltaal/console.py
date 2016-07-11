@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import pdb
 import argparse
 import ConfigParser
 import logging
@@ -9,7 +10,7 @@ from koppeltaal import (connector, codes, models)
 
 
 ACTIVITY_OUTPUT = """Activity: {model.identifier}
-- fhir id: {model.fhir_link}
+- fhir link: {model.fhir_link}
 - name: {model.name}
 - description: {model.description}
 - kind: {model.kind}
@@ -20,22 +21,22 @@ ACTIVITY_OUTPUT = """Activity: {model.identifier}
 """
 
 MESSAGE_OUTPUT = """Message: {model.identifier}
-- fhir id: {model.fhir_link}
+- fhir link: {model.fhir_link}
 - event: {model.event}
 - time stamp: {model.timestamp}
 - status: {model.status.status}
 """
 
 CAREPLAN_OUTPUT = """CarePlan:
-- fhir id: {model.fhir_link}
+- fhir link: {model.fhir_link}
 """
 
 PATIENT_OUTPUT = """Patient: {model.name.family} {model.name.given}
-- fhir id: {model.fhir_link}
+- fhir link: {model.fhir_link}
 """
 
 PRACTITIONER_OUTPUT = """Practitioner: {model.name.family} {model.name.given}
-- fhir id: {model.fhir_link}
+- fhir link: {model.fhir_link}
 """
 
 OUTPUT = {
@@ -102,6 +103,7 @@ def cli():
         '--domain',
         help='The domain on the server to send data to.')
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--post-mortem')
 
     subparsers = parser.add_subparsers(title='commands', dest='command')
 
@@ -148,55 +150,61 @@ def cli():
     connection = connector.Connector(
         args.server, username, password, domain, configuration)
 
-    if args.command == 'metadata':
-        print_json(connection.metadata())
-    elif args.command == 'activities':
-        for activity in connection.activities():
-            print_model(activity)
-    elif args.command == 'messages':
-        for message in connection.search(
-                event=args.event,
-                status=args.status,
-                patient=DummyResource(args.patient)):
-            print_model(message)
-    elif args.command == 'message':
-        for model in connection.search(message_id=args.message_id):
-            print_model(model)
-    elif args.command == 'care_plan':
-        activity = connection.activity(args.activity_id)
+    try:
+        if args.command == 'metadata':
+            print_json(connection.metadata())
+        elif args.command == 'activities':
+            for activity in connection.activities():
+                print_model(activity)
+        elif args.command == 'messages':
+            for message in connection.search(
+                    event=args.event,
+                    status=args.status,
+                    patient=DummyResource(args.patient)):
+                print_model(message)
+        elif args.command == 'message':
+            for model in connection.search(message_id=args.message_id):
+                print_model(model)
+        elif args.command == 'care_plan':
+            activity = connection.activity(args.activity_id)
 
-        if activity is None:
-            print "Unknown activity {}.".format(args.activity_id)
-            return
+            if activity is None:
+                print "Unknown activity {}.".format(args.activity_id)
+                return
 
-        # patient = koppeltaal.model.Patient()
-        # patient.__url__ = args.patient_url
-        # patient.name.given = args.patient_given_name
-        # patient.name.family = args.patient_family_name
+            # patient = koppeltaal.model.Patient()
+            # patient.__url__ = args.patient_url
+            # patient.name.given = args.patient_given_name
+            # patient.name.family = args.patient_family_name
 
-        # practitioner = koppeltaal.model.Practitioner()
-        # practitioner.__url__ = args.practitioner_url
-        # practitioner.name.given = args.practitioner_given_name
-        # practitioner.name.family = args.practitioner_family_name
+            # practitioner = koppeltaal.model.Practitioner()
+            # practitioner.__url__ = args.practitioner_url
+            # practitioner.name.given = args.practitioner_given_name
+            # practitioner.name.family = args.practitioner_family_name
 
-        # careplan = koppeltaal.models.CarePlan()
-        message = models.Message()
-        print_json(connection.send(message))
-    elif args.command == 'next':
-        with connection.next_update() as model:
-            print_model(model)
-            if args.failure:
-                raise ValueError(args.failure)
-            print_model(message)
-    elif args.command == 'launch':
-        activity = connection.activity(args.activity)
+            # careplan = koppeltaal.models.CarePlan()
+            message = models.Message()
+            print_json(connection.send(message))
+        elif args.command == 'next':
+            with connection.next_update() as model:
+                print_model(model)
+                if args.failure:
+                    raise ValueError(args.failure)
+                print_model(message)
+        elif args.command == 'launch':
+            activity = connection.activity(args.activity)
 
-        if activity is None:
-            print "Unknown activity {}.".format(args.activity)
-            return
+            if activity is None:
+                print "Unknown activity {}.".format(args.activity)
+                return
 
-        patient = DummyResource(args.patient)
-        user = DummyResource(args.user)
-        print connection.launch(activity, patient, user)
-    else:
-        sys.exit('Unknown command {}'.format(args.command))
+            patient = DummyResource(args.patient)
+            user = DummyResource(args.user)
+            print connection.launch(activity, patient, user)
+        else:
+            sys.exit('Unknown command {}'.format(args.command))
+    except Exception as error:
+        if args.post_mortem:
+            print error
+            pdb.post_mortem()
+        raise
