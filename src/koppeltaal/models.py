@@ -3,6 +3,11 @@ import koppeltaal.definitions
 import koppeltaal.interfaces
 
 
+@zope.interface.implementer(koppeltaal.interfaces.IFHIRResource)
+class FHIRResource(object):
+    fhir_link = None
+
+
 @zope.interface.implementer(koppeltaal.definitions.SubActivityDefinition)
 class SubActivityDefinition(object):
 
@@ -19,8 +24,7 @@ class SubActivityDefinition(object):
 
 
 @zope.interface.implementer(koppeltaal.definitions.ActivityDefinition)
-class ActivityDefinition(object):
-    fhir_link = None
+class ActivityDefinition(FHIRResource):
 
     def __init__(
             self,
@@ -71,8 +75,7 @@ class Participant(object):
 
 
 @zope.interface.implementer(koppeltaal.definitions.Patient)
-class Patient(object):
-    fhir_link = None
+class Patient(FHIRResource):
 
     def __init__(
             self,
@@ -85,8 +88,7 @@ class Patient(object):
 
 
 @zope.interface.implementer(koppeltaal.definitions.Practitioner)
-class Practitioner(object):
-    fhir_link = None
+class Practitioner(FHIRResource):
 
     def __init__(
             self,
@@ -163,8 +165,7 @@ class Activity(object):
 
 
 @zope.interface.implementer(koppeltaal.definitions.CarePlan)
-class CarePlan(object):
-    fhir_link = None
+class CarePlan(FHIRResource):
 
     def __init__(
             self,
@@ -208,8 +209,7 @@ class Source(object):
 
 
 @zope.interface.implementer(koppeltaal.definitions.MessageHeader)
-class MessageHeader(object):
-    fhir_link = None
+class MessageHeader(FHIRResource):
 
     def __init__(
             self,

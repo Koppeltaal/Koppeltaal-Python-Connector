@@ -1,5 +1,6 @@
 import datetime
 import dateutil.parser
+import uuid
 
 
 from koppeltaal import (
@@ -413,7 +414,10 @@ def pack(model, definition, resource):
             native.pack(field, value)
         else:
             extension.pack(field, value)
-    payload = {}
+    # We do not have to add an idref because we do not refer back to
+    # any object. However due to a bug the javascript connector
+    # requires it in some cases.
+    payload = {'id': resource.idref()}
     payload.update(extension.payload)
     payload.update(native.payload)
     return payload

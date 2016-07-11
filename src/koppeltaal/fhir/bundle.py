@@ -7,19 +7,19 @@ from koppeltaal import (interfaces, utils)
 MARKER = object()
 
 
-class BundleEntry(resource.ResourceEntry):
+class Entry(resource.Entry):
     _atom_id = MARKER
 
-    def __init__(self, bundle, entry=None, model=None):
+    def __init__(self, resource, entry=None, model=None):
         if entry is not None:
             self._fhir_link = utils.json2links(entry).get('self')
             self._atom_id = entry['id']
 
-            super(BundleEntry, self).__init__(
-                bundle, resource=entry['content'])
+            super(Entry, self).__init__(
+                resource, content=entry['content'])
         if model is not None:
-            super(BundleEntry, self).__init__(
-                bundle, model=model)
+            super(Entry, self).__init__(
+                resource, model=model)
 
     @property
     def atom_id(self):
@@ -29,13 +29,13 @@ class BundleEntry(resource.ResourceEntry):
         if self.fhir_link is not None:
             self._atom_id = utils.strip_history_from_link(self.fhir_link)
         else:
-            self._atom_id = self._bundle.configuration.link(
+            self._atom_id = self._resource.configuration.link(
                 self._model, self.resource_type)
         return self._atom_id
 
     def pack(self):
         entry = {
-            "content": super(BundleEntry, self).pack(),
+            "content": super(Entry, self).pack(),
             "id": self.atom_id}
         if self.fhir_link is not None:
             entry["link"] = [{"rel": "self", "href": self.fhir_link}]
@@ -43,7 +43,7 @@ class BundleEntry(resource.ResourceEntry):
 
 
 class Bundle(resource.Resource):
-    entry_type = BundleEntry
+    entry_type = Entry
 
     def add_payload(self, response):
         if response['resourceType'] != 'Bundle' or 'entry' not in response:

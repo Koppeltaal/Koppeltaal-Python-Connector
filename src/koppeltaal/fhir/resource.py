@@ -11,7 +11,7 @@ from koppeltaal import (
 MARKER = object()
 
 
-class ResourceEntry(object):
+class Entry(object):
     _model = MARKER
     _content = MARKER
     _definition = MARKER
@@ -19,11 +19,11 @@ class ResourceEntry(object):
     _standard_type = MARKER
     _fhir_link = MARKER
 
-    def __init__(self, bundle, resource=None, model=None):
-        self._bundle = bundle
+    def __init__(self, resource, content=None, model=None):
+        self._resource = resource
 
-        if resource is not None:
-            self._content = resource.copy()
+        if content is not None:
+            self._content = content.copy()
             resource_type = self._content.get('resourceType', 'Other')
             if resource_type == 'Other':
                 self._standard_type = False
@@ -73,7 +73,7 @@ class ResourceEntry(object):
             return self._fhir_link
 
         if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
-            self._fhir_link = self._bundle.configuration.link(
+            self._fhir_link = self._resource.configuration.link(
                 self._model, self.resource_type)
             return self._fhir_link
 
@@ -86,7 +86,7 @@ class ResourceEntry(object):
         self._model = None
         if self.definition is not None:
             self._model = packaging.unpack(
-                self._content, self.definition, self._bundle)
+                self._content, self.definition, self._resource)
             if self._model is not None:
                 self._model.fhir_link = self.fhir_link
         return self._model
@@ -96,7 +96,7 @@ class ResourceEntry(object):
             if self.definition is None:
                 raise interfaces.InvalidValue(None, self._model)
             self._content = packaging.pack(
-                self._model, self.definition, self._bundle)
+                self._model, self.definition, self._resource)
             if self.standard_type:
                 self._content['resourceType'] = self.resource_type
             else:
@@ -130,15 +130,20 @@ class ResourceEntry(object):
 
 
 class Resource(object):
-    entry_type = ResourceEntry
+    entry_type = Entry
 
     def __init__(self, domain=None, configuration=None):
         self.items = []
         self.domain = domain
         self.configuration = configuration
+        self._idref = 0
+
+    def idref(self):
+        self._idref += 1
+        return 'ref{0:03}'.format(self._idref)
 
     def add_payload(self, response):
-        self.items.append(self.entry_type(self, resource=response))
+        self.items.append(self.entry_type(self, content=response))
 
     def add_model(self, model):
         assert interfaces.IFHIRResource.providedBy(model), \
@@ -152,7 +157,7 @@ class Resource(object):
     def find(self, entry):
         for item in self.items:
             if entry == item:
-                # ResourceEntry provides a smart "comparison".
+                # Entry provides a smart "comparison".
                 return item
         return None
 

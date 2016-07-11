@@ -135,9 +135,12 @@ GENDER = Code(
     'http://hl7.org/fhir/v3/AdministrativeGender',
     ['F', 'M', 'UN'])
 
+# BlackBoxState is not valid, but the javascript connector generate
+# some of those.
 OTHER_RESOURCE_USAGE = Code(
     'OtherResourceUsage',
     ['ActivityDefinition',
-     'UserMessage',
+     'BlackBoxState',
      'CarePlanActivityStatus',
-     'StorageItem'])
+     'StorageItem',
+     'UserMessage'])
