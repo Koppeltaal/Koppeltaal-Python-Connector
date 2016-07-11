@@ -18,14 +18,14 @@ class BundleEntry(object):
     _content = MARKER
     resource_type = None
     fhir_link = None
-    fhir_unversioned_link = None
+    atom_id = None
 
     def __init__(self, bundle, entry=None, model=None):
         self._bundle = bundle
 
         if entry is not None:
             self.fhir_link = utils.json2links(entry).get('self')
-            self.fhir_unversioned_link = entry['id']
+            self.atom_id = entry['id']
 
             self._content = entry['content'].copy()
             resource_type = self._content.get('resourceType', 'Other')
@@ -72,16 +72,25 @@ class BundleEntry(object):
                 self._content['resourceType'] = self.resource_type
 
             self.fhir_link = self._model.fhir_link
+            if self.atom_id is None:
 
-            if self.fhir_unversioned_link is None:
-                self.fhir_unversioned_link = self._bundle.configuration.link(
-                    self._model, self.resource_type)
+                if (interfaces.IIdentifiedFHIRResource.providedBy(
+                        self._model) or self.atom_id is not None):
+                    if self.fhir_link is None:
+                        self.fhir_link = self._bundle.configuration.link(
+                            self._model, self.resource_type)
+                    self.atom_id = utils.strip_history_from_link(
+                        self.fhir_link)
+                else:
+                    self.atom_id = self._bundle.configuration.link(
+                        self._model, self.resource_type)
+            else:
+                assert self.fhir_link is not None, 'Should not happen'
 
         entry = {
             "content": self._content,
-            "id": utils.strip_history_from_link(self.fhir_link)}
-
-        if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
+            "id": self.atom_id}
+        if self.fhir_link is not None:
             entry.update({
                 "links": [{"rel": "self",
                            "url": self.fhir_link}]})
@@ -91,7 +100,7 @@ class BundleEntry(object):
     def __eq__(self, other):
         if isinstance(other, dict):
             return other.get('reference', None) in (
-                self.fhir_link, self.fhir_unversioned_link)
+                self.fhir_link, self.atom_id)
         if interfaces.IFHIRResource.providedBy(other):
             if self._model is not MARKER:
                 return self._model is other
