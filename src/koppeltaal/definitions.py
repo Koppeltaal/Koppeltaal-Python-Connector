@@ -170,7 +170,7 @@ class Patient(interfaces.IIdentifiedFHIRResource):
     age = Field(
         'age', 'integer',
         optional=True,
-        binding='Patient#Age')
+        extension='Patient#Age')
 
     birth_date = Field(
         'birthDate', 'datetime',
