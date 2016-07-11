@@ -70,19 +70,22 @@ class BundleEntry(object):
                             self.resource_type)]}
             else:
                 self._content['resourceType'] = self.resource_type
+
             self.fhir_link = self._model.fhir_link
-            if (interfaces.IIdentifiedFHIRResource.providedBy(self._model) and
-                    self.fhir_link is None):
-                self.fhir_link = self._bundle.configuration.link(
+
+            if self.fhir_unversioned_link is None:
+                self.fhir_unversioned_link = self._bundle.configuration.link(
                     self._model, self.resource_type)
 
         entry = {
-            "content": self._content}
-        if self.fhir_link is not None:
+            "content": self._content,
+            "id": utils.strip_history_from_link(self.fhir_link)}
+
+        if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
             entry.update({
-                "id": utils.strip_history_from_link(self.fhir_link),
                 "links": [{"rel": "self",
                            "url": self.fhir_link}]})
+
         return entry
 
     def __eq__(self, other):
