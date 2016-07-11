@@ -32,7 +32,7 @@ class FHIRConfiguration(object):
 
     def link(self, model, resource_type):
         return '{}/{}/{}'.format(
-            self.endpoint, resource_type, self.model_id(model))
+            self.url, resource_type, self.model_id(model))
 
 
 @zope.interface.implementer(interfaces.IConnector)
@@ -137,4 +137,11 @@ class Connector(object):
             patient=patient)
         resource_bundle = bundle.Bundle(self.domain, self.configuration)
         resource_bundle.add_model(message)
-        return resource_bundle.get_payload()
+        try:
+            return self.transport.create(
+                interfaces.MAILBOX_URL,
+                resource_bundle.get_payload())
+        except Exception as e:
+            print e
+            import pdb; pdb.post_mortem()
+            raise
