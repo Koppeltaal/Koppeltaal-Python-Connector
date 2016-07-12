@@ -162,13 +162,41 @@ class Name(zope.interface.Interface):
         binding=codes.NAME_USE)
 
 
+class Contact(zope.interface.Interface):
+
+    system = Field(
+        'system', 'code',
+        optional=True,
+        binding=codes.CONTACT_SYSTEM)
+
+    value = Field(
+        'value', 'string',
+        optional=True)
+
+    use = Field(
+        'use', 'code',
+        optional=True,
+        binding=codes.CONTACT_USE)
+
+
+class Identifier(zope.interface.Interface):
+
+    system = Field(
+        'system', 'string',
+        optional=True)
+
+    value = Field(
+        'value', 'string',
+        optional=True)
+
+    use = Field(
+        'use', 'code',
+        optional=True,
+        binding=codes.IDENTIFIER_USE)
+
+
 @resource_type('Patient')
 class Patient(interfaces.IIdentifiedFHIRResource):
-
-    name = Field(
-        'name', 'object',
-        binding=Name,
-        multiple=FIRST_ITEM)
 
     age = Field(
         'age', 'integer',
@@ -179,9 +207,38 @@ class Patient(interfaces.IIdentifiedFHIRResource):
         'birthDate', 'datetime',
         optional=True)
 
+    contact = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=FIRST_ITEM,
+        optional=True)
+
+    identifiers = Field(
+        'identifier', 'object',
+        binding=Identifier,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    name = Field(
+        'name', 'object',
+        binding=Name,
+        multiple=FIRST_ITEM)
+
 
 @resource_type('Practitioner')
 class Practitioner(interfaces.IIdentifiedFHIRResource):
+
+    contact = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=FIRST_ITEM,
+        optional=True)
+
+    identifiers = Field(
+        'identifier', 'object',
+        binding=Identifier,
+        multiple=ALL_ITEMS,
+        optional=True)
 
     name = Field(
         'name', 'object',

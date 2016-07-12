@@ -87,9 +87,32 @@ CAREPLAN_GOAL_STATUS = Code(
      'sustaining',
      'cancelled'])
 
+CONTACT_SYSTEM = Code(
+    'http://hl7.org/fhir/contact-system',
+    ['phone',
+     'fax',
+     'url',
+     'email'])
+
+CONTACT_USE = Code(
+    'http://hl7.org/fhir/contact-use',
+    ['home',
+     'work',
+     'temp',
+     'old',
+     'mobile'])
+
 DEVICE_KIND = Code(
     'DeviceKind',
     ['Application'])
+
+
+IDENTIFIER_USE = Code(
+    'http://hl7.org/fhir/identifier-use',
+    ['usual',
+     'official',
+     'temp',
+     'secondary'])
 
 MESSAGE_EVENTS = Code(
     'MessageEvents',

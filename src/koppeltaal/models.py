@@ -63,6 +63,32 @@ class Name(object):
         self.use = use
 
 
+@zope.interface.implementer(koppeltaal.definitions.Contact)
+class Contact(object):
+
+    def __init__(
+            self,
+            system=None,
+            value=None,
+            use=None):
+        self.system = system
+        self.value = value
+        self.use = use
+
+
+@zope.interface.implementer(koppeltaal.definitions.Identifier)
+class Identifier(object):
+
+    def __init__(
+            self,
+            system=None,
+            value=None,
+            use=None):
+        self.system = system
+        self.value = value
+        self.use = use
+
+
 @zope.interface.implementer(koppeltaal.definitions.Participant)
 @zope.interface.implementer(koppeltaal.definitions.ActivityParticipant)
 class Participant(object):
@@ -82,10 +108,14 @@ class Patient(FHIRResource):
             self,
             age=None,
             birth_date=None,
+            contact=None,
+            identifiers=None,
             name=None):
-        self.name = name
         self.age = age
         self.birth_date = birth_date
+        self.contact = contact
+        self.identifiers = identifiers
+        self.name = name
 
 
 @zope.interface.implementer(koppeltaal.definitions.Practitioner)
@@ -93,7 +123,11 @@ class Practitioner(FHIRResource):
 
     def __init__(
             self,
+            contact=None,
+            identifiers=None,
             name=None):
+        self.contact = contact
+        self.identifiers = identifiers
         self.name = name
 
 
