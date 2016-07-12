@@ -67,12 +67,12 @@ class Connector(object):
                 return activity
         return None
 
-    def launch(self, activity, patient, user):
+    def launch(self, activity, patient, user, resource=None):
         params = {
             'client_id': activity.identifier,
             'patient': patient.fhir_link,
             'user': user.fhir_link,
-            'resource': activity.identifier}
+            'resource': resource or activity.identifier}
         return self.transport.query_redirect(
             interfaces.OAUTH_LAUNCH_URL, params)
 
