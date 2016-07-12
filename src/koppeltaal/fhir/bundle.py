@@ -13,7 +13,7 @@ class Entry(resource.Entry):
     def __init__(self, resource, entry=None, model=None):
         if entry is not None:
             self._fhir_link = utils.json2links(entry).get('self')
-            self._atom_id = entry['id']
+            self._atom_id = entry.get('id')
 
             super(Entry, self).__init__(
                 resource, content=entry['content'])

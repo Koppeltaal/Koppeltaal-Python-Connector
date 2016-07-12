@@ -158,6 +158,7 @@ class Name(zope.interface.Interface):
 
     use = Field(
         'use', 'code',
+        optional=True,
         binding=codes.NAME_USE)
 
 

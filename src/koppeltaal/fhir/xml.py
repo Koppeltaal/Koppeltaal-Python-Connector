@@ -3,6 +3,20 @@ import lxml.etree
 from koppeltaal import fhir
 
 
+TYPES = [
+    (('extension', 'valueInteger'), 'int'),
+    (('extension', 'valueBoolean'), 'boolean'),
+    (('activity', 'prohibited'), 'boolean'),
+]
+
+
+def type_for(node_tag, child_tag):
+    for key, value in TYPES:
+        if (node_tag, child_tag) == key:
+            return value
+    return 'string'
+
+
 def tag(node, namespace="atom"):
     tag = node.tag
     if namespace == "atom":
@@ -15,6 +29,7 @@ def tag(node, namespace="atom"):
 
 
 def fhir2json(node, repeatable_field_names):
+    node_tag = tag(node, "fhir")
     result = dict(node.attrib)
     for child in node.getchildren():
         child_tag = tag(child, "fhir")
@@ -26,7 +41,13 @@ def fhir2json(node, repeatable_field_names):
             child_value.update(child.attrib)
         else:
             assert 'value' in child.attrib
-            child_value = child.attrib['value']
+            child_value_type = type_for(node_tag, child_tag)
+            if child_value_type == 'int':
+                child_value = int(child.attrib['value'])
+            elif child_value_type == 'boolean':
+                child_value = child.attrib['value'] == 'true'
+            else:
+                child_value = unicode(child.attrib['value'])
         if child_tag in repeatable_field_names:
             result.setdefault(child_tag, []).append(child_value)
         else:
@@ -39,7 +60,7 @@ def atom2json(node, is_entry=False):
     result = {}
     for child in node.getchildren():
         child_tag = tag(child, "atom")
-        if child_tag == 'id':
+        if child_tag in {'id', 'updated', 'title'}:
             result[child_tag] = child.text
         if child_tag in {'category', 'link'}:
             child_value = result.setdefault(child_tag, [])

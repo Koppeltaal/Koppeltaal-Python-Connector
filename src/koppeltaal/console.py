@@ -7,7 +7,7 @@ import ConfigParser
 import logging
 
 from koppeltaal import (connector, codes, models)
-from koppeltaal.fhir import xml
+from koppeltaal.fhir import xml, bundle
 
 
 ACTIVITY_OUTPUT = """Activity: {model.identifier}
@@ -25,7 +25,6 @@ MESSAGE_OUTPUT = """Message: {model.identifier}
 - fhir link: {model.fhir_link}
 - event: {model.event}
 - time stamp: {model.timestamp}
-- status: {model.status.status}
 """
 
 CAREPLAN_OUTPUT = """CarePlan:
@@ -114,10 +113,13 @@ def cli():
     subparsers.add_parser('activities')
     subparsers.add_parser('metadata')
 
-    convert = subparsers.add_parser('convert')
-    convert.add_argument(
-        '--xml', required=True, type=argparse.FileType('rb'),
-        help="XML file to convert")
+    validate = subparsers.add_parser('validate')
+    validate.add_argument(
+        '--xml', type=argparse.FileType('rb'),
+        help="XML file to validate")
+    validate.add_argument(
+        '--json', type=argparse.FileType('rb'),
+        help="JSON file to validate")
 
     messages = subparsers.add_parser('messages')
     messages.add_argument(
@@ -177,8 +179,20 @@ def cli():
     try:
         if args.command == 'metadata':
             print_json(connection.metadata())
-        elif args.command == 'convert':
-            print_json(xml.xml2json(args.xml))
+        elif args.command == 'validate':
+            payload = None
+            if args.xml:
+                payload = xml.xml2json(args.xml)
+            if args.json:
+                payload = json.load(args.json)
+            if payload is None:
+                print "Please provide an XML or JSON file."
+                return
+            print_json(payload)
+            resource_bundle = bundle.Bundle(domain, configuration)
+            resource_bundle.add_payload(payload)
+            for model in resource_bundle.unpack():
+                print_model(model)
         elif args.command == 'activities':
             for activity in connection.activities():
                 print_model(activity)

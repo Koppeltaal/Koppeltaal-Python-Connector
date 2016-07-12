@@ -15,6 +15,8 @@ class Registry(dict):
             for name, field in definition.namesAndDescriptions():
                 if not isinstance(field, definitions.Field):
                     continue
+                if field.extension:
+                    continue
                 if field.multiple:
                     fields.add(field.name)
                 if field.field_type == 'object':
