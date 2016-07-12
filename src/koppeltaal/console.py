@@ -7,6 +7,7 @@ import ConfigParser
 import logging
 
 from koppeltaal import (connector, codes, models)
+from koppeltaal.fhir import xml
 
 
 ACTIVITY_OUTPUT = """Activity: {model.identifier}
@@ -101,25 +102,42 @@ def cli():
     parser.add_argument('--password')
     parser.add_argument(
         '--domain',
-        help='The domain on the server to send data to.')
+        help='The domain on the server to send data to')
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('--post-mortem', action='store_true')
+    parser.add_argument(
+        '--post-mortem',
+        action='store_true',
+        help='Debug any error with a Python debugger')
 
     subparsers = parser.add_subparsers(title='commands', dest='command')
 
     subparsers.add_parser('activities')
     subparsers.add_parser('metadata')
 
+    convert = subparsers.add_parser('convert')
+    convert.add_argument(
+        '--xml', required=True, type=argparse.FileType('rb'),
+        help="XML file to convert")
+
     messages = subparsers.add_parser('messages')
-    messages.add_argument('--patient')
-    messages.add_argument('--status', choices=codes.PROCESSING_STATUS)
-    messages.add_argument('--event', choices=codes.MESSAGE_EVENTS)
+    messages.add_argument(
+        '--patient',
+        help='Patient FHIR link')
+    messages.add_argument(
+        '--status',
+        choices=codes.PROCESSING_STATUS,
+        help='Message header status')
+    messages.add_argument(
+        '--event', choices=codes.MESSAGE_EVENTS,
+        help='Event type')
 
     message = subparsers.add_parser('message')
     message.add_argument('message_id')
 
     next_update = subparsers.add_parser('next')
-    next_update.add_argument('--failure')
+    next_update.add_argument(
+        '--failure',
+        help='Fail and set the exception on the next message.')
 
     care_plan = subparsers.add_parser('care_plan')
     care_plan.add_argument('activity_id')
@@ -132,9 +150,15 @@ def cli():
     care_plan.add_argument('practitioner_family_name')
 
     launch = subparsers.add_parser('launch')
-    launch.add_argument('activity')
-    launch.add_argument('patient')
-    launch.add_argument('user')
+    launch.add_argument(
+        '--activity', required=True,
+        help='Activity identifier')
+    launch.add_argument(
+        '--patient', required=True,
+        help='Patient FHIR link')
+    launch.add_argument(
+        '--user', required=True,
+        help='FHIR link of the user launching the activity')
 
     args = parser.parse_args()
 
@@ -153,6 +177,8 @@ def cli():
     try:
         if args.command == 'metadata':
             print_json(connection.metadata())
+        elif args.command == 'convert':
+            print_json(xml.xml2json(args.xml))
         elif args.command == 'activities':
             for activity in connection.activities():
                 print_model(activity)
