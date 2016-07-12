@@ -1,10 +1,10 @@
 import datetime
 import dateutil.parser
-import uuid
 
 
 from koppeltaal import (
     fhir,
+    compat,
     definitions,
     interfaces,
     utils)
@@ -19,6 +19,7 @@ class Extension(object):
             for extension in content['extension']:
                 url = extension['url']
                 self._index.setdefault(url, []).append(extension)
+        compat.extensions(self._index)
 
     def _unpack_item(self, field, extension):
         if field.field_type == 'boolean':

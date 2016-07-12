@@ -1,7 +1,7 @@
 import urlparse
 import requests
 
-from koppeltaal import interfaces
+from koppeltaal import (interfaces, logger)
 
 
 class Transport(object):
@@ -33,7 +33,9 @@ class Transport(object):
         response.raise_for_status()
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response.text)
-        return response.json()
+        json = response.json()
+        logger.debug_json('Query on {url}:\n {json}', json=json, url=url)
+        return json
 
     def query_redirect(self, url, params=None):
         """Query a url for a redirect.
@@ -60,7 +62,9 @@ class Transport(object):
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response.text)
         if response.text:
-            return response.json()
+            json = response.json()
+            logger.debug_json('Create on {url}:\n {json}', json=json, url=url)
+            return json
         return None
 
     def update(self, url, data):
@@ -76,5 +80,7 @@ class Transport(object):
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response.text)
         if response.text:
-            return response.json()
+            json = response.json()
+            logger.debug_json('Update on {url}:\n {json}', json=json, url=url)
+            return json
         return None
