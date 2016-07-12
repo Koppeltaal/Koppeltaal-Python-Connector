@@ -64,6 +64,7 @@ class Name(object):
 
 
 @zope.interface.implementer(koppeltaal.definitions.Participant)
+@zope.interface.implementer(koppeltaal.definitions.ActivityParticipant)
 class Participant(object):
 
     def __init__(
@@ -118,17 +119,6 @@ class SubActivity(object):
             status=None):
         self.definition = definition
         self.status = status
-
-
-@zope.interface.implementer(koppeltaal.definitions.ActivityParticipant)
-class ActivityParticipant(object):
-
-    def __init__(
-            self,
-            member=None,
-            role=None):
-        self.member = member
-        self.role = role
 
 
 @zope.interface.implementer(koppeltaal.definitions.Activity)

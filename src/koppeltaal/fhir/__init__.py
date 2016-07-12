@@ -6,7 +6,7 @@ from koppeltaal import definitions, models
 REGISTRY = Registry({
     definitions.Activity: models.Activity,
     definitions.ActivityDefinition: models.ActivityDefinition,
-    definitions.ActivityParticipant: models.ActivityParticipant,
+    definitions.ActivityParticipant: models.Participant,
     definitions.CarePlan: models.CarePlan,
     definitions.Goal: models.Goal,
     definitions.MessageHeader: models.MessageHeader,
