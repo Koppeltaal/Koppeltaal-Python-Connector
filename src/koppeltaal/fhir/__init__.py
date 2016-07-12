@@ -8,6 +8,8 @@ REGISTRY = Registry({
     definitions.ActivityDefinition: models.ActivityDefinition,
     definitions.ActivityParticipant: models.Participant,
     definitions.CarePlan: models.CarePlan,
+    definitions.CarePlanActivityStatus: models.ActivityStatus,
+    definitions.CarePlanSubActivityStatus: models.SubActivityStatus,
     definitions.Contact: models.Contact,
     definitions.Goal: models.Goal,
     definitions.Identifier: models.Identifier,

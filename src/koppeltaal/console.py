@@ -10,7 +10,7 @@ from koppeltaal import (connector, codes, models)
 from koppeltaal.fhir import xml, bundle
 
 
-ACTIVITY_OUTPUT = """Activity: {model.identifier}
+ACTIVITY_DEFINITION_OUTPUT = """Activity: {model.identifier}
 - fhir link: {model.fhir_link}
 - name: {model.name}
 - description: {model.description}
@@ -19,6 +19,11 @@ ACTIVITY_OUTPUT = """Activity: {model.identifier}
 - active: {model.is_active}
 - domain specific: {model.is_domain_specific}
 - archived: {model.is_archived}
+"""
+
+ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
+- fhir link: {model.fhir_link}
+- status: {model.status}
 """
 
 MESSAGE_OUTPUT = """Message: {model.identifier}
@@ -40,7 +45,8 @@ PRACTITIONER_OUTPUT = """Practitioner: {model.name.family} {model.name.given}
 """
 
 OUTPUT = {
-    models.ActivityDefinition: ACTIVITY_OUTPUT,
+    models.ActivityDefinition: ACTIVITY_DEFINITION_OUTPUT,
+    models.ActivityStatus: ACTIVITY_STATUS_OUTPUT,
     models.CarePlan: CAREPLAN_OUTPUT,
     models.MessageHeader: MESSAGE_OUTPUT,
     models.Patient: PATIENT_OUTPUT,

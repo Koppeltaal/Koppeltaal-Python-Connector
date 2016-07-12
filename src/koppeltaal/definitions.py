@@ -144,6 +144,38 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
         extension='ActivityDefinition#IsArchived')
 
 
+class CarePlanSubActivityStatus(zope.interface.Interface):
+
+    identifier = Field(
+        'identifier', 'string',
+        extension='CarePlanActivityStatus#SubActivityIdentifier')
+
+    status = Field(
+        'status', 'coding',
+        binding=codes.CAREPLAN_ACTIVITY_STATUS,
+        extension='CarePlanActivityStatus#SubActivityStatus')
+
+
+@resource_type('CarePlanActivityStatus', False)
+class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
+
+    identifier = Field(
+        'activity', 'string',
+        extension='CarePlanActivityStatus#Activity')
+
+    status = Field(
+        'activityStatus', 'coding',
+        binding=codes.CAREPLAN_ACTIVITY_STATUS,
+        extension='CarePlanActivityStatus#ActivityStatus')
+
+    subactivities = Field(
+        'subactivity', 'object',
+        binding=CarePlanSubActivityStatus,
+        extension='CarePlanActivityStatus#SubActivity',
+        multiple=ALL_ITEMS,
+        optional=True)
+
+
 class Name(zope.interface.Interface):
 
     given = Field(

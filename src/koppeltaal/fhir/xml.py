@@ -5,6 +5,7 @@ from koppeltaal import fhir
 
 TYPES = [
     (('extension', 'valueInteger'), 'int'),
+    (('extension', 'valueDecimal'), 'float'),
     (('extension', 'valueBoolean'), 'boolean'),
     (('activity', 'prohibited'), 'boolean'),
 ]
@@ -44,6 +45,8 @@ def fhir2json(node, repeatable_field_names):
             child_value_type = type_for(node_tag, child_tag)
             if child_value_type == 'int':
                 child_value = int(child.attrib['value'])
+            elif child_value_type == 'float':
+                child_value = float(child.attrib['value'])
             elif child_value_type == 'boolean':
                 child_value = child.attrib['value'] == 'true'
             else:

@@ -232,6 +232,30 @@ class Source(object):
         self.version = version
 
 
+@zope.interface.implementer(koppeltaal.definitions.CarePlanSubActivityStatus)
+class SubActivityStatus(object):
+
+    def __init__(
+            self,
+            identifier=None,
+            status=None):
+        self.identifier = identifier
+        self.status = status
+
+
+@zope.interface.implementer(koppeltaal.definitions.CarePlanActivityStatus)
+class ActivityStatus(FHIRResource):
+
+    def __init__(
+            self,
+            identifier=None,
+            status=None,
+            subactivities=None):
+        self.identifier = identifier
+        self.status = status
+        self.subactivities = subactivities
+
+
 @zope.interface.implementer(koppeltaal.definitions.MessageHeader)
 class MessageHeader(FHIRResource):
 
