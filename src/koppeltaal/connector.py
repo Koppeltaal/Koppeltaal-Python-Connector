@@ -48,7 +48,9 @@ class Update(object):
         if exc_type is None and exc_val is None and exc_tb is None:
             self.success()
         else:
-            self.fail(exc_val)
+            # There was an exception. We put back the message to new
+            # since we assume we can be solved after.
+            self.mark('New')
         if self.updated is not None:
             self._finalize(self.message)
 
