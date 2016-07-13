@@ -1,7 +1,7 @@
 import uuid
 
 from koppeltaal.fhir import resource
-from koppeltaal import (interfaces, utils)
+from koppeltaal import (definitions, interfaces, utils)
 
 
 MARKER = object()
@@ -68,3 +68,13 @@ class Bundle(resource.Resource):
                 "scheme": "http://hl7.org/fhir/tag"
             }],
             "entry": entries}
+
+    def unpack_message_header(self):
+        message = None
+        for model in self.unpack():
+            if definitions.MessageHeader.providedBy(model):
+                if message is not None:
+                    # We allow only one message header in the bundle.
+                    raise interfaces.InvalidBundle(self)
+                message = model
+        return message

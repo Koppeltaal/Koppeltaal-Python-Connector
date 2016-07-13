@@ -1,6 +1,6 @@
 import datetime
 import dateutil.parser
-
+import zope.interface
 
 from koppeltaal import (
     fhir,
@@ -8,6 +8,14 @@ from koppeltaal import (
     definitions,
     interfaces,
     utils)
+
+
+@zope.interface.implementer(interfaces.IFHIRResource)
+class ReferredResource(object):
+    fhir_link = None
+
+    def __init__(self, link):
+        self.fhir_link = link
 
 
 class Extension(object):
@@ -25,76 +33,78 @@ class Extension(object):
         if field.field_type == 'boolean':
             value = extension.get('valueBoolean')
             if not isinstance(value, bool):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return value
 
         if field.field_type == 'codeable':
             value = extension.get('valueCodeableConcept')
             if not isinstance(value, dict):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             if 'coding' not in value:
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             if not isinstance(value['coding'], list):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             if len(value['coding']) != 1:
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return field.binding.unpack_coding(value['coding'][0])
 
         if field.field_type == 'code':
             value = extension.get('valueCode')
             if not isinstance(value, unicode):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return field.binding.unpack_code(value)
 
         if field.field_type == 'coding':
             value = extension.get('valueCoding')
             if not isinstance(value, dict):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return field.binding.unpack_coding(value)
 
         if field.field_type == 'date':
             value = extension.get('valueDate')
             if not isinstance(value, unicode):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return dateutil.parser.parse(value).date()
 
         if field.field_type == 'datetime':
             value = extension.get('valueDateTime')
             if not isinstance(value, unicode):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return dateutil.parser.parse(value)
 
         if field.field_type == 'instant':
             value = extension.get('valueInstant')
             if not isinstance(value, unicode):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return dateutil.parser.parse(value)
 
         if field.field_type == 'integer':
             value = extension.get('valueInteger')
             if not isinstance(value, int):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return value
 
         if field.field_type == 'object':
             value = extension.get('extension')
             if not isinstance(value, list):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return unpack(extension, field.binding, self._resource)
 
         if field.field_type == 'reference':
             value = extension.get('valueResource')
             if not isinstance(value, dict):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
+            if 'reference' not in value:
+                interfaces.InvalidValue(field, extension)
             reference = self._resource.find(value)
             if reference:
                 return reference.unpack()
-            return None
+            return ReferredResource(value['reference'])
 
         if field.field_type == 'string':
             value = extension.get('valueString')
             if not isinstance(value, unicode):
-                raise interfaces.InvalidValue(field, value)
+                raise interfaces.InvalidValue(field, extension)
             return value
 
         raise NotImplementedError()
@@ -271,10 +281,12 @@ class Native(object):
         if field.field_type == 'reference':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
+            if 'reference' not in value:
+                raise interfaces.InvalidValue(field, value)
             reference = self._resource.find(value)
             if reference is not None:
                 return reference.unpack()
-            return None
+            return ReferredResource(value['reference'])
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):

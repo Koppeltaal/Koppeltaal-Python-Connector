@@ -456,7 +456,7 @@ class ProcessingStatus(zope.interface.Interface):
         extension='MessageHeader#ProcessingStatusException')
 
 
-class Source(zope.interface.Interface):
+class MessageHeaderSource(zope.interface.Interface):
 
     name = Field(
         'name', 'string',
@@ -471,6 +471,16 @@ class Source(zope.interface.Interface):
 
     endpoint = Field(
         'endpoint', 'string')
+
+
+class MessageHeaderResponse(zope.interface.Interface):
+
+    identifier = Field(
+        'identifier', 'string')
+
+    code = Field(
+        'code', 'code',
+        binding=codes.MESSAGE_HEADER_RESPONSE_CODE)
 
 
 @resource_type('MessageHeader')
@@ -494,7 +504,12 @@ class MessageHeader(interfaces.IFHIRResource):
 
     event = Field(
         'event', 'coding',
-        binding=codes.MESSAGE_EVENTS)
+        binding=codes.MESSAGE_HEADER_EVENTS)
+
+    response = Field(
+        'response', 'object',
+        optional=True,
+        binding=MessageHeaderResponse)
 
     status = Field(
         'processingStatus', 'object',
@@ -504,4 +519,4 @@ class MessageHeader(interfaces.IFHIRResource):
 
     source = Field(
         'source', 'object',
-        binding=Source)
+        binding=MessageHeaderSource)

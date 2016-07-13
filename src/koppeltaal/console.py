@@ -136,7 +136,7 @@ def cli():
         choices=codes.PROCESSING_STATUS,
         help='Message header status')
     messages.add_argument(
-        '--event', choices=codes.MESSAGE_EVENTS,
+        '--event', choices=codes.MESSAGE_HEADER_EVENTS,
         help='Event type')
 
     message = subparsers.add_parser('message')

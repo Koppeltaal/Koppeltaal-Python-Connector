@@ -110,8 +110,7 @@ class Entry(object):
 
     def __eq__(self, other):
         if isinstance(other, dict):
-            return other.get('reference', None) in (
-                self.fhir_link, self.atom_id)
+            return other.get('reference') in (self.fhir_link, self.atom_id)
         if interfaces.IFHIRResource.providedBy(other):
             if self._model is not MARKER:
                 return self._model is other

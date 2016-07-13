@@ -46,20 +46,21 @@ class Connector(object):
     def _fetch_bundle(self, url, params=None):
         next_url = url
         next_params = params
-        resource_bundle = bundle.Bundle(self.domain, self.configuration)
+        fetched_bundle = bundle.Bundle(self.domain, self.configuration)
         while next_url:
             response = self.transport.query(next_url, next_params)
-            resource_bundle.add_payload(response)
+            fetched_bundle.add_payload(response)
             next_url = utils.json2links(response).get('next')
             next_params = None  # Parameters are already in the next link.
-        return resource_bundle.unpack()
+        return fetched_bundle
 
     def metadata(self):
         return self.transport.query(interfaces.METADATA_URL)
 
     def activities(self):
         return self._fetch_bundle(
-            interfaces.ACTIVITY_DEFINITION_URL, {'code': 'ActivityDefinition'})
+            interfaces.ACTIVITY_DEFINITION_URL,
+            {'code': 'ActivityDefinition'}).unpack()
 
     def activity(self, identifier):
         for activity in self.activities():
@@ -79,12 +80,9 @@ class Connector(object):
     @contextlib.contextmanager
     def next_update(self):
         params = {'_query': 'MessageHeader.GetNextNewAndClaim'}
-        message = None
-        for model in self._fetch_bundle(
-                interfaces.MESSAGE_HEADER_URL, params):
-            if definitions.MessageHeader.providedBy(model):
-                assert message is None
-                message = model
+        message = self._fetch_bundle(
+            interfaces.MESSAGE_HEADER_URL,
+            params).unpack_message_header()
         try:
             yield message.data
         except Exception as error:
@@ -120,10 +118,13 @@ class Connector(object):
             params['ProcessingStatus'] = status
         if patient:
             params['Patient'] = patient.fhir_link
-        return self._fetch_bundle(interfaces.MESSAGE_HEADER_URL, params)
+        return self._fetch_bundle(
+            interfaces.MESSAGE_HEADER_URL,
+            params).unpack()
 
     def send(self, event, data, patient):
-        source = models.Source(
+        identifier = unicode(uuid.uuid4())
+        source = models.MessageHeaderSource(
             name=unicode(self.configuration.name),
             endpoint=unicode(self.configuration.url),
             software=unicode(interfaces.SOFTWARE),
@@ -131,12 +132,19 @@ class Connector(object):
         message = models.MessageHeader(
             timestamp=utils.now(),
             event=event,
-            identifier=unicode(uuid.uuid4()),
+            identifier=identifier,
             data=data,
             source=source,
             patient=patient)
-        resource_bundle = bundle.Bundle(self.domain, self.configuration)
-        resource_bundle.add_model(message)
-        return self.transport.create(
-            interfaces.MAILBOX_URL,
-            resource_bundle.get_payload())
+        send_bundle = bundle.Bundle(self.domain, self.configuration)
+        send_bundle.add_model(message)
+        response_bundle = bundle.Bundle(self.domain, self.configuration)
+        response_bundle.add_payload(
+            self.transport.create(
+                interfaces.MAILBOX_URL,
+                send_bundle.get_payload()))
+        response = response_bundle.unpack_message_header()
+        assert response.response.identifier == identifier
+        if response.response.code != "ok":
+            raise interfaces.InvalidResponse(response)
+        return response.data

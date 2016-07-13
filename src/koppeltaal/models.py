@@ -1,14 +1,13 @@
 import zope.interface
-import koppeltaal.definitions
-import koppeltaal.interfaces
+from koppeltaal import (definitions, interfaces)
 
 
-@zope.interface.implementer(koppeltaal.interfaces.IFHIRResource)
+@zope.interface.implementer(interfaces.IFHIRResource)
 class FHIRResource(object):
     fhir_link = None
 
 
-@zope.interface.implementer(koppeltaal.definitions.SubActivityDefinition)
+@zope.interface.implementer(definitions.SubActivityDefinition)
 class SubActivityDefinition(object):
 
     def __init__(
@@ -23,7 +22,7 @@ class SubActivityDefinition(object):
         self.name = name
 
 
-@zope.interface.implementer(koppeltaal.definitions.ActivityDefinition)
+@zope.interface.implementer(definitions.ActivityDefinition)
 class ActivityDefinition(FHIRResource):
 
     def __init__(
@@ -50,7 +49,7 @@ class ActivityDefinition(FHIRResource):
         self.subactivities = subactivities
 
 
-@zope.interface.implementer(koppeltaal.definitions.Name)
+@zope.interface.implementer(definitions.Name)
 class Name(object):
 
     def __init__(
@@ -63,7 +62,7 @@ class Name(object):
         self.use = use
 
 
-@zope.interface.implementer(koppeltaal.definitions.Contact)
+@zope.interface.implementer(definitions.Contact)
 class Contact(object):
 
     def __init__(
@@ -76,7 +75,7 @@ class Contact(object):
         self.use = use
 
 
-@zope.interface.implementer(koppeltaal.definitions.Identifier)
+@zope.interface.implementer(definitions.Identifier)
 class Identifier(object):
 
     def __init__(
@@ -89,8 +88,8 @@ class Identifier(object):
         self.use = use
 
 
-@zope.interface.implementer(koppeltaal.definitions.Participant)
-@zope.interface.implementer(koppeltaal.definitions.ActivityParticipant)
+@zope.interface.implementer(definitions.Participant)
+@zope.interface.implementer(definitions.ActivityParticipant)
 class Participant(object):
 
     def __init__(
@@ -101,7 +100,7 @@ class Participant(object):
         self.role = role
 
 
-@zope.interface.implementer(koppeltaal.definitions.Patient)
+@zope.interface.implementer(definitions.Patient)
 class Patient(FHIRResource):
 
     def __init__(
@@ -118,7 +117,7 @@ class Patient(FHIRResource):
         self.name = name
 
 
-@zope.interface.implementer(koppeltaal.definitions.Practitioner)
+@zope.interface.implementer(definitions.Practitioner)
 class Practitioner(FHIRResource):
 
     def __init__(
@@ -131,7 +130,7 @@ class Practitioner(FHIRResource):
         self.name = name
 
 
-@zope.interface.implementer(koppeltaal.definitions.Goal)
+@zope.interface.implementer(definitions.Goal)
 class Goal(object):
 
     def __init__(
@@ -144,7 +143,7 @@ class Goal(object):
         self.notes = notes
 
 
-@zope.interface.implementer(koppeltaal.definitions.SubActivity)
+@zope.interface.implementer(definitions.SubActivity)
 class SubActivity(object):
 
     def __init__(
@@ -155,7 +154,7 @@ class SubActivity(object):
         self.status = status
 
 
-@zope.interface.implementer(koppeltaal.definitions.Activity)
+@zope.interface.implementer(definitions.Activity)
 class Activity(object):
 
     def __init__(
@@ -188,7 +187,7 @@ class Activity(object):
         self.prohibited = prohibited
 
 
-@zope.interface.implementer(koppeltaal.definitions.CarePlan)
+@zope.interface.implementer(definitions.CarePlan)
 class CarePlan(FHIRResource):
 
     def __init__(
@@ -205,7 +204,7 @@ class CarePlan(FHIRResource):
         self.status = status
 
 
-@zope.interface.implementer(koppeltaal.definitions.ProcessingStatus)
+@zope.interface.implementer(definitions.ProcessingStatus)
 class Status(object):
 
     def __init__(
@@ -218,21 +217,7 @@ class Status(object):
         self.status = status
 
 
-@zope.interface.implementer(koppeltaal.definitions.Source)
-class Source(object):
-
-    def __init__(self,
-                 endpoint=None,
-                 name=None,
-                 software=None,
-                 version=None):
-        self.endpoint = endpoint
-        self.name = name
-        self.software = software
-        self.version = version
-
-
-@zope.interface.implementer(koppeltaal.definitions.CarePlanSubActivityStatus)
+@zope.interface.implementer(definitions.CarePlanSubActivityStatus)
 class SubActivityStatus(object):
 
     def __init__(
@@ -243,7 +228,7 @@ class SubActivityStatus(object):
         self.status = status
 
 
-@zope.interface.implementer(koppeltaal.definitions.CarePlanActivityStatus)
+@zope.interface.implementer(definitions.CarePlanActivityStatus)
 class ActivityStatus(FHIRResource):
 
     def __init__(
@@ -256,7 +241,31 @@ class ActivityStatus(FHIRResource):
         self.subactivities = subactivities
 
 
-@zope.interface.implementer(koppeltaal.definitions.MessageHeader)
+@zope.interface.implementer(definitions.MessageHeaderResponse)
+class MessageHeaderResponse(object):
+
+    def __init__(self,
+                 identifier=None,
+                 code=None):
+        self.identifier = identifier
+        self.code = code
+
+
+@zope.interface.implementer(definitions.MessageHeaderSource)
+class MessageHeaderSource(object):
+
+    def __init__(self,
+                 endpoint=None,
+                 name=None,
+                 software=None,
+                 version=None):
+        self.endpoint = endpoint
+        self.name = name
+        self.software = software
+        self.version = version
+
+
+@zope.interface.implementer(definitions.MessageHeader)
 class MessageHeader(FHIRResource):
 
     def __init__(
@@ -265,6 +274,7 @@ class MessageHeader(FHIRResource):
             event=None,
             identifier=None,
             patient=None,
+            response=None,
             source=None,
             status=None,
             timestamp=None):
@@ -272,6 +282,7 @@ class MessageHeader(FHIRResource):
         self.event = event
         self.identifier = identifier
         self.patient = patient
+        self.response = response
         self.source = source
         self.status = status
         self.timestamp = timestamp

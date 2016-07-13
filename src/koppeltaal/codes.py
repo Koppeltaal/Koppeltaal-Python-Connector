@@ -114,7 +114,14 @@ IDENTIFIER_USE = Code(
      'temp',
      'secondary'])
 
-MESSAGE_EVENTS = Code(
+
+MESSAGE_HEADER_RESPONSE_CODE = Code(
+    'http://hl7.org/fhir/response-code',
+    ['fatal-error',
+     'ok',
+     'transient-error'])
+
+MESSAGE_HEADER_EVENTS = Code(
     'MessageEvents',
     ['CreateOrUpdatePatient',
      'CreateOrUpdatePractitioner',
