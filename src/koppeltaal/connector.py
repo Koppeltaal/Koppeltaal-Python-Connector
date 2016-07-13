@@ -5,7 +5,6 @@ import zope.interface
 from koppeltaal.fhir import bundle, resource
 from koppeltaal import(
     interfaces,
-    definitions,
     models,
     transport,
     utils)
@@ -35,6 +34,44 @@ class FHIRConfiguration(object):
             self.url, resource_type, self.model_id(model))
 
 
+class Update(object):
+
+    def __init__(self, message, finalize):
+        self.message = message
+        self.data = message.data
+        self._finalize = finalize
+
+    def __enter__(self):
+        self.updated = False
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None and exc_val is None and exc_tb is None:
+            self.success()
+        else:
+            self.fail(exc_val)
+        if self.updated is not None:
+            self._finalize(self.message)
+
+    def mark(self, status, exception=None):
+        if self.updated is not False:
+            return
+        self.updated = True
+        if self.message.status is None:
+            self.message.status = models.Status()
+        self.message.status.status = status
+        self.message.status.exception = exception
+        self.message.status.last_changed = utils.now()
+
+    def success(self):
+        self.mark('Success')
+
+    def fail(self, exception="FAILED"):
+        self.mark('Failed', unicode(exception))
+
+    def postpone(self):
+        self.updated = None
+
+
 @zope.interface.implementer(interfaces.IConnector)
 class Connector(object):
 
@@ -46,13 +83,13 @@ class Connector(object):
     def _fetch_bundle(self, url, params=None):
         next_url = url
         next_params = params
-        fetched_bundle = bundle.Bundle(self.domain, self.configuration)
+        packaging = bundle.Bundle(self.domain, self.configuration)
         while next_url:
             response = self.transport.query(next_url, next_params)
-            fetched_bundle.add_payload(response)
+            packaging.add_payload(response)
             next_url = utils.json2links(response).get('next')
             next_params = None  # Parameters are already in the next link.
-        return fetched_bundle
+        return packaging
 
     def metadata(self):
         return self.transport.query(interfaces.METADATA_URL)
@@ -77,32 +114,20 @@ class Connector(object):
         return self.transport.query_redirect(
             interfaces.OAUTH_LAUNCH_URL, params)
 
-    @contextlib.contextmanager
-    def next_update(self):
+    def updates(self):
+
+        def send_back(message):
+            packaging = resource.Resource(self.domain, self.configuration)
+            packaging.add_model(message)
+            self.transport.update(message.fhir_link, packaging.get_payload())
+
         params = {'_query': 'MessageHeader.GetNextNewAndClaim'}
-        message = self._fetch_bundle(
-            interfaces.MESSAGE_HEADER_URL,
-            params).unpack_message_header()
-        try:
-            yield message.data
-        except Exception as error:
-            status, exception = 'Failed', unicode(error)
-            raise
-        else:
-            status, exception = 'Success', None
-        finally:
-            # Send back this message.
-            if message.status is None:
-                message.status = models.Status()
-            message.status.status = status
-            message.status.exception = exception
-            message.status.last_changed = utils.now()
-            message_resource = resource.Resource(
-                self.domain, self.configuration)
-            message_resource.add_model(message)
-            self.transport.update(
-                message.fhir_link,
-                message_resource.get_payload())
+        while True:
+            message = self._fetch_bundle(
+                interfaces.MESSAGE_HEADER_URL, params).unpack_message_header()
+            if message is None:
+                break
+            yield Update(message, send_back)
 
     def search(
             self, message_id=None, event=None, status=None, patient=None):

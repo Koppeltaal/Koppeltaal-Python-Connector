@@ -1,12 +1,13 @@
-import os
-import sys
-import json
-import pdb
-import argparse
 import ConfigParser
+import argparse
+import json
 import logging
+import os
+import pdb
+import sys
+import dateutil
 
-from koppeltaal import (connector, codes, models)
+from koppeltaal import (connector, codes, models, utils)
 from koppeltaal.fhir import xml, bundle
 
 
@@ -142,10 +143,13 @@ def cli():
     message = subparsers.add_parser('message')
     message.add_argument('message_id')
 
-    next_update = subparsers.add_parser('next')
-    next_update.add_argument(
+    updates = subparsers.add_parser('updates')
+    updates.add_argument(
+        '--until',
+        help='Process all next messages until the given date (and time)')
+    updates.add_argument(
         '--failure',
-        help='Fail and set the exception on the next message.')
+        help='Fail and set the exception on the messages.')
 
     care_plan = subparsers.add_parser('care_plan')
     care_plan.add_argument('activity_id')
@@ -231,12 +235,25 @@ def cli():
             # careplan = koppeltaal.models.CarePlan()
             message = models.Message()
             print_json(connection.send(message))
-        elif args.command == 'next':
-            with connection.next_update() as model:
-                print_model(model)
-                if args.failure:
-                    raise ValueError(args.failure)
-                print_model(message)
+        elif args.command == 'updates':
+            until = None
+            if args.until is not None:
+                until = dateutil.parser.parse(args.until, tzinfos=utils.UTC)
+
+            for index, update in enumerate(connection.updates()):
+                with update:
+                    if until is None:
+                        if index:
+                            update.postpone()
+                            break
+                    else:
+                        if update.message.timestamp > until:
+                            update.postpone()
+                            break
+                    print_model(update.data)
+                    if args.failure:
+                        update.fail(args.failure)
+
         elif args.command == 'launch':
             activity = connection.activity(args.activity)
 
