@@ -13,6 +13,7 @@ from koppeltaal.fhir import xml, bundle
 
 ACTIVITY_DEFINITION_OUTPUT = """Activity: {model.identifier}
 - fhir link: {model.fhir_link}
+- application: {model.application.fhir_link}
 - name: {model.name}
 - description: {model.description}
 - kind: {model.kind}

@@ -29,6 +29,7 @@ class ActivityDefinition(FHIRResource):
             self,
             description=None,
             identifier=None,
+            application=None,
             is_active=True,
             is_archived=False,
             is_domain_specific=False,
@@ -39,6 +40,7 @@ class ActivityDefinition(FHIRResource):
             subactivities=None):
         self.description = description
         self.identifier = identifier
+        self.application = application
         self.is_active = is_active
         self.is_archived = is_archived
         self.is_domain_specific = is_domain_specific

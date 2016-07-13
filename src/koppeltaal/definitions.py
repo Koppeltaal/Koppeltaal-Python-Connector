@@ -91,6 +91,10 @@ class SubActivityDefinition(zope.interface.Interface):
 @resource_type('ActivityDefinition', False)
 class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
+    application = Field(
+        'application', 'reference',
+        extension='ActivityDefinition#Application')
+
     identifier = Field(
         'identifier', 'string',
         extension='ActivityDefinition#ActivityDefinitionIdentifier')
