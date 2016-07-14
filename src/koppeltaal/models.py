@@ -145,6 +145,7 @@ class Goal(object):
         self.notes = notes
 
 
+@zope.interface.implementer(definitions.CarePlanSubActivityStatus)
 @zope.interface.implementer(definitions.SubActivity)
 class SubActivity(object):
 
@@ -219,17 +220,6 @@ class Status(object):
         self.status = status
 
 
-@zope.interface.implementer(definitions.CarePlanSubActivityStatus)
-class SubActivityStatus(object):
-
-    def __init__(
-            self,
-            identifier=None,
-            status=None):
-        self.identifier = identifier
-        self.status = status
-
-
 @zope.interface.implementer(definitions.CarePlanActivityStatus)
 class ActivityStatus(FHIRResource):
 
@@ -237,10 +227,12 @@ class ActivityStatus(FHIRResource):
             self,
             identifier=None,
             status=None,
-            subactivities=None):
+            subactivities=None,
+            percentage=None):
         self.identifier = identifier
         self.status = status
         self.subactivities = subactivities
+        self.percentage = percentage
 
 
 @zope.interface.implementer(definitions.MessageHeaderResponse)

@@ -9,7 +9,7 @@ REGISTRY = Registry({
     definitions.ActivityParticipant: models.Participant,
     definitions.CarePlan: models.CarePlan,
     definitions.CarePlanActivityStatus: models.ActivityStatus,
-    definitions.CarePlanSubActivityStatus: models.SubActivityStatus,
+    definitions.CarePlanSubActivityStatus: models.SubActivity,
     definitions.Contact: models.Contact,
     definitions.Goal: models.Goal,
     definitions.Identifier: models.Identifier,

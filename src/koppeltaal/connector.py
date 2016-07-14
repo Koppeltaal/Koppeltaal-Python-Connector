@@ -38,6 +38,7 @@ class Update(object):
     def __init__(self, message, finalize):
         self.message = message
         self.data = message.data
+        self.patient = message.patient
         self._finalize = finalize
 
     def __enter__(self):

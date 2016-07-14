@@ -150,7 +150,7 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
 class CarePlanSubActivityStatus(zope.interface.Interface):
 
-    identifier = Field(
+    definition = Field(
         'identifier', 'string',
         extension='CarePlanActivityStatus#SubActivityIdentifier')
 
@@ -178,6 +178,11 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
         extension='CarePlanActivityStatus#SubActivity',
         multiple=ALL_ITEMS,
         optional=True)
+
+    percentage = Field(
+        'percentageCompleted', 'integer',
+        optional=True,
+        extension='CarePlanActivityStatus#PercentageCompleted')
 
 
 class Name(zope.interface.Interface):
