@@ -84,7 +84,7 @@ class IConnector(zope.interface.Interface):
         None.
         """
 
-    def launch(activity, patient, user):
+    def launch(activity, patient, user, resource=None):
         """Retrieve launch URL for a specific `activity` which have been added
         to a `patient` to be used by `user`.
         """
