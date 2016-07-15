@@ -109,12 +109,12 @@ class Patient(FHIRResource):
             self,
             age=None,
             birth_date=None,
-            contact=None,
+            contacts=None,
             identifiers=None,
             name=None):
         self.age = age
         self.birth_date = birth_date
-        self.contact = contact
+        self.contacts = contacts
         self.identifiers = identifiers
         self.name = name
 
@@ -124,10 +124,10 @@ class Practitioner(FHIRResource):
 
     def __init__(
             self,
-            contact=None,
+            contacts=None,
             identifiers=None,
             name=None):
-        self.contact = contact
+        self.contacts = contacts
         self.identifiers = identifiers
         self.name = name
 

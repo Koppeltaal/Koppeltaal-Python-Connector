@@ -248,10 +248,10 @@ class Patient(interfaces.IIdentifiedFHIRResource):
         'birthDate', 'datetime',
         optional=True)
 
-    contact = Field(
+    contacts = Field(
         'telecom', 'object',
         binding=Contact,
-        multiple=FIRST_ITEM,
+        multiple=ALL_ITEMS,
         optional=True)
 
     identifiers = Field(
@@ -269,10 +269,10 @@ class Patient(interfaces.IIdentifiedFHIRResource):
 @resource_type('Practitioner')
 class Practitioner(interfaces.IIdentifiedFHIRResource):
 
-    contact = Field(
+    contacts = Field(
         'telecom', 'object',
         binding=Contact,
-        multiple=FIRST_ITEM,
+        multiple=ALL_ITEMS,
         optional=True)
 
     identifiers = Field(
