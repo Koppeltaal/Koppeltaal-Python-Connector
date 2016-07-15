@@ -21,6 +21,9 @@ class FHIRConfiguration(object):
         self.name = name
         self.url = url
 
+    def ack_message(self, ack_function, message):
+        return ack_function(message)
+
     def model_id(self, model):
         # You should in your implementation extend this class and
         # re-implement this method so that model_id() of a given model
@@ -35,14 +38,14 @@ class FHIRConfiguration(object):
 
 class Update(object):
 
-    def __init__(self, message, finalize):
+    def __init__(self, message, ack_function):
         self.message = message
         self.data = message.data
         self.patient = message.patient
-        self._finalize = finalize
+        self._ack_function = ack_function
 
     def __enter__(self):
-        self.updated = False
+        self.acked = False
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None and exc_val is None and exc_tb is None:
@@ -50,14 +53,14 @@ class Update(object):
         else:
             # There was an exception. We put back the message to new
             # since we assume we can be solved after.
-            self.mark('New')
-        if self.updated is not None:
-            self._finalize(self.message)
+            self.ack('New')
+        if self.acked is not None:
+            self._ack_function(self.message)
 
-    def mark(self, status, exception=None):
-        if self.updated is not False:
+    def ack(self, status, exception=None):
+        if self.acked is not False:
             return
-        self.updated = True
+        self.acked = True
         if self.message.status is None:
             self.message.status = models.Status()
         self.message.status.status = status
@@ -65,13 +68,13 @@ class Update(object):
         self.message.status.last_changed = utils.now()
 
     def success(self):
-        self.mark('Success')
+        self.ack('Success')
 
     def fail(self, exception="FAILED"):
-        self.mark('Failed', unicode(exception))
+        self.ack('Failed', unicode(exception))
 
     def postpone(self):
-        self.updated = None
+        self.acked = None
 
 
 @zope.interface.implementer(interfaces.IConnector)
@@ -129,7 +132,10 @@ class Connector(object):
                 interfaces.MESSAGE_HEADER_URL, params).unpack_message_header()
             if message is None:
                 break
-            yield Update(message, send_back)
+            yield Update(
+                message,
+                lambda message: self.configuration.ack_message(
+                    send_back, message))
 
     def search(
             self, message_id=None, event=None, status=None, patient=None):

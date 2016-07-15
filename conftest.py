@@ -5,6 +5,7 @@ import ConfigParser
 import selenium.webdriver
 import koppeltaal.connector
 import koppeltaal.models
+import koppeltaal.testing
 
 
 def pytest_addoption(parser):
@@ -46,6 +47,13 @@ def connector(request):
         name='Python connector tests')
     return koppeltaal.connector.Connector(
         server, username, password, domain, configuration)
+
+
+@pytest.fixture
+def transport(monkeypatch, connector):
+    transport = koppeltaal.testing.MockTransport('koppeltaal.tests')
+    monkeypatch.setattr(connector, 'transport', transport)
+    return transport
 
 
 @pytest.fixture
