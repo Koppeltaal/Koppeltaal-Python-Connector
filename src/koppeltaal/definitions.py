@@ -239,6 +239,10 @@ class Identifier(zope.interface.Interface):
 @resource_type('Patient')
 class Patient(interfaces.IIdentifiedFHIRResource):
 
+    active = Field(
+        'active', 'boolean',
+        optional=True)
+
     age = Field(
         'age', 'integer',
         optional=True,
@@ -258,6 +262,11 @@ class Patient(interfaces.IIdentifiedFHIRResource):
         'identifier', 'object',
         binding=Identifier,
         multiple=ALL_ITEMS,
+        optional=True)
+
+    gender = Field(
+        'gender', 'codeable',
+        binding=codes.GENDER,
         optional=True)
 
     name = Field(
