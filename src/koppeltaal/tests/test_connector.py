@@ -65,6 +65,8 @@ def test_search_message_id_from_fixture(monkeypatch, connector):
         'koppeltaal.tests',
         'fixtures/bundle_one_message.json')
 
+    monkeypatch.setattr(connector, 'transport', transport)
+
     models = list(connector.search(message_id='45909'))
     assert len(models) > 1
 
