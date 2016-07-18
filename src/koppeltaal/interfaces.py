@@ -17,7 +17,7 @@ class InvalidResponse(ValueError):
     pass
 
 
-class InvalidBundle(ValueError):
+class InvalidBundle(InvalidResponse):
     pass
 
 
@@ -27,9 +27,38 @@ class InvalidValue(ValueError):
         self.field = field
         self.value = value
 
+    def __str__(self):
+        return "{}: invalid value for '{}'.".format(
+            self.__class__.__name__,
+            self.field.name)
+
+
+class InvalidCode(InvalidValue):
+
+    def __str__(self):
+        return "{}: '{}' not in '{}'.".format(
+            self.__class__.__name__,
+            self.value,
+            self.field.system)
+
+
+class InvalidResource(InvalidValue):
+
+    def __str__(self):
+        if self.field is not None:
+            return "{}: expected '{}' resource type.".format(
+                self.__class__.__name__,
+                self.field.__class__.__name__)
+        return "{}: unknown resource type.".format(
+            self.__class__.__name__)
+
 
 class RequiredMissing(InvalidValue):
-    pass
+
+    def __str__(self):
+        return "{}: '{}' required but missing.".format(
+            self.__class__.__name__,
+            self.field.name)
 
 
 class IFHIRResource(zope.interface.Interface):
@@ -40,8 +69,28 @@ class IFHIRResource(zope.interface.Interface):
         'Link to resource containing resource type, id and version')
 
 
+class IBrokenFHIRResource(IFHIRResource):
+    """A resource that was broken.
+    """
+
+    error = zope.interface.Attribute(
+        'Error')
+
+    payload = zope.interface.Attribute(
+        'Resource payload')
+
+
+class IReferredFHIRResource(IFHIRResource):
+    """A resource that is referred but missing from the resource payload
+    or bundle.
+    """
+
+    display = zope.interface.Attribute(
+        'Display value for this resource.')
+
+
 class IIdentifiedFHIRResource(IFHIRResource):
-    """A resource that can be identified.
+    """A resource that can be identified with a self link.
     """
 
 
@@ -50,6 +99,11 @@ class IFHIRConfiguration(zope.interface.Interface):
     name = zope.interface.Attribute('application name using the connector')
 
     url = zope.interface.Attribute('fhir base URL for generated resources')
+
+    def transaction_hook(commit_function, message):
+        """Optional hook to integrate sending back a message into a
+        transaction system.
+        """
 
     def model_id(model):
         """Return a (unique) id for the given `model`. Should stay the same id

@@ -10,12 +10,25 @@ from koppeltaal import (
     utils)
 
 
-@zope.interface.implementer(interfaces.IFHIRResource)
+@zope.interface.implementer(interfaces.IReferredFHIRResource)
 class ReferredResource(object):
     fhir_link = None
+    display = None
 
-    def __init__(self, link):
-        self.fhir_link = link
+    def __init__(self, value):
+        self.fhir_link = value['reference']
+        self.diplay = value.get('display')
+
+
+@zope.interface.implementer(interfaces.IBrokenFHIRResource)
+class BrokenResource(object):
+    fhir_link = None
+    error = None
+    payload = None
+
+    def __init__(self, error, payload):
+        self.error = error
+        self.payload = payload
 
 
 class Extension(object):
@@ -99,7 +112,7 @@ class Extension(object):
             reference = self._resource.find(value)
             if reference:
                 return reference.unpack()
-            return ReferredResource(value['reference'])
+            return ReferredResource(value)
 
         if field.field_type == 'string':
             value = extension.get('valueString')
@@ -286,7 +299,7 @@ class Native(object):
             reference = self._resource.find(value)
             if reference is not None:
                 return reference.unpack()
-            return ReferredResource(value['reference'])
+            return ReferredResource(value)
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):
@@ -399,17 +412,22 @@ def unpack(payload, definition, resource):
     if factory is None:
         return None
 
-    extension = Extension(resource, payload)
-    native = Native(resource, payload)
-    data = {}
-    for name, field in definition.namesAndDescriptions():
-        if not isinstance(field, definitions.Field):
-            continue
-        if field.extension is None:
-            data[name] = native.unpack(field)
-        else:
-            data[name] = extension.unpack(field)
-    return factory(**data)
+    try:
+        extension = Extension(resource, payload)
+        native = Native(resource, payload)
+        data = {}
+        for name, field in definition.namesAndDescriptions():
+            if not isinstance(field, definitions.Field):
+                continue
+            if field.extension is None:
+                data[name] = native.unpack(field)
+            else:
+                data[name] = extension.unpack(field)
+        return factory(**data)
+    except interfaces.InvalidValue as error:
+        if definition.isOrExtends(interfaces.IFHIRResource):
+            return BrokenResource(error, payload)
+        raise
 
 
 def pack(model, definition, resource):
@@ -417,7 +435,7 @@ def pack(model, definition, resource):
     native = Native(resource)
 
     if not definition.providedBy(model):
-        raise interfaces.InvalidValue(definition, model)
+        raise interfaces.InvalidResource(definition, model)
 
     for name, field in definition.namesAndDescriptions():
         if not isinstance(field, definitions.Field):

@@ -94,7 +94,7 @@ class Entry(object):
     def pack(self):
         if self._content is MARKER:
             if self.definition is None:
-                raise interfaces.InvalidValue(None, self._model)
+                raise interfaces.InvalidResource(None, self._model)
             self._content = packaging.pack(
                 self._model, self.definition, self._resource)
             if self.standard_type:

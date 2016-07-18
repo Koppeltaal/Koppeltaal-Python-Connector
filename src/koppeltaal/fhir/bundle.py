@@ -47,7 +47,7 @@ class Bundle(resource.Resource):
 
     def add_payload(self, response):
         if response['resourceType'] != 'Bundle' or 'entry' not in response:
-            raise interfaces.InvalidBundle(response)
+            raise interfaces.InvalidBundle(self, response)
         for entry in response['entry']:
             self.items.append(self.entry_type(self, entry=entry))
 
@@ -68,6 +68,13 @@ class Bundle(resource.Resource):
                 "scheme": "http://hl7.org/fhir/tag"
             }],
             "entry": entries}
+
+    def errors(self):
+        errors = []
+        for model in self.unpack():
+            if interfaces.IBrokenFHIRResource.providedBy(model):
+                errors.append(model)
+        return errors
 
     def unpack_message_header(self):
         message = None

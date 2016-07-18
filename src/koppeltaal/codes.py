@@ -11,27 +11,27 @@ class Code(list):
 
     def pack_code(self, value):
         if value not in self:
-            raise koppeltaal.interfaces.InvalidValue(self, value)
+            raise koppeltaal.interfaces.InvalidCode(self, value)
         return value
 
     def pack_coding(self, value):
         if value not in self:
-            raise koppeltaal.interfaces.InvalidValue(self, value)
+            raise koppeltaal.interfaces.InvalidCode(self, value)
         return {"code": value,
                 "display": value,
                 "system": self.system}
 
     def unpack_code(self, code):
         if code not in self:
-            raise koppeltaal.interfaces.InvalidValue(self, code)
+            raise koppeltaal.interfaces.InvalidCode(self, code)
         return code
 
     def unpack_coding(self, coding):
         value = coding["code"]
         if coding.get('system') != self.system:
-            raise koppeltaal.interfaces.InvalidValue(self, value)
+            raise koppeltaal.interfaces.InvalidCode(self, value)
         if value not in self:
-            raise koppeltaal.interfaces.InvalidValue(self, value)
+            raise koppeltaal.interfaces.InvalidCode(self, value)
         return value
 
 

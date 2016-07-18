@@ -10,7 +10,10 @@ import koppeltaal.testing
 
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
-    parser.addoption('--server', help='Koppeltaal server URL')
+    parser.addoption(
+        '--server',
+        help='Koppeltaal server URL',
+        default="https://edgekoppeltaal.vhscloud.nl")
 
 
 @pytest.fixture(scope='session')

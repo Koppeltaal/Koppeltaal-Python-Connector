@@ -4,6 +4,7 @@ import zope.interface
 from koppeltaal.fhir import bundle, resource
 from koppeltaal import(
     interfaces,
+    logger,
     models,
     transport,
     utils)
@@ -21,8 +22,8 @@ class FHIRConfiguration(object):
         self.name = name
         self.url = url
 
-    def ack_message(self, ack_function, message):
-        return ack_function(message)
+    def transaction_hook(self, commit_function, message):
+        return commit_function(message)
 
     def model_id(self, model):
         # You should in your implementation extend this class and
@@ -126,16 +127,30 @@ class Connector(object):
             packaging.add_model(message)
             self.transport.update(message.fhir_link, packaging.get_payload())
 
-        params = {'_query': 'MessageHeader.GetNextNewAndClaim'}
+        def send_back_on_transaction(message):
+            return self.configuration.transaction_hook(send_back, message)
+
+        p = {'_query': 'MessageHeader.GetNextNewAndClaim'}
         while True:
-            message = self._fetch_bundle(
-                interfaces.MESSAGE_HEADER_URL, params).unpack_message_header()
+            try:
+                bundle = self._fetch_bundle(interfaces.MESSAGE_HEADER_URL, p)
+                message = bundle.unpack_message_header()
+            except interfaces.InvalidResponse as error:
+                logger.error('Error while reading mailbox: {}'.format(error))
+                continue
+
             if message is None:
+                # We are out of messages
                 break
-            yield Update(
-                message,
-                lambda message: self.configuration.ack_message(
-                    send_back, message))
+            update = Update(message, send_back_on_transaction)
+            errors = bundle.errors()
+            if errors:
+                logger.error('Error while reading message: {}'.format(errors))
+                with update:
+                    update.fail(u', '.join([u"Resource '{}': {}".format(
+                        e.fhir_link, e.error) for e in errors]))
+            else:
+                yield update
 
     def search(
             self, message_id=None, event=None, status=None, patient=None):

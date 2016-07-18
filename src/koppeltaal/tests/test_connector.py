@@ -14,7 +14,7 @@ def test_connector(connector):
 def test_activities_from_fixture(connector, transport):
     transport.expect_json(
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        'fixtures/activities_game.json')
+        ['fixtures/activities_game.json'])
 
     activities = list(connector.activities())
     assert len(activities) == 2
@@ -37,7 +37,8 @@ def test_activities_from_fixture(connector, transport):
 def test_activity_from_fixture(connector, transport):
     transport.expect_json(
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        'fixtures/activities_game.json')
+        ['fixtures/activities_game.json',
+         'fixtures/activities_game.json'])
 
     activity = connector.activity('FOO')
     assert activity is None
@@ -54,7 +55,7 @@ def test_activity_from_fixture(connector, transport):
 def test_search_message_id_from_fixture(connector, transport):
     transport.expect_json(
         '/FHIR/Koppeltaal/MessageHeader/_search?_id=45909',
-        'fixtures/bundle_one_message.json')
+        ['fixtures/bundle_one_message.json'])
 
     models = list(connector.search(message_id='45909'))
     assert len(models) > 1
@@ -73,39 +74,79 @@ def test_updates_success_from_fixture(connector, transport):
     transport.expect_json(
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        'fixtures/bundle_one_message.json')
+        ['fixtures/bundle_one_message.json',
+         'fixtures/bundle_zero_messages.json'])
     transport.expect_json(
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        'fixtures/message_header_ok.json')
+        ['fixtures/message_header_ok.json'])
 
-    for update in connector.updates():
+    updates = list(connector.updates())
+    assert len(updates) == 1
+    for update in updates:
         with update:
             assert zope.interface.verify.verifyObject(
                 koppeltaal.definitions.CarePlan, update.data)
             assert zope.interface.verify.verifyObject(
                 koppeltaal.definitions.Patient, update.patient)
 
-        response = transport.called.get(
-            '/FHIR/Koppeltaal/MessageHeader/45909'
-            '/_history/2016-07-15T11:50:24:494.7839')
-        assert response is not None
-        hamcrest.assert_that(
-            response,
-            hamcrest.has_entry(
-                'extension',
-                hamcrest.has_item(
-                    hamcrest.has_entry(
-                        'extension',
-                        hamcrest.has_item(
-                            hamcrest.has_entries({
-                                'url': hamcrest.ends_with(
-                                    '#ProcessingStatusStatus'),
-                                'valueCode': 'Success'
-                            }))))),
-            'message set to success')
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        hamcrest.has_entry(
+            'extension',
+            hamcrest.has_item(
+                hamcrest.has_entry(
+                    'extension',
+                    hamcrest.has_item(
+                        hamcrest.has_entries({
+                            'url': hamcrest.ends_with(
+                                '#ProcessingStatusStatus'),
+                            'valueCode': 'Success'
+                        }))))),
+        'message set to success')
 
-        transport.expect_json(
-            '/FHIR/Koppeltaal/MessageHeader/_search?'
-            '_query=MessageHeader.GetNextNewAndClaim',
-            'fixtures/bundle_zero_messages.json')
+
+def test_updates_error_from_fixture(connector, transport):
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        ['fixtures/bundle_one_error.json',
+         'fixtures/bundle_zero_messages.json'])
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        ['fixtures/message_header_ok.json'])
+
+    updates = list(connector.updates())
+    assert len(updates) == 0
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        hamcrest.has_entry(
+            'extension',
+            hamcrest.has_item(
+                hamcrest.has_entry(
+                    'extension',
+                    hamcrest.has_items(
+                        hamcrest.has_entries({
+                            'url': hamcrest.ends_with(
+                                '#ProcessingStatusStatus'),
+                            'valueCode': 'Failed'
+                        }),
+                        hamcrest.has_entries({
+                            'url': hamcrest.ends_with(
+                                '#ProcessingStatusException'),
+                            'valueString': hamcrest.ends_with(
+                                "RequiredMissing: 'startDate' "
+                                "required but missing.")
+                        })
+                    )))),
+        'message set to success')
