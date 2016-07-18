@@ -102,7 +102,7 @@ class DummyResource(object):
         self.fhir_link = fhir_link
 
 
-def cli():
+def console():
     parser = argparse.ArgumentParser(description='Koppeltaal connector')
     parser.add_argument('server', help='Koppeltaal server to connect to')
     parser.add_argument('--username')

@@ -1,3 +1,4 @@
+import hamcrest
 import koppeltaal.definitions
 import koppeltaal.interfaces
 import koppeltaal.testing
@@ -89,6 +90,20 @@ def test_updates_success_from_fixture(connector, transport):
             '/FHIR/Koppeltaal/MessageHeader/45909'
             '/_history/2016-07-15T11:50:24:494.7839')
         assert response is not None
+        hamcrest.assert_that(
+            response,
+            hamcrest.has_entry(
+                'extension',
+                hamcrest.has_item(
+                    hamcrest.has_entry(
+                        'extension',
+                        hamcrest.has_item(
+                            hamcrest.has_entries({
+                                'url': hamcrest.ends_with(
+                                    '#ProcessingStatusStatus'),
+                                'valueCode': 'Success'
+                            }))))),
+            'message set to success')
 
         transport.expect_json(
             '/FHIR/Koppeltaal/MessageHeader/_search?'

@@ -10,19 +10,20 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
+        'setuptools',
         'lxml',
         'python-dateutil',
         'requests >= 2.5.1',
         'zope.interface >= 3.7.0',
         ],
     extras_require={
-        'zope.component': [
-            'zope.component',
+        'tests': [
+            'PyHamcrest',
             ],
         },
     entry_points={
         'console_scripts': [
-            'koppeltaal = koppeltaal.console:cli'
+            'koppeltaal = koppeltaal.console:console'
             ],
         }
     )
