@@ -397,7 +397,6 @@ class Activity(zope.interface.Interface):
 
     planned = Field(
         'startDate', 'datetime',
-        optional=True,
         extension='CarePlan#StartDate')
 
     started = Field(
