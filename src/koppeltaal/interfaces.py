@@ -12,16 +12,28 @@ METADATA_URL = '/FHIR/Koppeltaal/metadata'
 MAILBOX_URL = '/FHIR/Koppeltaal/Mailbox'
 OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
 
-
-class InvalidResponse(ValueError):
-    pass
+TIMEOUT = 60
 
 
-class InvalidBundle(InvalidResponse):
-    pass
+class KoppeltaalError(ValueError):
+    """Generic koppeltaal error.
+    """
 
 
-class InvalidValue(ValueError):
+class InvalidResponse(KoppeltaalError):
+    """Invalid response from transport to the koppeltaal server.
+    """
+
+
+class InvalidBundle(KoppeltaalError):
+    """A malformed bundle was obtain from the koppeltaal server.
+    """
+
+
+class InvalidValue(KoppeltaalError):
+    """A value does not match the definition for its corresponding field
+    in the koppeltaal definitions.
+    """
 
     def __init__(self, field, value=None):
         self.field = field
@@ -34,6 +46,8 @@ class InvalidValue(ValueError):
 
 
 class InvalidCode(InvalidValue):
+    """A code appear that is not expected in its definition.
+    """
 
     def __str__(self):
         return "{}: '{}' not in '{}'.".format(
@@ -43,6 +57,8 @@ class InvalidCode(InvalidValue):
 
 
 class InvalidResource(InvalidValue):
+    """A resource type mismatch expected in the koppeltaal definitions.
+    """
 
     def __str__(self):
         if self.field is not None:
@@ -54,6 +70,9 @@ class InvalidResource(InvalidValue):
 
 
 class RequiredMissing(InvalidValue):
+    """A field is required in the koppeltaal definitions but its value is
+    missing.
+    """
 
     def __str__(self):
         return "{}: '{}' required but missing.".format(

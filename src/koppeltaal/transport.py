@@ -24,15 +24,19 @@ class Transport(object):
     def query(self, url, params=None):
         """Query a url.
         """
-        response = self.session.get(
-            self.absolute_url(url),
-            params=params,
-            auth=(self.username, self.password),
-            headers={'Accept': 'application/json'},
-            allow_redirects=False)
-        response.raise_for_status()
+        try:
+            response = self.session.get(
+                self.absolute_url(url),
+                params=params,
+                auth=(self.username, self.password),
+                headers={'Accept': 'application/json'},
+                timeout=interfaces.TIMEOUT,
+                allow_redirects=False)
+            response.raise_for_status()
+        except requests.RequestException as error:
+            raise interfaces.InvalidResponse(error)
         if not response.headers['content-type'].startswith('application/json'):
-            raise interfaces.InvalidResponse(response.text)
+            raise interfaces.InvalidResponse(response)
         json = response.json()
         logger.debug_json('Query on {url}:\n {json}', json=json, url=url)
         return json
@@ -40,27 +44,35 @@ class Transport(object):
     def query_redirect(self, url, params=None):
         """Query a url for a redirect.
         """
-        response = self.session.get(
-            self.absolute_url(url),
-            params=params,
-            auth=(self.username, self.password),
-            allow_redirects=False)
+        try:
+            response = self.session.get(
+                self.absolute_url(url),
+                params=params,
+                auth=(self.username, self.password),
+                timeout=interfaces.TIMEOUT,
+                allow_redirects=False)
+        except requests.RequestException as error:
+            raise interfaces.InvalidResponse(error)
         if not response.is_redirect:
-            raise interfaces.InvalidResponse()
+            raise interfaces.InvalidResponse(response)
         return response.headers.get('location')
 
     def create(self, url, data):
         """Create a new resource at the given url with JSON data.
         """
-        response = self.session.post(
-            self.absolute_url(url),
-            auth=(self.username, self.password),
-            json=data,
-            headers={'Accept': 'application/json'},
-            allow_redirects=False)
-        response.raise_for_status()
+        try:
+            response = self.session.post(
+                self.absolute_url(url),
+                auth=(self.username, self.password),
+                json=data,
+                headers={'Accept': 'application/json'},
+                timeout=interfaces.TIMEOUT,
+                allow_redirects=False)
+            response.raise_for_status()
+        except requests.RequestException as error:
+            raise interfaces.InvalidResponse(error)
         if not response.headers['content-type'].startswith('application/json'):
-            raise interfaces.InvalidResponse(response.text)
+            raise interfaces.InvalidResponse(response)
         if response.text:
             json = response.json()
             logger.debug_json('Create on {url}:\n {json}', json=json, url=url)
@@ -70,15 +82,19 @@ class Transport(object):
     def update(self, url, data):
         """Update an existing resource at the given url with JSON data.
         """
-        response = self.session.put(
-            self.absolute_url(url),
-            auth=(self.username, self.password),
-            json=data,
-            headers={'Accept': 'application/json'},
-            allow_redirects=False)
-        response.raise_for_status()
+        try:
+            response = self.session.put(
+                self.absolute_url(url),
+                auth=(self.username, self.password),
+                json=data,
+                headers={'Accept': 'application/json'},
+                timeout=interfaces.TIMEOUT,
+                allow_redirects=False)
+            response.raise_for_status()
+        except requests.RequestException as error:
+            raise interfaces.InvalidResponse(error)
         if not response.headers['content-type'].startswith('application/json'):
-            raise interfaces.InvalidResponse(response.text)
+            raise interfaces.InvalidResponse(response)
         if response.text:
             json = response.json()
             logger.debug_json('Update on {url}:\n {json}', json=json, url=url)

@@ -135,9 +135,14 @@ class Connector(object):
             try:
                 bundle = self._fetch_bundle(interfaces.MESSAGE_HEADER_URL, p)
                 message = bundle.unpack_message_header()
-            except interfaces.InvalidResponse as error:
-                logger.error('Error while reading mailbox: {}'.format(error))
+            except interfaces.InvalidBundle as error:
+                logger.error(
+                    'Bundle error while reading message: {}'.format(error))
                 continue
+            except interfaces.InvalidResponse as error:
+                logger.error(
+                    'Transport error while reading mailbox: {}'.format(error))
+                break
 
             if message is None:
                 # We are out of messages
