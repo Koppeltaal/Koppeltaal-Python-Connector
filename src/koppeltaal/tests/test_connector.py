@@ -1,4 +1,5 @@
 import hamcrest
+import pytest
 import koppeltaal.definitions
 import koppeltaal.interfaces
 import koppeltaal.testing
@@ -26,12 +27,48 @@ def test_activities_from_fixture(connector, transport):
     assert activity1.identifier == 'KTSTESTGAME'
     assert activity1.name == 'Test game'
     assert activity1.kind == 'Game'
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IReferredFHIRResource, activity1.application)
+
+    assert activity1.description == 'Testtest'
+    assert activity1.fhir_link == (
+        'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/'
+        'ActivityDefinition:3/_history/2016-07-04T07:49:01:742.1933')
+    assert activity1.is_active is False
+    assert activity1.is_archived is False
+    assert activity1.is_domain_specific is False
+    assert activity1.launch_type == 'Web'
+    assert activity1.performer == 'Patient'
+    assert activity1.subactivities == []
 
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.ActivityDefinition, activity2)
     assert activity2.identifier == 'RANJKA'
     assert activity2.name == 'Ranj Kick ASS Game'
     assert activity2.kind == 'Game'
+
+    assert activity2.description is None
+    assert activity2.fhir_link == (
+        'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/'
+        'ActivityDefinition:1433/_history/2016-07-04T09:04:24:679.3465')
+    assert activity2.is_active is True
+    assert activity2.is_archived is False
+    assert activity2.is_domain_specific is True
+    assert activity2.launch_type == u'Web'
+    assert activity2.performer == u'Patient'
+    assert len(activity2.subactivities) == 12
+    for subactivity in activity2.subactivities:
+        assert zope.interface.verify.verifyObject(
+            koppeltaal.definitions.SubActivityDefinition, subactivity)
+
+    assert subactivity.active is False
+    assert subactivity.description == (
+        u"Het is vrijdagmiddag en de werkweek is bijna voorbij. Maar niet "
+        "voor jou, want jij moet voor vijf uur handgeschreven notulen "
+        "hebben uitgewerkt. Je collega's treffen ondertussen de "
+        "voorbereidingen voor het vieren van de verjaardag van hun chef.")
+    assert subactivity.identifier == u'scenario_12'
+    assert subactivity.name == u'Verjaardag op het werk'
 
 
 def test_activity_from_fixture(connector, transport):
@@ -70,7 +107,7 @@ def test_search_message_id_from_fixture(connector, transport):
         koppeltaal.definitions.Patient, message.patient)
 
 
-def test_updates_success_from_fixture(connector, transport):
+def test_updates_implicit_success_from_fixture(connector, transport):
     transport.expect_json(
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
@@ -85,6 +122,7 @@ def test_updates_success_from_fixture(connector, transport):
     assert len(updates) == 1
     for update in updates:
         with update:
+            assert update.message.event == 'CreateOrUpdateCarePlan'
             assert zope.interface.verify.verifyObject(
                 koppeltaal.definitions.CarePlan, update.data)
             assert zope.interface.verify.verifyObject(
@@ -96,18 +134,165 @@ def test_updates_success_from_fixture(connector, transport):
     assert response is not None
     hamcrest.assert_that(
         response,
-        hamcrest.has_entry(
-            'extension',
-            hamcrest.has_item(
-                hamcrest.has_entry(
-                    'extension',
-                    hamcrest.has_item(
-                        hamcrest.has_entries({
-                            'url': hamcrest.ends_with(
-                                '#ProcessingStatusStatus'),
-                            'valueCode': 'Success'
-                        }))))),
-        'message set to success')
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'Success'))))
+
+
+def test_updates_explicit_success_from_fixture(connector, transport):
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        ['fixtures/bundle_one_message.json',
+         'fixtures/bundle_zero_messages.json'])
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        ['fixtures/message_header_ok.json'])
+
+    updates = list(connector.updates())
+    assert len(updates) == 1
+    for update in updates:
+        with update:
+            assert update.message.event == 'CreateOrUpdateCarePlan'
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.CarePlan, update.data)
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.Patient, update.patient)
+            update.success()
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'Success'))))
+
+
+def test_updates_explicit_fail_from_fixture(connector, transport):
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        ['fixtures/bundle_one_message.json',
+         'fixtures/bundle_zero_messages.json'])
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        ['fixtures/message_header_ok.json'])
+
+    updates = list(connector.updates())
+    assert len(updates) == 1
+    for update in updates:
+        with update:
+            assert update.message.event == 'CreateOrUpdateCarePlan'
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.CarePlan, update.data)
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.Patient, update.patient)
+            update.fail("I failed testing it.")
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            hamcrest.all_of(
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusStatus',
+                    hamcrest.has_entry('valueCode', 'Failed')),
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusException',
+                    hamcrest.has_entry('valueString', "I failed testing it."))
+            )))
+
+
+def test_updates_implicit_success_exception_from_fixture(connector, transport):
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        ['fixtures/bundle_one_message.json',
+         'fixtures/bundle_zero_messages.json'])
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        ['fixtures/message_header_ok.json'])
+
+    updates = list(connector.updates())
+    assert len(updates) == 1
+    with pytest.raises(ValueError):
+        for update in updates:
+            with update:
+                assert update.message.event == 'CreateOrUpdateCarePlan'
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.definitions.CarePlan, update.data)
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.definitions.Patient, update.patient)
+                raise ValueError("I cannot write code.")
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'New'))
+            ))
+
+
+def test_updates_explicit_success_exception_from_fixture(connector, transport):
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        ['fixtures/bundle_one_message.json',
+         'fixtures/bundle_zero_messages.json'])
+    transport.expect_json(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        ['fixtures/message_header_ok.json'])
+
+    updates = list(connector.updates())
+    assert len(updates) == 1
+    with pytest.raises(ValueError):
+        for update in updates:
+            with update:
+                assert update.message.event == 'CreateOrUpdateCarePlan'
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.definitions.CarePlan, update.data)
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.definitions.Patient, update.patient)
+                update.success()
+                raise ValueError("I cannot write code.")
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            hamcrest.all_of(
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusStatus',
+                    hamcrest.has_entry('valueCode', 'New')),
+                hamcrest.not_(
+                    koppeltaal.testing.has_extension(
+                        '#ProcessingStatusException'))
+            )))
 
 
 def test_updates_error_from_fixture(connector, transport):
@@ -128,25 +313,20 @@ def test_updates_error_from_fixture(connector, transport):
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839')
     assert response is not None
+
     hamcrest.assert_that(
         response,
-        hamcrest.has_entry(
-            'extension',
-            hamcrest.has_item(
-                hamcrest.has_entry(
-                    'extension',
-                    hamcrest.has_items(
-                        hamcrest.has_entries({
-                            'url': hamcrest.ends_with(
-                                '#ProcessingStatusStatus'),
-                            'valueCode': 'Failed'
-                        }),
-                        hamcrest.has_entries({
-                            'url': hamcrest.ends_with(
-                                '#ProcessingStatusException'),
-                            'valueString': hamcrest.ends_with(
-                                "RequiredMissing: 'startDate' "
-                                "required but missing.")
-                        })
-                    )))),
-        'message set to success')
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            hamcrest.all_of(
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusStatus',
+                    hamcrest.has_entry('valueCode', 'Failed')),
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusException',
+                    hamcrest.has_entry(
+                        'valueString',
+                        hamcrest.ends_with(
+                            "RequiredMissing: 'startDate' "
+                            "required but missing.")))
+            )))

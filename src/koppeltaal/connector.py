@@ -50,7 +50,8 @@ class Update(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None and exc_val is None and exc_tb is None:
-            self.success()
+            if self.acked is False:
+                self.success()
         else:
             # There was an exception. We put back the message to new
             # since we assume we can be solved after.
@@ -59,8 +60,6 @@ class Update(object):
             self._ack_function(self.message)
 
     def ack(self, status, exception=None):
-        if self.acked is not False:
-            return
         self.acked = True
         if self.message.status is None:
             self.message.status = models.Status()
