@@ -17,7 +17,7 @@ class ReferredResource(object):
 
     def __init__(self, value):
         self.fhir_link = value['reference']
-        self.diplay = value.get('display')
+        self.display = value.get('display')
 
 
 @zope.interface.implementer(interfaces.IBrokenFHIRResource)

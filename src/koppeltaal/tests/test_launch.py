@@ -1,73 +1,73 @@
-# import urlparse
-# import selenium.webdriver.support.wait
-# import selenium.webdriver.support.expected_conditions as EC
+import urlparse
+import selenium.webdriver.support.wait
+import selenium.webdriver.support.expected_conditions as EC
 
 
-# def wait_for_game(browser):
-#     # wait until the page redirect dance is over.
-#     selenium.webdriver.support.wait.WebDriverWait(
-#         browser, 10).until(lambda d: 'test.html' in d.current_url)
+def wait_for_application(browser):
+    # wait until the page redirect dance is over.
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(lambda d: 'test.html' in d.current_url)
 
 
-# def login_with_oauth(browser):
-#     [b for b in browser.find_elements_by_tag_name('button') if
-#         b.text == 'log in with oauth'][0].click()
-#     selenium.webdriver.support.wait.WebDriverWait(
-#         browser, 10).until(
-#             EC.text_to_be_present_in_element(
-#                 ('id', 'authorizationOutput'), 'access_token'))
+def login_with_oauth(browser):
+    [b for b in browser.find_elements_by_tag_name('button') if
+        b.text == 'log in with oauth'][0].click()
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            EC.text_to_be_present_in_element(
+                ('id', 'authorizationOutput'), 'access_token'))
 
 
-# def request_care_plan(browser):
-#     [b for b in browser.find_elements_by_tag_name('button') if
-#         b.text == 'request care plan'][0].click()
-#     selenium.webdriver.support.wait.WebDriverWait(
-#         browser, 10).until(
-#             EC.text_to_be_present_in_element(
-#                 ('id', 'carePlanOutput'), 'reference'))
+def request_care_plan(browser):
+    [b for b in browser.find_elements_by_tag_name('button') if
+        b.text == 'request care plan'][0].click()
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            EC.text_to_be_present_in_element(
+                ('id', 'carePlanOutput'), 'reference'))
 
 
-# def test_launch_patient(
-#         connector, activity, careplan_on_server, patient, browser):
-#     import koppeltaal
-
-#     launch_url = connector.launch(activity, patient, patient)
-#     parsed_launch_url = urlparse.urlparse(launch_url)
-#     assert urlparse.parse_qs(
-#         parsed_launch_url.query)['iss'][0].startswith(connector.server)
-
-#     # There is a 'login with oauth' button in the page, let's see what that
-#     # does.
-#     browser.get(launch_url)
-#     wait_for_game(browser)
-#     assert browser.find_element_by_id('patientReference').text == ''
-#     assert browser.find_element_by_id('userReference').text == ''
-
-#     login_with_oauth(browser)
-#     assert browser.find_element_by_id('patientReference').text == \
-#         koppeltaal.url(patient)
-#     assert browser.find_element_by_id('userReference').text == \
-#         koppeltaal.url(patient)
+def parse_launch_url(url):
+    parsed_url = urlparse.urlparse(url)
+    query = urlparse.parse_qs(parsed_url.query)
+    return query.get('iss', [''])[0]
 
 
-# def test_launch_practitioner(
-#         connector, activity, careplan_on_server, patient, practitioner,
-#         browser):
-#     import koppeltaal
+def test_launch_patient(connector, careplan, careplan_sent, patient, browser):
+    launch_url = connector.launch(careplan, user=patient)
+    assert parse_launch_url(launch_url).startswith(connector.transport.server)
 
-#     # There is a 'login with oauth' button in the page, let's see what that
-#     # does.
-#     launch_url = connector.launch(activity, patient, practitioner)
-#     browser.get(launch_url)
-#     wait_for_game(browser)
-#     assert browser.find_element_by_id('patientReference').text == ''
-#     assert browser.find_element_by_id('userReference').text == ''
+    # There is a 'login with oauth' button in the page, let's see what that
+    # does.
+    browser.get(launch_url)
+    wait_for_application(browser)
+    assert browser.find_element_by_id('patientReference').text == ''
+    assert browser.find_element_by_id('userReference').text == ''
 
-#     login_with_oauth(browser)
-#     assert browser.find_element_by_id('patientReference').text == \
-#         koppeltaal.url(patient)
-#     assert browser.find_element_by_id('userReference').text == \
-#         koppeltaal.url(practitioner)
+    login_with_oauth(browser)
+    assert browser.find_element_by_id('patientReference').text == \
+        careplan.patient.fhir_link
+    assert browser.find_element_by_id('userReference').text == \
+        careplan.patient.fhir_link
+
+
+def test_launch_practitioner(
+        connector, careplan, careplan_sent, practitioner, browser):
+    # There is a 'login with oauth' button in the page, let's see what that
+    # does.
+    launch_url = connector.launch(careplan, user=practitioner)
+    assert parse_launch_url(launch_url).startswith(connector.transport.server)
+
+    browser.get(launch_url)
+    wait_for_application(browser)
+    assert browser.find_element_by_id('patientReference').text == ''
+    assert browser.find_element_by_id('userReference').text == ''
+
+    login_with_oauth(browser)
+    assert browser.find_element_by_id('patientReference').text == \
+        careplan.patient.fhir_link
+    assert browser.find_element_by_id('userReference').text == \
+        practitioner.fhir_link
 
 
 # def set_domain(browser):
@@ -93,11 +93,9 @@
 
 
 # def test_send_message_from_game_to_server(
-#         connector, activity, careplan_on_server, patient, browser):
-#     import koppeltaal.interfaces
-#     from koppeltaal.feed import parse
+#         connector, careplan, careplan_sent, patient, browser):
 
-#     launch_url = connector.launch(activity, patient, patient)
+#     launch_url = connector.launch(careplan)
 
 #     # The message to koppeltaal server needs to be acked.
 #     headers = list(parse(
@@ -117,9 +115,10 @@
 #     assert len(headers2) == 0
 
 #     browser.get(launch_url)
-#     wait_for_game(browser)
-#     set_domain(browser)
+#     wait_for_application(browser)
 #     login_with_oauth(browser)
+
+#     set_domain(browser)
 #     request_care_plan(browser)
 #     post_sub_activities(browser)
 #     headers3 = list(parse(

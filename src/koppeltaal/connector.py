@@ -110,12 +110,43 @@ class Connector(object):
                 return activity
         return None
 
-    def launch(self, activity, patient, user, resource=None):
+    def launch(self, careplan, user=None, activity_identifier=None):
+        activity = None
+        for candidate in careplan.activities:
+            if (activity_identifier is None or
+                    candidate.identifier == activity_identifier):
+                activity = candidate
+                break
+        if activity is None:
+            raise interfaces.KoppeltaalError('No activity found')
+        if user is None:
+            user = careplan.patient
+        application_id = None
+        if activity.definition is not None:
+            activity_definition = self.activity(activity.definition)
+            assert interfaces.IReferredFHIRResource.providedBy(
+                activity_definition.application)
+            application_id = activity_definition.application.display
+        return self.launch_from_parameters(
+            application_id,
+            careplan.patient.fhir_link,
+            user.fhir_link,
+            activity.identifier)
+
+    def launch_from_parameters(
+            self,
+            application_id,
+            patient_link,
+            user_link,
+            activity_identifier):
+        assert application_id is not None, 'Invalid activity'
+        assert patient_link is not None, 'Invalid patient'
+        assert user_link is not None, 'Invalid user'
         params = {
-            'client_id': activity.identifier,
-            'patient': patient.fhir_link,
-            'user': user.fhir_link,
-            'resource': resource or activity.identifier}
+            'client_id': application_id,
+            'patient': patient_link,
+            'user': user_link,
+            'resource': activity_identifier}
         return self.transport.query_redirect(
             interfaces.OAUTH_LAUNCH_URL, params)
 

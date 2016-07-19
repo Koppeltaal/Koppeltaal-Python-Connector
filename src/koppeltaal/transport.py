@@ -9,6 +9,7 @@ class Transport(object):
     def __init__(self, server, username, password):
         parts = urlparse.urlparse(server)
 
+        self.server = server
         self.scheme = parts.scheme
         self.netloc = parts.netloc
         self.username = username

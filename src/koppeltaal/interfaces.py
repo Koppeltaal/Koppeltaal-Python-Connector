@@ -157,9 +157,14 @@ class IConnector(zope.interface.Interface):
         None.
         """
 
-    def launch(activity, patient, user, resource=None):
-        """Retrieve launch URL for a specific `activity` which have been added
-        to a `patient` to be used by `user`.
+    def launch(careplan, user=None, activity_identifier=None):
+        """Retrieve launch URL for an activity in a careplan for a give user..
+        """
+
+    def launch_from_parameters(
+            application_id, patient_link, user_link, activity_identifier):
+        """Retrieve launch URL out of all required parameters. Those
+        parameters can be extracted from a careplan.
         """
 
     def updates():

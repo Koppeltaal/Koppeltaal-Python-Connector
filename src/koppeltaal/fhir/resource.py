@@ -75,6 +75,7 @@ class Entry(object):
         if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
             self._fhir_link = self._resource.configuration.link(
                 self._model, self.resource_type)
+            self._model.fhir_link = self._fhir_link
             return self._fhir_link
 
         return None

@@ -1,7 +1,9 @@
-import urlparse
-import pytest
-import os.path
 import ConfigParser
+import datetime
+import os.path
+import pytest
+import urlparse
+import uuid
 import selenium.webdriver
 import koppeltaal.connector
 import koppeltaal.models
@@ -61,51 +63,68 @@ def transport(monkeypatch, connector):
 
 @pytest.fixture
 def patient(request, connector):
-    p = koppeltaal.models.Patient()
+    patient = koppeltaal.models.Patient(
+        name=koppeltaal.models.Name(
+            family=u"Doe",
+            given=u"John"),
+        age=42,
+        gender="M",
+        active=True)
 
-    def cleanup_patient_messages():
-        # XXX Fix the URL
-        for message in connector.messages(patient='fakeurl'):
-            message.status = 'Success'
-            connector.send(message)
+    # def cleanup_patient_messages():
+    #     # XXX Fix the URL
+    #     for message in connector.search(patient='fakeurl'):
+    #         message.status = 'Success'
+    #         connector.send(message)
 
-    request.addfinalizer(cleanup_patient_messages)
-    return p
+    # request.addfinalizer(cleanup_patient_messages)
+    return patient
 
 
 @pytest.fixture
 def practitioner():
-    p = koppeltaal.models.Practitioner()
-    p.name = koppeltaal.models.Name()
-    p.name.given = 'Jozef'
-    p.name.family = 'van Buuren'
-    return p
+    return koppeltaal.models.Practitioner(
+        name=koppeltaal.models.Name(
+            given=u'John',
+            family=u'Q. Practitioner'))
 
 
 @pytest.fixture
-def practitioner2():
-    p = koppeltaal.models.Practitioner()
-    p.name = koppeltaal.models.Name()
-    p.name.given = 'Hank'
-    p.name.family = 'Schrader'
-    return p
+def testgame_definition(connector):
+    # Highly depending on what's activated on the server.
+    definition = connector.activity('KTSTESTGAME')
+    assert definition is not None, 'Test activity not found.'
+    return definition
 
 
 @pytest.fixture
-def careplan(connector, patient):
-    return koppeltaal.model.CarePlan(patient)
+def careplan(patient, practitioner, testgame_definition):
+    participants = [koppeltaal.models.Participant(
+        member=practitioner,
+        role='Caregiver')]
+    return koppeltaal.models.CarePlan(
+        activities=[koppeltaal.models.Activity(
+            identifier=unicode(uuid.uuid4()),
+            definition=testgame_definition.identifier,
+            kind=testgame_definition.kind,
+            participants=participants,
+            planned=datetime.datetime.now(),
+            status='Available')],
+        patient=patient,
+        participants=participants,
+        status='active')
 
 
 @pytest.fixture
-def activities(connector):
-    return connector.activities()
+def careplan_sent(connector, careplan):
+    return connector.send('CreateOrUpdateCarePlan', careplan, careplan.patient)
 
 
 @pytest.fixture(scope='session')
 def driver(request):
-    d = selenium.webdriver.Firefox()
-    request.addfinalizer(d.quit)
-    return d
+    driver = selenium.webdriver.Firefox()
+    request.addfinalizer(driver.quit)
+    return driver
 
 
 @pytest.fixture

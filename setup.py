@@ -19,6 +19,7 @@ setup(
     extras_require={
         'tests': [
             'PyHamcrest',
+            'selenium',
             ],
         },
     entry_points={
