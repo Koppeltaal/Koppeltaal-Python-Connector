@@ -227,7 +227,8 @@ class Connector(object):
                 interfaces.MAILBOX_URL,
                 send_bundle.get_payload()))
         response = response_bundle.unpack_message_header()
-        if (response.response is None or
+        if (response is None or
+                response.response is None or
                 response.response.identifier != identifier or
                 response.response.code != "ok"):
             raise interfaces.InvalidResponse(response)
