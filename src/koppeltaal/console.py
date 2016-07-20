@@ -30,6 +30,8 @@ MESSAGE_OUTPUT = """Message: {model.identifier}
 - fhir link: {model.fhir_link}
 - event: {model.event}
 - time stamp: {model.timestamp}
+- software: {model.source.software} ({model.source.version})
+- endpoint: {model.source.endpoint}
 """
 
 CAREPLAN_OUTPUT = """CarePlan:
@@ -132,6 +134,9 @@ def console():
 
     updates = subparsers.add_parser('updates')
     updates.add_argument(
+        '--all', dest='all_updates', action='store_true',
+        help='Process all next messages')
+    updates.add_argument(
         '--until',
         help='Process all next messages until the given date (and time)')
     updates.add_argument(
@@ -230,7 +235,7 @@ def console():
             for index, update in enumerate(connection.updates()):
                 with update:
                     if until is None:
-                        if index:
+                        if not args.all_updates and index:
                             update.postpone()
                             break
                     else:
