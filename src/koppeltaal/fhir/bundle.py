@@ -1,5 +1,3 @@
-import uuid
-
 from koppeltaal.fhir import resource
 from koppeltaal import (definitions, interfaces, utils)
 
@@ -56,7 +54,7 @@ class Bundle(resource.Resource):
         entries = list(self.pack())
         return {
             "resourceType": "Bundle",
-            "id": "urn:uuid:{}".format(uuid.uuid4()),
+            "id": "urn:uuid:{}".format(utils.uniqueid()),
             "updated": utils.now().isoformat(),
             "category": [{
                 "term": "{}Domain#{}".format(

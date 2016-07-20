@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 
 class UTC(datetime.tzinfo):
@@ -24,6 +25,18 @@ def json2links(data):
     for link in data.get('link', []):
         links[link['rel']] = link['href']
     return links
+
+
+def uniqueid():
+    """Generate a unique ID.
+    """
+    return unicode(uuid.uuid4())
+
+
+def messageid():
+    """Generate a unique ID for a new message.
+    """
+    return uniqueid()
 
 
 def now():

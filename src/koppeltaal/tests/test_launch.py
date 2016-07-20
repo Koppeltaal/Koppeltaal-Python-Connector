@@ -33,7 +33,8 @@ def parse_launch_url(url):
     return query.get('iss', [''])[0]
 
 
-def test_launch_patient(connector, careplan, careplan_sent, patient, browser):
+def test_launch_patient(
+        connector, careplan, careplan_response, patient, browser):
     launch_url = connector.launch(careplan, user=patient)
     assert parse_launch_url(launch_url).startswith(connector.transport.server)
 
@@ -52,7 +53,7 @@ def test_launch_patient(connector, careplan, careplan_sent, patient, browser):
 
 
 def test_launch_practitioner(
-        connector, careplan, careplan_sent, practitioner, browser):
+        connector, careplan, careplan_response, practitioner, browser):
     # There is a 'login with oauth' button in the page, let's see what that
     # does.
     launch_url = connector.launch(careplan, user=practitioner)

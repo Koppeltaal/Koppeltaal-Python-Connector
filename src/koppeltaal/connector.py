@@ -1,4 +1,3 @@
-import uuid
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
@@ -207,7 +206,7 @@ class Connector(object):
             params).unpack()
 
     def send(self, event, data, patient):
-        identifier = unicode(uuid.uuid4())
+        identifier = utils.messageid()
         source = models.MessageHeaderSource(
             name=unicode(self.configuration.name),
             endpoint=unicode(self.configuration.url),
@@ -228,7 +227,8 @@ class Connector(object):
                 interfaces.MAILBOX_URL,
                 send_bundle.get_payload()))
         response = response_bundle.unpack_message_header()
-        assert response.response.identifier == identifier
-        if response.response.code != "ok":
+        if (response.response is None or
+                response.response.identifier != identifier or
+                response.response.code != "ok"):
             raise interfaces.InvalidResponse(response)
         return response.data

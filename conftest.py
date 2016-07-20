@@ -8,6 +8,7 @@ import selenium.webdriver
 import koppeltaal.connector
 import koppeltaal.models
 import koppeltaal.testing
+import koppeltaal.utils
 
 
 def pytest_addoption(parser):
@@ -58,6 +59,8 @@ def connector(request):
 def transport(monkeypatch, connector):
     transport = koppeltaal.testing.MockTransport('koppeltaal.tests')
     monkeypatch.setattr(connector, 'transport', transport)
+    monkeypatch.setattr(connector.configuration, 'model_id', lambda m: u'1')
+    monkeypatch.setattr(koppeltaal.utils, 'messageid', lambda: u'1234-5678')
     return transport
 
 
@@ -90,7 +93,7 @@ def practitioner():
 
 
 @pytest.fixture
-def testgame_definition(connector):
+def activity_definition(connector):
     # Highly depending on what's activated on the server.
     definition = connector.activity('KTSTESTGAME')
     assert definition is not None, 'Test activity not found.'
@@ -98,15 +101,15 @@ def testgame_definition(connector):
 
 
 @pytest.fixture
-def careplan(patient, practitioner, testgame_definition):
+def careplan(patient, practitioner, activity_definition):
     participants = [koppeltaal.models.Participant(
         member=practitioner,
         role='Caregiver')]
     return koppeltaal.models.CarePlan(
         activities=[koppeltaal.models.Activity(
             identifier=unicode(uuid.uuid4()),
-            definition=testgame_definition.identifier,
-            kind=testgame_definition.kind,
+            definition=activity_definition.identifier,
+            kind=activity_definition.kind,
             participants=participants,
             planned=datetime.datetime.now(),
             status='Available')],
@@ -116,7 +119,15 @@ def careplan(patient, practitioner, testgame_definition):
 
 
 @pytest.fixture
-def careplan_sent(connector, careplan):
+def careplan_from_fixture(request, transport):
+    transport.expect(
+        '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
+        json='fixtures/activities_game.json')
+    return request.getfuncargvalue('careplan')
+
+
+@pytest.fixture
+def careplan_response(connector, careplan):
     return connector.send('CreateOrUpdateCarePlan', careplan, careplan.patient)
 
 

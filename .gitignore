@@ -12,5 +12,6 @@ pytestdebug.log
 dev
 tmp_*xml
 .mr.developer.cfg
+.cache
 .coverage
 htmlcov

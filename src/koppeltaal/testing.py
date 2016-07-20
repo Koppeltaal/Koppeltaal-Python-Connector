@@ -1,6 +1,7 @@
 from hamcrest.core.base_matcher import BaseMatcher
 import hamcrest
 import json
+import functools
 import pkg_resources
 import urllib
 import urlparse
@@ -10,20 +11,27 @@ class MockTransport(object):
 
     def __init__(self, module_name):
         self._module_name = module_name
+        self.clear()
+
+    def _expect_json(self, args, url, data=None):
+        return json.load(pkg_resources.resource_stream(
+            self._module_name, args['json']))
+
+    def _expect_redirect(self, args, url, data=None):
+        return args['redirect']
+
+    def clear(self):
         self.expected = {}
         self.called = {}
 
-    def expect_json(self, url, fixture_names):
-        if not isinstance(fixture_names, list):
-            fixture_names = [fixture_names]
-        self.expected[url] = [
-            json.load(pkg_resources.resource_stream(self._module_name, name))
-            for name in fixture_names]
-
-    def expect_url(self, url, locations):
-        if not isinstance(locations, list):
-            locations = [locations]
-        self.expected[url] = locations
+    def expect(self, url, **fixture):
+        expect_method = None
+        if 'json' in fixture:
+            expect_method = functools.partial(self._expect_json, fixture)
+        elif 'redirect' in fixture:
+            expect_method = functools.partial(self._expect_redirect, fixture)
+        assert expect_method is not None
+        self.expected.setdefault(url, []).append(expect_method)
 
     def relative_url(self, url, params=None):
         parts = urlparse.urlparse(url)[2:]
@@ -36,27 +44,31 @@ class MockTransport(object):
         url = self.relative_url(url, params)
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call')
-        return self.expected[url].pop(0)
+        expect_method = self.expected[url].pop(0)
+        return expect_method(url, None)
 
     def query_redirect(self, url, params=None):
         url = self.relative_url(url, params)
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call')
-        return self.expected[url].pop(0)
+        expect_method = self.expected[url].pop(0)
+        return expect_method(url, None)
 
     def create(self, url, data):
         url = self.relative_url(url)
         self.called[url] = data
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call')
-        return self.expected[url].pop(0)
+        expect_method = self.expected[url].pop(0)
+        return expect_method(url, None)
 
     def update(self, url, data):
         url = self.relative_url(url)
         self.called[url] = data
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call')
-        return self.expected[url].pop(0)
+        expect_method = self.expected[url].pop(0)
+        return expect_method(url, None)
 
 
 class HasFHIRExtension(BaseMatcher):
