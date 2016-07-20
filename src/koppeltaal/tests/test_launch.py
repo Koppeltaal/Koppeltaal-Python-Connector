@@ -72,7 +72,6 @@ def test_launch_practitioner(
 
 # def set_domain(browser):
 #     browser.find_element_by_id("domain").clear()
-#     # XXX Find the domain in the settings.
 #     browser.find_element_by_id("domain").send_keys("MindDistrict")
 #     [b for b in browser.find_elements_by_tag_name('button') if
 #         b.text == 'set new domain'][0].click()

@@ -17,7 +17,7 @@ setup(
         'zope.interface >= 3.7.0',
         ],
     extras_require={
-        'tests': [
+        'test': [
             'PyHamcrest',
             'selenium',
             ],

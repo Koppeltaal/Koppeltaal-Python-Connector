@@ -79,9 +79,10 @@ class Update(object):
 
 @zope.interface.implementer(interfaces.IConnector)
 class Connector(object):
+    _create_transport = transport.Transport
 
     def __init__(self, server, username, password, domain, configuration):
-        self.transport = transport.Transport(server, username, password)
+        self.transport = self._create_transport(server, username, password)
         self.domain = domain
         self.configuration = configuration
 
