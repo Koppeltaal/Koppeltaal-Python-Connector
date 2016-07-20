@@ -1,8 +1,6 @@
-import ConfigParser
 import argparse
 import json
 import logging
-import os
 import pdb
 import sys
 import dateutil
@@ -76,19 +74,7 @@ def get_credentials(args):
                 'please always supply username and password.')
         else:
             return args.username, args.password, args.domain
-
-    # They're not passed in, so now look at ~/.koppeltaal.cfg.
-    parser = ConfigParser.ConfigParser()
-    parser.read(os.path.expanduser('~/.koppeltaal.cfg'))
-    if not parser.has_section(args.server):
-        sys.exit('No user credentials found in ~/.koppeltaal.cfg')
-    username = parser.get(args.server, 'username')
-    password = parser.get(args.server, 'password')
-    # Domain is not required for all actions.
-    domain = parser.get(args.server, 'domain')
-    if not username or not password:
-        sys.exit('No user credentials found in ~/.koppeltaal.cfg')
-    return username, password, domain
+    return utils.get_credentials_from_file(args.server)
 
 
 class DummyResource(object):
