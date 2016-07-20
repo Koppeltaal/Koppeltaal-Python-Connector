@@ -109,11 +109,11 @@ def test_search_message_id_from_fixture(connector, transport):
         koppeltaal.definitions.Patient, message.patient)
 
 
-def test_send_careplan_from_fixture(
+def test_send_careplan_success_from_fixture(
         connector, transport, careplan_from_fixture):
     transport.expect(
         '/FHIR/Koppeltaal/Mailbox',
-        json='fixtures/bundle_post_message.json')
+        json='fixtures/bundle_post_answer_ok.json')
     message = connector.send(
         'CreateOrUpdateCarePlan',
         careplan_from_fixture,
@@ -123,6 +123,24 @@ def test_send_careplan_from_fixture(
     assert message.fhir_link == (
         'https://example.com/fhir/Koppeltaal/CarePlan/1/'
         '_history/1970-01-01T01:01:01:01.1')
+
+    response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
+    assert response is not None
+
+
+def test_send_careplan_fail_from_fixture(
+        connector, transport, careplan_from_fixture):
+    transport.expect(
+        '/FHIR/Koppeltaal/Mailbox',
+        json='fixtures/bundle_post_answer_failed.json')
+    with pytest.raises(koppeltaal.interfaces.InvalidResponse):
+        connector.send(
+            'CreateOrUpdateCarePlan',
+            careplan_from_fixture,
+            careplan_from_fixture.patient)
+
+    response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
+    assert response is not None
 
 
 def test_updates_implicit_success_from_fixture(connector, transport):
