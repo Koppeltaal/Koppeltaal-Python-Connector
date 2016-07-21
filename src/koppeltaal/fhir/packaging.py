@@ -33,8 +33,8 @@ class BrokenResource(object):
 
 class Extension(object):
 
-    def __init__(self, resource, content=None):
-        self._resource = resource
+    def __init__(self, packer, content=None):
+        self._packer = packer
         self._index = {}
         if content and 'extension' in content:
             for extension in content['extension']:
@@ -101,7 +101,7 @@ class Extension(object):
             value = extension.get('extension')
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, extension)
-            return unpack(extension, field.binding, self._resource)
+            return self._packer.unpack(extension, field.binding)
 
         if field.field_type == 'reference':
             value = extension.get('valueResource')
@@ -109,10 +109,7 @@ class Extension(object):
                 raise interfaces.InvalidValue(field, extension)
             if 'reference' not in value:
                 interfaces.InvalidValue(field, extension)
-            reference = self._resource.find(value)
-            if reference:
-                return reference.unpack()
-            return ReferredResource(value)
+            return self._packer.unpack_reference(value)
 
         if field.field_type == 'string':
             value = extension.get('valueString')
@@ -198,13 +195,12 @@ class Extension(object):
         if field.field_type == 'object':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            return pack(value, field.binding, self._resource)
+            return self._packer.pack(value, field.binding)
 
         if field.field_type == 'reference':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            entry = self._resource.add_model(value)
-            return {'valueResource': {'reference': entry.fhir_link}}
+            return {'valueResource': self._packer.pack_reference(value)}
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):
@@ -231,8 +227,8 @@ class Extension(object):
 
 class Native(object):
 
-    def __init__(self, resource, content=None):
-        self._resource = resource
+    def __init__(self, packer, content=None):
+        self._packer = packer
         self._content = content or {}
 
     @property
@@ -289,17 +285,14 @@ class Native(object):
         if field.field_type == 'object':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            return unpack(value, field.binding, self._resource)
+            return self._packer.unpack(value, field.binding)
 
         if field.field_type == 'reference':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
             if 'reference' not in value:
                 raise interfaces.InvalidValue(field, value)
-            reference = self._resource.find(value)
-            if reference is not None:
-                return reference.unpack()
-            return ReferredResource(value)
+            return self._packer.unpack_reference(value)
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):
@@ -375,13 +368,12 @@ class Native(object):
         if field.field_type == 'object':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            return pack(value, field.binding, self._resource)
+            return self._packer.pack(value, field.binding)
 
         if field.field_type == 'reference':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            entry = self._resource.add_model(value)
-            return {'reference': entry.fhir_link}
+            return self._packer.pack_reference(value)
 
         if field.field_type == 'string':
             if not isinstance(value, unicode):
@@ -407,48 +399,73 @@ class Native(object):
         self._content[field.name] = item
 
 
-def unpack(payload, definition, resource):
-    factory = fhir.REGISTRY.model_for_definition(definition)
-    if factory is None:
-        return None
+class Packer(object):
 
-    try:
-        extension = Extension(resource, payload)
-        native = Native(resource, payload)
-        data = {}
+    def __init__(self, resource, fhir_link):
+        self.resource = resource
+        self.fhir_link = fhir_link
+        self._idref = 0
+
+    def idref(self):
+        self._idref += 1
+        return 'ref{0:03}'.format(self._idref)
+
+    def unpack(self, payload, definition):
+        factory = fhir.REGISTRY.model_for_definition(definition)
+        if factory is None:
+            return None
+
+        try:
+            extension = Extension(self, payload)
+            native = Native(self, payload)
+            data = {}
+            for name, field in definition.namesAndDescriptions():
+                if not isinstance(field, definitions.Field):
+                    continue
+                if field.extension is None:
+                    data[name] = native.unpack(field)
+                else:
+                    data[name] = extension.unpack(field)
+            return factory(**data)
+        except interfaces.InvalidValue as error:
+            if definition.isOrExtends(interfaces.IFHIRResource):
+                return BrokenResource(error, payload)
+            raise
+
+    def pack(self, model, definition):
+        extension = Extension(self)
+        native = Native(self)
+
+        if not definition.providedBy(model):
+            raise interfaces.InvalidResource(definition, model)
+
         for name, field in definition.namesAndDescriptions():
             if not isinstance(field, definitions.Field):
                 continue
+            value = getattr(model, name, field.default)
             if field.extension is None:
-                data[name] = native.unpack(field)
+                native.pack(field, value)
             else:
-                data[name] = extension.unpack(field)
-        return factory(**data)
-    except interfaces.InvalidValue as error:
-        if definition.isOrExtends(interfaces.IFHIRResource):
-            return BrokenResource(error, payload)
-        raise
+                extension.pack(field, value)
+        # We do not have to add an idref because we do not refer back to
+        # any object. However due to a bug the javascript connector
+        # requires it in some cases.
+        payload = {'id': self.idref()}
+        payload.update(extension.payload)
+        payload.update(native.payload)
+        return payload
 
+    def unpack_reference(self, value):
+        reference = self.resource.find(value)
+        if reference:
+            return reference.unpack()
+        return ReferredResource(value)
 
-def pack(model, definition, resource):
-    extension = Extension(resource)
-    native = Native(resource)
-
-    if not definition.providedBy(model):
-        raise interfaces.InvalidResource(definition, model)
-
-    for name, field in definition.namesAndDescriptions():
-        if not isinstance(field, definitions.Field):
-            continue
-        value = getattr(model, name, field.default)
-        if field.extension is None:
-            native.pack(field, value)
-        else:
-            extension.pack(field, value)
-    # We do not have to add an idref because we do not refer back to
-    # any object. However due to a bug the javascript connector
-    # requires it in some cases.
-    payload = {'id': resource.idref()}
-    payload.update(extension.payload)
-    payload.update(native.payload)
-    return payload
+    def pack_reference(self, value):
+        if interfaces.IReferredFHIRResource.providedBy(value):
+            reference = {'reference': value.fhir_link}
+            if value.display:
+                reference['display'] = value.display
+            return reference
+        entry = self.resource.add_model(value)
+        return {'reference': entry.fhir_link}

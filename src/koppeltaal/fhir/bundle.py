@@ -8,16 +8,14 @@ MARKER = object()
 class Entry(resource.Entry):
     _atom_id = MARKER
 
-    def __init__(self, resource, entry=None, model=None):
+    def __init__(self, packer, entry=None, model=None):
         if entry is not None:
             self._fhir_link = utils.json2links(entry).get('self')
             self._atom_id = entry.get('id')
 
-            super(Entry, self).__init__(
-                resource, content=entry['content'])
+            super(Entry, self).__init__(packer, content=entry['content'])
         if model is not None:
-            super(Entry, self).__init__(
-                resource, model=model)
+            super(Entry, self).__init__(packer, model=model)
 
     @property
     def atom_id(self):
@@ -27,7 +25,7 @@ class Entry(resource.Entry):
         if self.fhir_link is not None:
             self._atom_id = utils.strip_history_from_link(self.fhir_link)
         else:
-            self._atom_id = self._resource.configuration.link(
+            self._atom_id = self._packer.fhir_link(
                 self._model, self.resource_type)
         return self._atom_id
 
@@ -47,7 +45,7 @@ class Bundle(resource.Resource):
         if response['resourceType'] != 'Bundle' or 'entry' not in response:
             raise interfaces.InvalidBundle(self, response)
         for entry in response['entry']:
-            self.items.append(self.entry_type(self, entry=entry))
+            self.items.append(self.entry_type(self.packer, entry=entry))
 
     def get_payload(self):
         assert self.domain is not None, 'Domain is required to create payloads'

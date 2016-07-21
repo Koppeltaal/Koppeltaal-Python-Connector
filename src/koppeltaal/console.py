@@ -174,9 +174,9 @@ def console():
 
     username, password, domain = get_credentials(args)
 
-    configuration = connector.FHIRConfiguration(name='Python command line')
+    integration = connector.Integration(name='Python command line')
     connection = connector.Connector(
-        args.server, username, password, domain, configuration)
+        args.server, username, password, domain, integration)
 
     try:
         if args.command == 'metadata':
@@ -191,7 +191,7 @@ def console():
                 print "Please provide an XML or JSON file."
                 return
             print_json(payload)
-            resource_bundle = bundle.Bundle(domain, configuration)
+            resource_bundle = bundle.Bundle(domain, integration)
             resource_bundle.add_payload(payload)
             for model in resource_bundle.unpack():
                 print_model(model)

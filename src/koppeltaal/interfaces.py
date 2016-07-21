@@ -113,7 +113,9 @@ class IIdentifiedFHIRResource(IFHIRResource):
     """
 
 
-class IFHIRConfiguration(zope.interface.Interface):
+class IIntegration(zope.interface.Interface):
+    """Personalizing of connector settings and behavior.
+    """
 
     name = zope.interface.Attribute('application name using the connector')
 
@@ -142,7 +144,7 @@ class IConnector(zope.interface.Interface):
 
     domain = zope.interface.Attribute('domain')
 
-    configuration = zope.interface.Attribute('fhir configuration')
+    integration = zope.interface.Attribute('integration for this connector')
 
     def metadata():
         """Return the conformance statement.

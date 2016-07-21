@@ -1,4 +1,3 @@
-
 import json
 
 from koppeltaal.fhir import packaging
@@ -19,8 +18,8 @@ class Entry(object):
     _standard_type = MARKER
     _fhir_link = MARKER
 
-    def __init__(self, resource, content=None, model=None):
-        self._resource = resource
+    def __init__(self, packer, content=None, model=None):
+        self._packer = packer
 
         if content is not None:
             self._content = content.copy()
@@ -73,7 +72,7 @@ class Entry(object):
             return self._fhir_link
 
         if interfaces.IIdentifiedFHIRResource.providedBy(self._model):
-            self._fhir_link = self._resource.configuration.link(
+            self._fhir_link = self._packer.fhir_link(
                 self._model, self.resource_type)
             self._model.fhir_link = self._fhir_link
             return self._fhir_link
@@ -86,8 +85,7 @@ class Entry(object):
 
         self._model = None
         if self.definition is not None:
-            self._model = packaging.unpack(
-                self._content, self.definition, self._resource)
+            self._model = self._packer.unpack(self._content, self.definition)
             if self._model is not None:
                 self._model.fhir_link = self.fhir_link
         return self._model
@@ -96,8 +94,7 @@ class Entry(object):
         if self._content is MARKER:
             if self.definition is None:
                 raise interfaces.InvalidResource(None, self._model)
-            self._content = packaging.pack(
-                self._model, self.definition, self._resource)
+            self._content = self._packer.pack(self._model, self.definition)
             if self.standard_type:
                 self._content['resourceType'] = self.resource_type
             else:
@@ -132,25 +129,21 @@ class Entry(object):
 class Resource(object):
     entry_type = Entry
 
-    def __init__(self, domain=None, configuration=None):
+    def __init__(self, domain=None, integration=None):
         self.items = []
         self.domain = domain
-        self.configuration = configuration
-        self._idref = 0
-
-    def idref(self):
-        self._idref += 1
-        return 'ref{0:03}'.format(self._idref)
+        self.integration = integration
+        self.packer = packaging.Packer(self, integration.fhir_link)
 
     def add_payload(self, response):
-        self.items.append(self.entry_type(self, content=response))
+        self.items.append(self.entry_type(self.packer, content=response))
 
     def add_model(self, model):
         assert interfaces.IFHIRResource.providedBy(model), \
             'Can only add resources'
         entry = self.find(model)
         if entry is None:
-            entry = self.entry_type(self, model=model)
+            entry = self.entry_type(self.packer, model=model)
             self.items.append(entry)
         return entry
 

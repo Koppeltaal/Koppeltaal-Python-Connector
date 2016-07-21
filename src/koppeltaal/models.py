@@ -34,7 +34,7 @@ class ActivityDefinition(FHIRResource):
             is_archived=False,
             is_domain_specific=False,
             kind=None,
-            launch_type=None,
+            launch_type='Web',
             name=None,
             performer=None,
             subactivities=None):
@@ -166,12 +166,14 @@ class Activity(object):
 
     def __init__(
             self,
+            application=None,
             cancelled=None,
             definition=None,
             description=None,
             finished=None,
             identifier=None,
             kind=None,
+            launch_type=None,
             notes=None,
             participants=None,
             planned=None,
@@ -179,12 +181,14 @@ class Activity(object):
             status=None,
             subactivities=None,
             prohibited=False):
+        self.application = application
         self.cancelled = cancelled
         self.definition = definition
         self.description = description
         self.finished = finished
         self.identifier = identifier
         self.kind = kind
+        self.launch_type = launch_type
         self.notes = notes
         self.participants = participants
         self.planned = planned

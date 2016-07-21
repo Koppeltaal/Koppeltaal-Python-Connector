@@ -33,13 +33,15 @@ class Field(zope.interface.Attribute):
             self,
             name,
             field_type,
-            optional=False,
-            multiple=False,
             binding=None,
             default=None,
-            extension=None):
+            extension=None,
+            multiple=False,
+            optional=False,
+            reserved_allowed=False):
         super(Field, self).__init__(__name__='')
-        assert name not in RESERVED_NAMES, '{} is a reserved name.'
+        assert reserved_allowed or name not in RESERVED_NAMES, \
+            '{} is a reserved name.'
         assert field_type in FIELD_TYPES, \
             'Unknown field type {} for {}.'.format(field_type, name)
         assert field_type not in {
@@ -84,8 +86,9 @@ class SubActivityDefinition(zope.interface.Interface):
 
     active = Field(
         'isActive', 'boolean',
-        optional=True,
-        extension='ActivityDefinition#SubActivityIsActive')
+        default=True,
+        extension='ActivityDefinition#SubActivityIsActive',
+        optional=True)
 
 
 @resource_type('ActivityDefinition', False)
@@ -95,8 +98,10 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
         'application', 'reference',
         extension='ActivityDefinition#Application')
 
+    # Note that this is not required in the specification but his in
+    # practice so that other messages can refer to it.
     identifier = Field(
-        'identifier', 'string',
+        'activityDefinitionIdentifier', 'string',
         extension='ActivityDefinition#ActivityDefinitionIdentifier')
 
     kind = Field(
@@ -115,10 +120,10 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     subactivities = Field(
         'subActivity', 'object',
-        optional=True,
-        multiple=ALL_ITEMS,
         binding=SubActivityDefinition,
-        extension='ActivityDefinition#SubActivity')
+        extension='ActivityDefinition#SubActivity',
+        multiple=ALL_ITEMS,
+        optional=True)
 
     performer = Field(
         'defaultPerformer', 'coding',
@@ -128,14 +133,16 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     launch_type = Field(
         'launchType', 'code',
-        optional=True,
         binding=codes.ACTIVITY_LAUNCH_TYPE,
-        extension='ActivityDefinition#LaunchType')
+        default='Web',
+        extension='ActivityDefinition#LaunchType',
+        optional=True)
 
     is_active = Field(
         'isActive', 'boolean',
-        optional=True,
-        extension='ActivityDefinition#IsActive')
+        default=True,
+        extension='ActivityDefinition#IsActive',
+        optional=True)
 
     is_domain_specific = Field(
         'isDomainSpecific', 'boolean',
@@ -144,8 +151,9 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     is_archived = Field(
         'isArchived', 'boolean',
-        optional=True,
-        extension='ActivityDefinition#IsArchived')
+        default=False,
+        extension='ActivityDefinition#IsArchived',
+        optional=True)
 
 
 class CarePlanSubActivityStatus(zope.interface.Interface):
@@ -292,7 +300,8 @@ class Practitioner(interfaces.IIdentifiedFHIRResource):
 
     name = Field(
         'name', 'object',
-        binding=Name)
+        binding=Name,
+        optional=True)
 
 
 class Participant(zope.interface.Interface):
@@ -313,7 +322,8 @@ class Goal(zope.interface.Interface):
 
     status = Field(
         'status', 'code',
-        binding=codes.CAREPLAN_GOAL_STATUS)
+        binding=codes.CAREPLAN_GOAL_STATUS,
+        optional=True)
 
     notes = Field(
         'notes', 'string',
@@ -331,8 +341,8 @@ class SubActivity(zope.interface.Interface):
     status = Field(
         'status', 'code',
         binding=codes.CAREPLAN_ACTIVITY_STATUS,
-        optional=True,
-        extension='CarePlan#SubActivityStatus')
+        extension='CarePlan#SubActivityStatus',
+        optional=True)
 
 
 class ActivityParticipant(zope.interface.Interface):
@@ -343,16 +353,22 @@ class ActivityParticipant(zope.interface.Interface):
 
     role = Field(
         'role', 'codeable',
-        optional=True,
         binding=codes.CAREPLAN_PARTICIPANT_ROLE,
-        extension='CarePlan#ParticipantRole')
+        extension='CarePlan#ParticipantRole',
+        optional=True)
 
 
 class Activity(zope.interface.Interface):
 
+    application = Field(
+        'application', 'reference',
+        extension='CarePlan#Application',
+        optional=True)
+
+    # This is optional in the specification but cannot be in practice,
+    # or other messages won't be able to refer to it.
     identifier = Field(
         'identifier', 'string',
-        optional=True,
         extension='CarePlan#ActivityIdentifier')
 
     cancelled = Field(
@@ -384,6 +400,12 @@ class Activity(zope.interface.Interface):
         binding=codes.ACTIVITY_KIND,
         extension='CarePlan#ActivityKind')
 
+    launch_type = Field(
+        'launchType', 'code',
+        binding=codes.ACTIVITY_LAUNCH_TYPE,
+        extension='CarePlan#LaunchType',
+        optional=True)
+
     notes = Field(
         'notes', 'string',
         optional=True)
@@ -391,9 +413,9 @@ class Activity(zope.interface.Interface):
     participants = Field(
         'participant', 'object',
         binding=ActivityParticipant,
-        optional=True,
+        extension='CarePlan#Participant',
         multiple=ALL_ITEMS,
-        extension='CarePlan#Participant')
+        optional=True)
 
     planned = Field(
         'startDate', 'datetime',
@@ -435,6 +457,12 @@ class CarePlan(interfaces.IIdentifiedFHIRResource):
         optional=True,
         multiple=ALL_ITEMS)
 
+    goals = Field(
+        'goal', 'object',
+        binding=Goal,
+        optional=True,
+        multiple=ALL_ITEMS)
+
     participants = Field(
         'participant', 'object',
         binding=Participant,
@@ -442,17 +470,12 @@ class CarePlan(interfaces.IIdentifiedFHIRResource):
         multiple=ALL_ITEMS)
 
     patient = Field(
-        'patient', 'reference')
+        'patient', 'reference',
+        optional=True)
 
     status = Field(
         'status', 'code',
         binding=codes.CAREPLAN_STATUS)
-
-    goals = Field(
-        'goal', 'object',
-        binding=Goal,
-        optional=True,
-        multiple=ALL_ITEMS)
 
 
 class ProcessingStatus(zope.interface.Interface):

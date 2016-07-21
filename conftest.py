@@ -49,17 +49,17 @@ def connector(request):
     password = config.get(server, 'password')
     domain = config.get(server, 'domain')
 
-    configuration = koppeltaal.connector.FHIRConfiguration(
+    integration = koppeltaal.connector.Integration(
         name='Python connector tests')
     return koppeltaal.connector.Connector(
-        server, username, password, domain, configuration)
+        server, username, password, domain, integration)
 
 
 @pytest.fixture
 def transport(monkeypatch, connector):
     transport = koppeltaal.testing.MockTransport('koppeltaal.tests')
     monkeypatch.setattr(connector, 'transport', transport)
-    monkeypatch.setattr(connector.configuration, 'model_id', lambda m: u'1')
+    monkeypatch.setattr(connector.integration, 'model_id', lambda m: u'1')
     monkeypatch.setattr(koppeltaal.utils, 'messageid', lambda: u'1234-5678')
     return transport
 

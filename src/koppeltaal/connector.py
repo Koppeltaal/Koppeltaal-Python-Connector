@@ -11,8 +11,8 @@ from koppeltaal import(
 DEFAULT_COUNT = 100
 
 
-@zope.interface.implementer(interfaces.IFHIRConfiguration)
-class FHIRConfiguration(object):
+@zope.interface.implementer(interfaces.IIntegration)
+class Integration(object):
 
     def __init__(
             self,
@@ -31,7 +31,7 @@ class FHIRConfiguration(object):
         # this simplistic default implementation.
         return id(model)
 
-    def link(self, model, resource_type):
+    def fhir_link(self, model, resource_type):
         return '{}/{}/{}'.format(
             self.url, resource_type, self.model_id(model))
 
@@ -80,15 +80,15 @@ class Update(object):
 class Connector(object):
     _create_transport = transport.Transport
 
-    def __init__(self, server, username, password, domain, configuration):
+    def __init__(self, server, username, password, domain, integration):
         self.transport = self._create_transport(server, username, password)
         self.domain = domain
-        self.configuration = configuration
+        self.integration = integration
 
     def _fetch_bundle(self, url, params=None):
         next_url = url
         next_params = params
-        packaging = bundle.Bundle(self.domain, self.configuration)
+        packaging = bundle.Bundle(self.domain, self.integration)
         while next_url:
             response = self.transport.query(next_url, next_params)
             packaging.add_payload(response)
@@ -153,12 +153,12 @@ class Connector(object):
     def updates(self):
 
         def send_back(message):
-            packaging = resource.Resource(self.domain, self.configuration)
+            packaging = resource.Resource(self.domain, self.integration)
             packaging.add_model(message)
             self.transport.update(message.fhir_link, packaging.get_payload())
 
         def send_back_on_transaction(message):
-            return self.configuration.transaction_hook(send_back, message)
+            return self.integration.transaction_hook(send_back, message)
 
         p = {'_query': 'MessageHeader.GetNextNewAndClaim'}
         while True:
@@ -208,8 +208,8 @@ class Connector(object):
     def send(self, event, data, patient):
         identifier = utils.messageid()
         source = models.MessageHeaderSource(
-            name=unicode(self.configuration.name),
-            endpoint=unicode(self.configuration.url),
+            name=unicode(self.integration.name),
+            endpoint=unicode(self.integration.url),
             software=unicode(interfaces.SOFTWARE),
             version=unicode(interfaces.VERSION))
         message = models.MessageHeader(
@@ -219,9 +219,9 @@ class Connector(object):
             data=data,
             source=source,
             patient=patient)
-        send_bundle = bundle.Bundle(self.domain, self.configuration)
+        send_bundle = bundle.Bundle(self.domain, self.integration)
         send_bundle.add_model(message)
-        response_bundle = bundle.Bundle(self.domain, self.configuration)
+        response_bundle = bundle.Bundle(self.domain, self.integration)
         response_bundle.add_payload(
             self.transport.create(
                 interfaces.MAILBOX_URL,

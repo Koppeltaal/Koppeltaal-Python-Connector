@@ -1,5 +1,7 @@
 import koppeltaal.interfaces
 
+NULL = 'http://hl7.org/fhir/v3/NullFlavor'
+
 
 class Code(list):
 
@@ -28,7 +30,10 @@ class Code(list):
 
     def unpack_coding(self, coding):
         value = coding["code"]
-        if coding.get('system') != self.system:
+        system = coding.get('system')
+        if system == NULL:
+            return None
+        if system != self.system:
             raise koppeltaal.interfaces.InvalidCode(self, value)
         if value not in self:
             raise koppeltaal.interfaces.InvalidCode(self, value)
