@@ -1,6 +1,6 @@
 import json
 
-from koppeltaal.fhir import packaging
+from koppeltaal.fhir import packer
 from koppeltaal import (
     fhir,
     codes,
@@ -133,7 +133,7 @@ class Resource(object):
         self.items = []
         self.domain = domain
         self.integration = integration
-        self.packer = packaging.Packer(self, integration.fhir_link)
+        self.packer = packer.Packer(self, integration.fhir_link)
 
     def add_payload(self, response):
         self.items.append(self.entry_type(self.packer, content=response))
