@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 import mock
 import pytest
@@ -153,3 +154,39 @@ def test_pack_patient(packer):
              'system': 'email',
              'value': 'petra@example.com',
              'use': 'home'}]}
+
+
+def test_pack_practitioner(packer):
+    practitioner1 = packer.pack(
+        koppeltaal.models.Practitioner(
+            contacts=[
+                koppeltaal.models.Contact(
+                    system='email',
+                    value=u'paul@example.com',
+                    use='work')],
+            identifiers=[
+                koppeltaal.models.Identifier(
+                    system=u'http://fhir.nl/fhir/NamingSystem/bsn',
+                    value=u'154694496',
+                    use='official')],
+            name=koppeltaal.models.Name(
+                given=u'Paul',
+                family=u'Cézanne')),
+        koppeltaal.definitions.Practitioner)
+
+    assert practitioner1 == {
+        'id': mock.ANY,
+        'identifier': [
+             {'id': mock.ANY,
+              'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+              'value': '154694496',
+              'use': 'official'}],
+        'name': {'id': mock.ANY,
+                 'given': ['Paul'],
+                 'family': [u'Cézanne'],
+                 'use': 'official'},
+        'telecom': [
+            {'id': mock.ANY,
+             'system': 'email',
+             'value': 'paul@example.com',
+             'use': 'work'}]}
