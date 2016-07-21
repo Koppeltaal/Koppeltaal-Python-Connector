@@ -143,27 +143,6 @@ def console():
         '--failure',
         help='Fail and set the exception on the messages.')
 
-    care_plan = subparsers.add_parser('care_plan')
-    care_plan.add_argument('activity_id')
-    care_plan.add_argument('patient_url')
-    care_plan.add_argument('patient_given_name')
-    care_plan.add_argument('patient_family_name')
-    care_plan.add_argument('careplan_url')
-    care_plan.add_argument('practitioner_url')
-    care_plan.add_argument('practitioner_given_name')
-    care_plan.add_argument('practitioner_family_name')
-
-    launch = subparsers.add_parser('launch')
-    launch.add_argument(
-        '--activity', required=True,
-        help='Activity identifier')
-    launch.add_argument(
-        '--patient', required=True,
-        help='Patient FHIR link')
-    launch.add_argument(
-        '--user', required=True,
-        help='FHIR link of the user launching the activity')
-
     args = parser.parse_args()
 
     root = logging.getLogger()
@@ -207,26 +186,6 @@ def console():
         elif args.command == 'message':
             for model in connection.search(message_id=args.message_id):
                 print_model(model)
-        elif args.command == 'care_plan':
-            activity = connection.activity(args.activity_id)
-
-            if activity is None:
-                print "Unknown activity {}.".format(args.activity_id)
-                return
-
-            # patient = koppeltaal.model.Patient()
-            # patient.__url__ = args.patient_url
-            # patient.name.given = args.patient_given_name
-            # patient.name.family = args.patient_family_name
-
-            # practitioner = koppeltaal.model.Practitioner()
-            # practitioner.__url__ = args.practitioner_url
-            # practitioner.name.given = args.practitioner_given_name
-            # practitioner.name.family = args.practitioner_family_name
-
-            # careplan = koppeltaal.models.CarePlan()
-            message = models.Message()
-            print_json(connection.send(message))
         elif args.command == 'updates':
             until = None
             if args.until is not None:
@@ -245,17 +204,6 @@ def console():
                     print_model(update.data)
                     if args.failure:
                         update.fail(args.failure)
-
-        elif args.command == 'launch':
-            activity = connection.activity(args.activity)
-
-            if activity is None:
-                print "Unknown activity {}.".format(args.activity)
-                return
-
-            patient = DummyResource(args.patient)
-            user = DummyResource(args.user)
-            print connection.launch(activity, patient, user)
         else:
             sys.exit('Unknown command {}'.format(args.command))
     except Exception as error:

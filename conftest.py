@@ -1,6 +1,4 @@
-import ConfigParser
 import datetime
-import os.path
 import pytest
 import urlparse
 import uuid
@@ -21,11 +19,6 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def connector(request):
-    # Get the password from the ~/.koppeltaal.cfg
-    local_config = os.path.expanduser('~/.koppeltaal.cfg')
-    if not os.path.isfile(local_config):
-        raise ValueError("Can't find ~/.koppeltaal.cfg")
-
     server = request.config.option.server
     if not server:
         raise ValueError("No server defined.")
@@ -37,17 +30,10 @@ def connector(request):
             parsed.params != '' or \
             parsed.query != '' or \
             parsed.fragment != '':
-        raise ValueError('Incorrect server URL')
+        raise ValueError('Incorrect server URL.')
 
-    config = ConfigParser.ConfigParser()
-    config.read(local_config)
-
-    if not config.has_section(server):
-        raise ValueError("Can't find {} in ~/.koppeltaal.cfg".format(server))
-
-    username = config.get(server, 'username')
-    password = config.get(server, 'password')
-    domain = config.get(server, 'domain')
+    username, password, domain = koppeltaal.utils.get_credentials_from_file(
+        server)
 
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')

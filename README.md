@@ -87,36 +87,6 @@ To get a specific message:
 $ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl message message_url
 ```
 
-### Create or update care plan
-
-```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl create_or_update_care_plan --help
-```
-
-To send a new careplan to the server, you need these arguments:
-
-- activity_id
-- patient_id
-- patient_url
-- patient_given_name
-- patient_family_name
-- careplan_id
-- careplan_url
-- practitioner_id
-- practitioner_url
-- practitioner_given_name
-- practitioner_family_name
-
-For example:
-
-```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl create_or_update_care_plan \
-KTSTESTGAME \
-1 http://test.minddistrict.com/p/1 Claes Vries \
-7 http://test.minddistrict.com/cp/7 \
-3 http://test.minddistrict.com/pp/3 Joop Smit
-```
-
 ## Python API
 
 Use the following API in your integration code to talk to a koppeltaal server:

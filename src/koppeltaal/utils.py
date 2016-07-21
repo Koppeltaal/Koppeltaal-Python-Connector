@@ -47,8 +47,11 @@ def now():
 
 def get_credentials_from_file(server):
     # They're not passed in, so now look at ~/.koppeltaal.cfg.
+    config = os.path.expanduser('~/.koppeltaal.cfg')
+    if not os.path.isfile(config):
+        raise ValueError("Can't find ~/.koppeltaal.cfg")
     parser = ConfigParser.ConfigParser()
-    parser.read(os.path.expanduser('~/.koppeltaal.cfg'))
+    parser.read(config)
     if not parser.has_section(server):
         raise ValueError('No user credentials found in ~/.koppeltaal.cfg')
     username = parser.get(server, 'username')
