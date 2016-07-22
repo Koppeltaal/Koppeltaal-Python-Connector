@@ -50,10 +50,24 @@ class InvalidCode(InvalidValue):
     """
 
     def __str__(self):
-        return "{}: '{}' not in '{}'.".format(
-            self.__class__.__name__,
-            self.value,
-            self.field.system)
+        if self.value:
+            return "{}: '{}' not in '{}'.".format(
+                self.__class__.__name__,
+                self.value,
+                self.field.system)
+        return "{}: code is missing.".format(self.__class__.__name__)
+
+
+class InvalidSystem(InvalidCode):
+    """The system mentioned by the code is not allowed/supported here.
+    """
+
+    def __str__(self):
+        if self.value:
+            return "{}: system '{}' is not supported.".format(
+                self.__class__.__name__,
+                self.value)
+        return "{}: system is missing.".format(self.__class__.__name__)
 
 
 class InvalidResource(InvalidValue):

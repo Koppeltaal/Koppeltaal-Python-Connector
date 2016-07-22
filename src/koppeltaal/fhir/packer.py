@@ -77,19 +77,28 @@ class Extension(object):
             value = extension.get('valueDate')
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, extension)
-            return dateutil.parser.parse(value).date()
+            try:
+                return dateutil.parser.parse(value).date()
+            except ValueError:
+                raise interfaces.InvalidValue(field, extension)
 
         if field.field_type == 'datetime':
             value = extension.get('valueDateTime')
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, extension)
-            return dateutil.parser.parse(value)
+            try:
+                return dateutil.parser.parse(value)
+            except ValueError:
+                raise interfaces.InvalidValue(field, extension)
 
         if field.field_type == 'instant':
             value = extension.get('valueInstant')
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, extension)
-            return dateutil.parser.parse(value)
+            try:
+                return dateutil.parser.parse(value)
+            except ValueError:
+                raise interfaces.InvalidValue(field, extension)
 
         if field.field_type == 'integer':
             value = extension.get('valueInteger')
@@ -265,17 +274,26 @@ class Native(object):
         if field.field_type == 'date':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
-            return dateutil.parser.parse(value).date()
+            try:
+                return dateutil.parser.parse(value).date()
+            except ValueError:
+                raise interfaces.InvalidValue(field, value)
 
         if field.field_type == 'datetime':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
-            return dateutil.parser.parse(value)
+            try:
+                return dateutil.parser.parse(value)
+            except ValueError:
+                raise interfaces.InvalidValue(field, value)
 
         if field.field_type == 'instant':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
-            return dateutil.parser.parse(value)
+            try:
+                return dateutil.parser.parse(value)
+            except ValueError:
+                raise interfaces.InvalidValue(field, value)
 
         if field.field_type == 'integer':
             if not isinstance(value, int):
@@ -410,7 +428,7 @@ class Packer(object):
         self._idref += 1
         return 'ref{0:03}'.format(self._idref)
 
-    def unpack(self, payload, definition):
+    def unpack(self, payload, definition, allow_broken=False):
         factory = fhir.REGISTRY.model_for_definition(definition)
         if factory is None:
             return None
@@ -428,7 +446,7 @@ class Packer(object):
                     data[name] = extension.unpack(field)
             return factory(**data)
         except interfaces.InvalidValue as error:
-            if definition.isOrExtends(interfaces.IFHIRResource):
+            if allow_broken:
                 return BrokenResource(error, payload)
             raise
 

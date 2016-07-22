@@ -85,7 +85,8 @@ class Entry(object):
 
         self._model = None
         if self.definition is not None:
-            self._model = self._packer.unpack(self._content, self.definition)
+            self._model = self._packer.unpack(
+                self._content, self.definition, allow_broken=True)
             if self._model is not None:
                 self._model.fhir_link = self.fhir_link
         return self._model
