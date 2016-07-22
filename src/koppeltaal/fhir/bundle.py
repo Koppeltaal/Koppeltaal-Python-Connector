@@ -39,13 +39,13 @@ class Entry(resource.Entry):
 
 
 class Bundle(resource.Resource):
-    entry_type = Entry
+    _create_entry = Entry
 
     def add_payload(self, response):
         if response['resourceType'] != 'Bundle' or 'entry' not in response:
             raise interfaces.InvalidBundle(self, response)
         for entry in response['entry']:
-            self.items.append(self.entry_type(self.packer, entry=entry))
+            self.items.append(self._create_entry(self.packer, entry=entry))
 
     def get_payload(self):
         assert self.domain is not None, 'Domain is required to create payloads'

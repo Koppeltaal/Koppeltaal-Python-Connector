@@ -128,7 +128,7 @@ class Entry(object):
 
 
 class Resource(object):
-    entry_type = Entry
+    _create_entry = Entry
 
     def __init__(self, domain=None, integration=None):
         self.items = []
@@ -137,14 +137,14 @@ class Resource(object):
         self.packer = packer.Packer(self, integration.fhir_link)
 
     def add_payload(self, response):
-        self.items.append(self.entry_type(self.packer, content=response))
+        self.items.append(self._create_entry(self.packer, content=response))
 
     def add_model(self, model):
         assert interfaces.IFHIRResource.providedBy(model), \
             'Can only add resources'
         entry = self.find(model)
         if entry is None:
-            entry = self.entry_type(self.packer, model=model)
+            entry = self._create_entry(self.packer, model=model)
             self.items.append(entry)
         return entry
 
