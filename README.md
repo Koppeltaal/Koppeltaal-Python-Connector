@@ -14,7 +14,7 @@ $ bin/buildout
 On Windows, run (this works best in a git shell):
 
 ```sh
-$ C:\Python27\Python.exe bootstrap.py --allow-site-packages --setuptools-version=8.0
+$ C:\Python27\Python.exe bootstrap.py
 $ bin\buildout.exe
 ```
 
@@ -50,17 +50,6 @@ domain = MindDistrict Kickass
 
 If you want to see verbose output, use the *--verbose* flag.
 
-### Test authentication
-
-To test whether you have the proper username+password for the server you want
-to work with, use the test_authentication command. This returns status code 1
-in case of failure, 0 in case of success.
-
-```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl test_authentication  # uses the values from ~/.koppeltaal.cfg
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl --username=foo --password=bar test_authentication  # Returns 1
-```
-
 ### Metadata / Conformance statement
 
 To retrieve the Conformance statement from the server:
@@ -74,38 +63,28 @@ $ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl metadata
 To get the activity definition from the server:
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl activity_definition
-```
-This returns the raw XML, not very useful.
-
-### Create or update care plan
-
-```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl create_or_update_care_plan --help
+$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl activities
 ```
 
-To send a new careplan to the server, you need these arguments:
+### Messages
 
-- activity_id
-- patient_id
-- patient_url
-- patient_given_name
-- patient_family_name
-- careplan_id
-- careplan_url
-- practitioner_id
-- practitioner_url
-- practitioner_given_name
-- practitioner_family_name
-
-For example:
+To get a list of messages in the mailbox:
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl create_or_update_care_plan \
-KTSTESTGAME \
-1 http://test.minddistrict.com/p/1 Claes Vries \
-7 http://test.minddistrict.com/cp/7 \
-3 http://test.minddistrict.com/pp/3 Joop Smit
+$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl messages
+```
+
+You can filter on a patient (with *--patient*), or event (with
+*--event*) or status (with *--status*):
+
+```sh
+$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl messages --status New --event CreateOrUpdateCarePlan
+```
+
+To get a specific message:
+
+```sh
+$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl message message_url
 ```
 
 ## Python API
@@ -116,26 +95,22 @@ Use the following API in your integration code to talk to a koppeltaal server:
 from koppeltaal.connect import Connector
 
 # takes server, username and password as arguments.
-c = Connector('https://edgekoppeltaal.vhscloud.nl', 'foo', 'bar')
+c = Connector('https://edgekoppeltaal.vhscloud.nl', 'username', 'password', 'domain')
 
 # metadata from the server, Conformance statement.
 c.metadata()
 
-# test authentication
-c.test_authentication()
+# get all the activity definitions from server.
+activities = c.activities()
 
-# get Activity definitions from server. Returns XML.
-xml = c.activity_definition()
-# use koppeltaal.activity_definition.parse to parse the XML feed.
-from koppeltaal.activity_definition import parse
-act = parse(xml)
+# get a specific activity definition from server.
+activity = c.activity('KTSTESTGAME')
 
-# Create or update a care plan.
-from koppeltaal.create_or_update_care_plan import generate
-# Generate the XML feed to be sent to the server.
-stanza = generate(domain, activity, patient, careplan, practitioner)
-# Send to the server.
-c.post_message(stanza)
+# search for messages in the mailbox.
+messages = c.search(status='New', event='CreateOrUpdateCarePlan')
+
+# send an update.
+c.send('CreateOrUpdateCarePlan', careplan, patient)
 ```
 
 [buildout]: http://www.buildout.org

@@ -1,175 +1,222 @@
+import pkg_resources
 import zope.interface
 
-NS = {
-    'atom': 'http://www.w3.org/2005/Atom',
-    'fhir': 'http://hl7.org/fhir',
-    'koppeltaal': 'http://ggz.koppeltaal.nl/fhir/Koppeltaal',
-    }
+NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
+
+SOFTWARE = 'Koppeltaal python adapter'
+VERSION = pkg_resources.get_distribution('koppeltaal').version
+
+ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
+MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
+METADATA_URL = '/FHIR/Koppeltaal/metadata'
+MAILBOX_URL = '/FHIR/Koppeltaal/Mailbox'
+OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
+
+TIMEOUT = 60
 
 
-ACTIVITY_DEFINITION_URL = 'FHIR/Koppeltaal/Other?code=ActivityDefinition'
-MESSAGE_HEADER_URL = 'FHIR/Koppeltaal/MessageHeader'
-METADATA_URL = 'FHIR/Koppeltaal/metadata'
-OAUTH_LAUNCH_URL = 'OAuth2/Koppeltaal/Launch'
-
-
-PROCESSING_STATUS_CLAIMED = 'Claimed'
-PROCESSING_STATUS_FAILED = 'Failed'
-PROCESSING_STATUS_NEW = 'New'
-PROCESSING_STATUS_SUCCESS = 'Success'
-
-
-PROCESSING_ACTIONS = (
-    PROCESSING_STATUS_CLAIMED,
-    PROCESSING_STATUS_FAILED,
-    PROCESSING_STATUS_SUCCESS
-    )
-
-
-class KoppeltaalException(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-# XXX Cross-reference with http://www.hl7.org/fhir/resourcelist.html
-
-# XXX (jw) I'd really would like to integrate the SMART-on-FHIR fhirclient
-# Python library for realizing data into FHIR model objects. This would mean
-# using JSON as transportation format though. Not a big deal perhaps?
-
-class IConnector(zope.interface.Interface):
-
-    server = zope.interface.Attribute('server base URL')
-
-    domain = zope.interface.Attribute('domain')
-
-    def metadata():
-        pass
-
-    def test_authentication():
-        pass
-
-    def activity_definition():
-        pass
-
-    def post_message(xml):
-        pass
-
-    def launch(activity_id, patient_url, user_url):
-        pass
-
-    def messages(
-            patient_url, processing_status=None, summary=False, count=5000):
-        """Fetch messages.
-
-        This will return a Bundle of MessageHeaders, allowing an application
-        to browse the available messages. A pagesize can be specified in the
-        count argument.
-
-        The following additional arguments can be specified:
-
-        patient_url: filters on the Patient dossier this message belongs
-
-        processing_status: filters on the ProcessingStatus
-        (New|Claimed|Success|Failed).
-
-        summary: summarizes output. True or False.
-
-        """
-
-    def message(id):
-        """Fetch single message."""
-
-    def claim(id):
-        pass
-
-    def success(id):
-        pass
-
-
-class IURL(zope.interface.Interface):
-
-    context = zope.interface.Attribute('context to compute id for')
-
-    def url(*args, **kw):
-        pass
-
-
-class IID(zope.interface.Interface):
-
-    context = zope.interface.Attribute('context to compute id for')
-
-    def id(*args, **kw):
-        pass
-
-
-class IName(zope.interface.Interface):
-
-    given = zope.interface.Attribute('given name')
-
-    family = zope.interface.Attribute('familiy name')
-
-
-class INamed(zope.interface.Interface):
-
-    name = zope.interface.Attribute('IName')
-
-
-class IFHIRResource(zope.interface.Interface):
-    """Marker interface for a resource that is defined in "standard" FHIR.
-
+class KoppeltaalError(ValueError):
+    """Generic koppeltaal error.
     """
 
 
-class IResource(IFHIRResource):
-
-    __node__ = zope.interface.Attribute(
-        'XML node representing this resource. Can be ``None``.')
-
-    __version__ = zope.interface.Attribute(
-        'Koppeltaal version specifier for this resource. Can be ``None``.')
+class InvalidResponse(KoppeltaalError):
+    """Invalid response from transport to the koppeltaal server.
+    """
 
 
-class IPatient(IResource, INamed):
-    pass
+class InvalidBundle(KoppeltaalError):
+    """A malformed bundle was obtain from the koppeltaal server.
+    """
 
 
-class IPractitioner(IResource, INamed):
-    pass
+class InvalidValue(KoppeltaalError):
+    """A value does not match the definition for its corresponding field
+    in the koppeltaal definitions.
+    """
+
+    def __init__(self, field, value=None):
+        self.field = field
+        self.value = value
+
+    def __str__(self):
+        return "{}: invalid value for '{}'.".format(
+            self.__class__.__name__,
+            self.field.name)
 
 
-class IUser(IResource):
-    # More generic than patient or practitioner - used where a user URL needs
-    # to be computed when assembling a launch URL.
-    pass
+class InvalidCode(InvalidValue):
+    """A code appear that is not expected in its definition.
+    """
+
+    def __str__(self):
+        if self.value:
+            return "{}: '{}' not in '{}'.".format(
+                self.__class__.__name__,
+                self.value,
+                self.field.system)
+        return "{}: code is missing.".format(self.__class__.__name__)
 
 
-class IMessageHeader(IResource):
+class InvalidSystem(InvalidCode):
+    """The system mentioned by the code is not allowed/supported here.
+    """
 
-    status = zope.interface.Attribute('processing status')
-
-    reference = zope.interface.Attribute(
-        'focal resource reference, with version')
-
-
-class IMessage(IResource):
-
-    status = zope.interface.Attribute('processing status')
-
-    reference = zope.interface.Attribute(
-        'focal resource reference, with version')
+    def __str__(self):
+        if self.value:
+            return "{}: system '{}' is not supported.".format(
+                self.__class__.__name__,
+                self.value)
+        return "{}: system is missing.".format(self.__class__.__name__)
 
 
-class ICarePlan(IResource):
+class InvalidResource(InvalidValue):
+    """A resource type mismatch expected in the koppeltaal definitions.
+    """
 
-    patient = zope.interface.Attribute('IPatient')
+    def __str__(self):
+        if self.field is not None:
+            return "{}: expected '{}' resource type.".format(
+                self.__class__.__name__,
+                self.field.__class__.__name__)
+        return "{}: unknown resource type.".format(
+            self.__class__.__name__)
 
 
-class IActivity(IResource):
+class RequiredMissing(InvalidValue):
+    """A field is required in the koppeltaal definitions but its value is
+    missing.
+    """
 
-    identifier = zope.interface.Attribute(
-        'ActivityDefinition#ActivityDefinitionIdentifier')
+    def __str__(self):
+        return "{}: '{}' required but missing.".format(
+            self.__class__.__name__,
+            self.field.name)
 
-    kind = zope.interface.Attribute('ActivityDefinition#ActivityKind')
 
-    name = zope.interface.Attribute('ActivityDefinition#ActivityName')
+class IFHIRResource(zope.interface.Interface):
+    """A resource that can be sent to the koppeltaal server.
+    """
+
+    fhir_link = zope.interface.Attribute(
+        'Link to resource containing resource type, id and version')
+
+
+class IBrokenFHIRResource(IFHIRResource):
+    """A resource that was broken.
+    """
+
+    error = zope.interface.Attribute(
+        'Error')
+
+    payload = zope.interface.Attribute(
+        'Resource payload')
+
+
+class IReferredFHIRResource(IFHIRResource):
+    """A resource that is referred but missing from the resource payload
+    or bundle.
+    """
+
+    display = zope.interface.Attribute(
+        'Display value for this resource.')
+
+
+class IIdentifiedFHIRResource(IFHIRResource):
+    """A resource that can be identified with a self link.
+    """
+
+
+class IIntegration(zope.interface.Interface):
+    """Personalizing of connector settings and behavior.
+    """
+
+    name = zope.interface.Attribute('application name using the connector')
+
+    url = zope.interface.Attribute('fhir base URL for generated resources')
+
+    def transaction_hook(commit_function, message):
+        """Optional hook to integrate sending back a message into a
+        transaction system.
+        """
+
+    def model_id(model):
+        """Return a (unique) id for the given `model`. Should stay the same id
+        if called again with the same model.
+        """
+
+    def link(model, resource_type):
+        """Return fhir URL for `model` which is a `resource_type`.
+        """
+
+
+class IUpdate(zope.interface.Interface):
+    """Update retrieved from a message via the connector. It can be used a
+    context manager to automatically update the processing status of
+    the message.
+    """
+    message = zope.interface.Attribute('message related to the update')
+
+    data = zope.interface.Attribute('focal resource of the message')
+
+    patient = zope.interface.Attribute('patient related to the message')
+
+    def success():
+        """Mark the message as succeed.
+        """
+
+    def fail(exception="FAILED"):
+        """Mark the message as failed, with the given exception message.
+        """
+
+    def postpone():
+        """Do nothing. The message will stay in claim an eventually revert
+        back to new.
+        """
+
+
+class IConnector(zope.interface.Interface):
+    """Connector to interact with the koppeltaal server.
+    """
+
+    transport = zope.interface.Attribute('transport to access the server')
+
+    domain = zope.interface.Attribute('domain')
+
+    integration = zope.interface.Attribute('integration for this connector')
+
+    def metadata():
+        """Return the conformance statement.
+        """
+
+    def activities():
+        """Return a list of activity definitions.
+        """
+
+    def activity(identifier):
+        """Return a specific activity definition identified by `identifier` or
+        None.
+        """
+
+    def launch(careplan, user=None, activity_identifier=None):
+        """Retrieve launch URL for an activity in a careplan for a give user..
+        """
+
+    def launch_from_parameters(
+            application_id, patient_link, user_link, activity_identifier):
+        """Retrieve launch URL out of all required parameters. Those
+        parameters can be extracted from a careplan.
+        """
+
+    def updates():
+        """Iterate over the available new messages in the mailbox for
+        processing.
+        """
+
+    def search(message_id=None, event=None, status=None, patient=None):
+        """Return a list of messages matching the given criteria.
+        """
+
+    def send(event, data, patient):
+        """Send an update about event with data for patient.
+        """

@@ -1,0 +1,213 @@
+import argparse
+import json
+import logging
+import pdb
+import sys
+import dateutil
+
+from koppeltaal import (connector, codes, models, utils)
+from koppeltaal.fhir import xml, bundle
+
+
+ACTIVITY_DEFINITION_OUTPUT = """Activity: {model.identifier}
+- fhir link: {model.fhir_link}
+- application: {model.application.fhir_link}
+- name: {model.name}
+- description: {model.description}
+- kind: {model.kind}
+- performer: {model.performer}
+- active: {model.is_active}
+- domain specific: {model.is_domain_specific}
+- archived: {model.is_archived}
+"""
+
+ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
+- fhir link: {model.fhir_link}
+- status: {model.status}
+"""
+
+MESSAGE_OUTPUT = """Message: {model.identifier}
+- fhir link: {model.fhir_link}
+- event: {model.event}
+- time stamp: {model.timestamp}
+- software: {model.source.software} ({model.source.version})
+- endpoint: {model.source.endpoint}
+"""
+
+CAREPLAN_OUTPUT = """CarePlan:
+- fhir link: {model.fhir_link}
+"""
+
+PATIENT_OUTPUT = """Patient: {model.name.family} {model.name.given}
+- fhir link: {model.fhir_link}
+"""
+
+PRACTITIONER_OUTPUT = """Practitioner: {model.name.family} {model.name.given}
+- fhir link: {model.fhir_link}
+"""
+
+OUTPUT = {
+    models.ActivityDefinition: ACTIVITY_DEFINITION_OUTPUT,
+    models.ActivityStatus: ACTIVITY_STATUS_OUTPUT,
+    models.CarePlan: CAREPLAN_OUTPUT,
+    models.MessageHeader: MESSAGE_OUTPUT,
+    models.Patient: PATIENT_OUTPUT,
+    models.Practitioner: PRACTITIONER_OUTPUT,
+}
+
+
+def print_model(model):
+    output = OUTPUT.get(model.__class__)
+    if output:
+        print output.format(model=model)
+
+
+def print_json(data):
+    print json.dumps(data, indent=2, sort_keys=True)
+
+
+def get_credentials(args):
+    # Domain is not required for all actions, so we're less strict about
+    # requiring that.
+    if args.username or args.password or args.domain:
+        if not(args.username and args.password):
+            sys.exit(
+                'When supplying credentials through the commandline '
+                'please always supply username and password.')
+        else:
+            return args.username, args.password, args.domain
+    return utils.get_credentials_from_file(args.server)
+
+
+class DummyResource(object):
+
+    def __new__(cls, fhir_link):
+        if fhir_link is None:
+            return None
+        return object.__new__(cls, fhir_link)
+
+    def __init__(self, fhir_link):
+        self.fhir_link = fhir_link
+
+
+def console():
+    parser = argparse.ArgumentParser(description='Koppeltaal connector')
+    parser.add_argument('server', help='Koppeltaal server to connect to')
+    parser.add_argument('--username')
+    parser.add_argument('--password')
+    parser.add_argument(
+        '--domain',
+        help='The domain on the server to send data to')
+    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument(
+        '--post-mortem',
+        action='store_true',
+        help='Debug any error with a Python debugger')
+
+    subparsers = parser.add_subparsers(title='commands', dest='command')
+
+    subparsers.add_parser('activities')
+    subparsers.add_parser('metadata')
+
+    validate = subparsers.add_parser('validate')
+    validate.add_argument(
+        '--xml', type=argparse.FileType('rb'),
+        help="XML file to validate")
+    validate.add_argument(
+        '--json', type=argparse.FileType('rb'),
+        help="JSON file to validate")
+
+    messages = subparsers.add_parser('messages')
+    messages.add_argument(
+        '--patient',
+        help='Patient FHIR link')
+    messages.add_argument(
+        '--status',
+        choices=codes.PROCESSING_STATUS,
+        help='Message header status')
+    messages.add_argument(
+        '--event', choices=codes.MESSAGE_HEADER_EVENTS,
+        help='Event type')
+
+    message = subparsers.add_parser('message')
+    message.add_argument('message_id')
+
+    updates = subparsers.add_parser('updates')
+    updates.add_argument(
+        '--all', dest='all_updates', action='store_true',
+        help='Process all next messages')
+    updates.add_argument(
+        '--until',
+        help='Process all next messages until the given date (and time)')
+    updates.add_argument(
+        '--failure',
+        help='Fail and set the exception on the messages.')
+
+    args = parser.parse_args()
+
+    root = logging.getLogger()
+    root.addHandler(logging.StreamHandler(sys.stdout))
+
+    if args.verbose:
+        root.setLevel(logging.DEBUG)
+
+    username, password, domain = get_credentials(args)
+
+    integration = connector.Integration(name='Python command line')
+    connection = connector.Connector(
+        args.server, username, password, domain, integration)
+
+    try:
+        if args.command == 'metadata':
+            print_json(connection.metadata())
+        elif args.command == 'validate':
+            payload = None
+            if args.xml:
+                payload = xml.xml2json(args.xml)
+            if args.json:
+                payload = json.load(args.json)
+            if payload is None:
+                print "Please provide an XML or JSON file."
+                return
+            print_json(payload)
+            resource_bundle = bundle.Bundle(domain, integration)
+            resource_bundle.add_payload(payload)
+            for model in resource_bundle.unpack():
+                print_model(model)
+        elif args.command == 'activities':
+            for activity in connection.activities():
+                print_model(activity)
+        elif args.command == 'messages':
+            for message in connection.search(
+                    event=args.event,
+                    status=args.status,
+                    patient=DummyResource(args.patient)):
+                print_model(message)
+        elif args.command == 'message':
+            for model in connection.search(message_id=args.message_id):
+                print_model(model)
+        elif args.command == 'updates':
+            until = None
+            if args.until is not None:
+                until = dateutil.parser.parse(args.until, tzinfos=utils.UTC)
+
+            for index, update in enumerate(connection.updates()):
+                with update:
+                    if until is None:
+                        if not args.all_updates and index:
+                            update.postpone()
+                            break
+                    else:
+                        if update.message.timestamp > until:
+                            update.postpone()
+                            break
+                    print_model(update.data)
+                    if args.failure:
+                        update.fail(args.failure)
+        else:
+            sys.exit('Unknown command {}'.format(args.command))
+    except Exception as error:
+        if args.post_mortem:
+            print error
+            pdb.post_mortem()
+        raise
