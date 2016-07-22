@@ -150,6 +150,31 @@ class IIntegration(zope.interface.Interface):
         """
 
 
+class IUpdate(zope.interface.Interface):
+    """Update retrieved from a message via the connector. It can be used a
+    context manager to automatically update the processing status of
+    the message.
+    """
+    message = zope.interface.Attribute('message related to the update')
+
+    data = zope.interface.Attribute('focal resource of the message')
+
+    patient = zope.interface.Attribute('patient related to the message')
+
+    def success():
+        """Mark the message as succeed.
+        """
+
+    def fail(exception="FAILED"):
+        """Mark the message as failed, with the given exception message.
+        """
+
+    def postpone():
+        """Do nothing. The message will stay in claim an eventually revert
+        back to new.
+        """
+
+
 class IConnector(zope.interface.Interface):
     """Connector to interact with the koppeltaal server.
     """

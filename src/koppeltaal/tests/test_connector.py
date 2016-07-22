@@ -161,6 +161,10 @@ def test_updates_implicit_success_from_fixture(connector, transport):
     assert len(updates) == 1
     for update in updates:
         with update:
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.interfaces.IUpdate, update)
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.MessageHeader, update.message)
             assert update.message.event == 'CreateOrUpdateCarePlan'
             assert zope.interface.verify.verifyObject(
                 koppeltaal.definitions.CarePlan, update.data)
@@ -198,6 +202,10 @@ def test_updates_explicit_success_from_fixture(connector, transport):
     assert len(updates) == 1
     for update in updates:
         with update:
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.interfaces.IUpdate, update)
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.MessageHeader, update.message)
             assert update.message.event == 'CreateOrUpdateCarePlan'
             assert zope.interface.verify.verifyObject(
                 koppeltaal.definitions.CarePlan, update.data)
@@ -236,6 +244,10 @@ def test_updates_explicit_fail_from_fixture(connector, transport):
     assert len(updates) == 1
     for update in updates:
         with update:
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.interfaces.IUpdate, update)
+            assert zope.interface.verify.verifyObject(
+                koppeltaal.definitions.MessageHeader, update.message)
             assert update.message.event == 'CreateOrUpdateCarePlan'
             assert zope.interface.verify.verifyObject(
                 koppeltaal.definitions.CarePlan, update.data)
@@ -280,6 +292,10 @@ def test_updates_implicit_success_exception_from_fixture(connector, transport):
     with pytest.raises(ValueError):
         for update in updates:
             with update:
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.interfaces.IUpdate, update)
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.definitions.MessageHeader, update.message)
                 assert update.message.event == 'CreateOrUpdateCarePlan'
                 assert zope.interface.verify.verifyObject(
                     koppeltaal.definitions.CarePlan, update.data)
@@ -320,6 +336,10 @@ def test_updates_explicit_success_exception_from_fixture(connector, transport):
     with pytest.raises(ValueError):
         for update in updates:
             with update:
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.interfaces.IUpdate, update)
+                assert zope.interface.verify.verifyObject(
+                    koppeltaal.definitions.MessageHeader, update.message)
                 assert update.message.event == 'CreateOrUpdateCarePlan'
                 assert zope.interface.verify.verifyObject(
                     koppeltaal.definitions.CarePlan, update.data)

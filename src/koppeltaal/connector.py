@@ -36,6 +36,7 @@ class Integration(object):
             self.url, resource_type, self.model_id(model))
 
 
+@zope.interface.implementer(interfaces.IUpdate)
 class Update(object):
 
     def __init__(self, message, ack_function):
