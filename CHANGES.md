@@ -1,7 +1,7 @@
 Changes
 =======
 
-0.1a2 (unreleased)
+1.0b1 (2016-07-22)
 ------------------
 
 - Complete rewrite of the connector code. This includes:
