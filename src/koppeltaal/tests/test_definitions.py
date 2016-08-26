@@ -249,7 +249,7 @@ def test_pack_practitioner(packer):
         'identifier': [
             {'id': mock.ANY,
              'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
-             'vlue': '154694496',
+             'value': '154694496',
              'use': 'official'}],
         'name': {'id': mock.ANY,
                  'given': ['Paul'],
