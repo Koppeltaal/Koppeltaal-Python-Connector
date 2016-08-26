@@ -106,9 +106,9 @@ def test_unpack_patient(packer, NAMESPACE):
 
     patient2 = packer.unpack(
         {'gender': {'coding': [
-             {'code': u'UNK',
-              'display': u'UNK',
-              'system': u'http://hl7.org/fhir/v3/NullFlavor'}]},
+            {'code': u'UNK',
+             'display': u'UNK',
+             'system': u'http://hl7.org/fhir/v3/NullFlavor'}]},
          'name': [
              {'given': [u'Paul'],
               'family': [u'Roger'],
@@ -179,15 +179,15 @@ def test_pack_patient(packer):
     assert patient2 == {
         'birthDate': '1976-06-01T12:34:00',
         'gender': {'coding': [
-             {'code': 'F',
-              'display': 'F',
-              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
+            {'code': 'F',
+             'display': 'F',
+             'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
         'id': mock.ANY,
         'identifier': [
-             {'id': mock.ANY,
-              'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
-              'value': '640563569',
-              'use': 'official'}],
+            {'id': mock.ANY,
+             'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+             'value': '640563569',
+             'use': 'official'}],
         'name': [
             {'id': mock.ANY,
              'given': ['Petra'],
@@ -247,10 +247,10 @@ def test_pack_practitioner(packer):
     assert practitioner1 == {
         'id': mock.ANY,
         'identifier': [
-             {'id': mock.ANY,
-              'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
-              'value': '154694496',
-              'use': 'official'}],
+            {'id': mock.ANY,
+             'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+             'vlue': '154694496',
+             'use': 'official'}],
         'name': {'id': mock.ANY,
                  'given': ['Paul'],
                  'family': [u'Cézanne'],
