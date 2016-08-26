@@ -4,8 +4,7 @@ Changes
 1.0b2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Option to save retrieved messages to file for introspection.
 
 1.0b1 (2016-07-22)
 ------------------
