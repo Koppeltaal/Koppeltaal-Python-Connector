@@ -1,11 +1,12 @@
 import argparse
+import dateutil
 import json
 import logging
+import os.path
 import pdb
 import sys
-import dateutil
 
-from koppeltaal import (connector, codes, models, utils)
+from koppeltaal import (connector, codes, models, utils, interfaces)
 from koppeltaal.fhir import xml, bundle
 
 
@@ -90,6 +91,37 @@ class DummyResource(object):
         self.fhir_link = fhir_link
 
 
+def directory(input):
+    directory_name = os.path.abspath(os.path.expanduser(input))
+    if not os.path.exists(directory_name):
+        sys.exit(
+            '"{}" does not exist'.format(input))
+    if not os.path.isdir(directory_name):
+        sys.exit(
+            '"{}" is not a valid directory path'.format(input))
+    return directory_name
+
+
+def download(connection, directory, msgid=None, msg=None):
+    if msg is not None:
+        url = utils.strip_history_from_link(msg.fhir_link)
+        msgid = url.rsplit('/', 1)[-1]
+    response = connection.transport.query(
+        interfaces.MESSAGE_HEADER_URL, {'_id': msgid})
+    packaging = bundle.Bundle(connection.domain, connection.integration)
+    packaging.add_payload(response)
+    msg = packaging.unpack_message_header()
+    ts = msg.timestamp.isoformat()
+    filename = os.path.join(directory, '{}-{}.json'.format(ts, msgid))
+    with open(filename, 'wb') as output:
+        json.dump(
+            response,
+            output,
+            indent=2,
+            sort_keys=True)
+    print 'Wrote message "{}" to "{}"'.format(msgid, filename)
+
+
 def console():
     parser = argparse.ArgumentParser(description='Koppeltaal connector')
     parser.add_argument('server', help='Koppeltaal server to connect to')
@@ -128,9 +160,16 @@ def console():
     messages.add_argument(
         '--event', choices=codes.MESSAGE_HEADER_EVENTS,
         help='Event type')
+    messages.add_argument(
+        '--save-in-dir', type=directory,
+        help='Save the source for each messsage listed in the query in '
+             'the given directory')
 
     message = subparsers.add_parser('message')
     message.add_argument('message_id')
+    message.add_argument(
+        '--save-in-dir', type=directory,
+        help='Save the source for the messsage in the given directory')
 
     updates = subparsers.add_parser('updates')
     updates.add_argument(
@@ -182,10 +221,18 @@ def console():
                     event=args.event,
                     status=args.status,
                     patient=DummyResource(args.patient)):
-                print_model(message)
+                if args.save_in_dir:
+                    download(connection, args.save_in_dir, msg=message)
+                else:
+                    print_model(message)
+
         elif args.command == 'message':
-            for model in connection.search(message_id=args.message_id):
-                print_model(model)
+            if args.save_in_dir:
+                download(connection, args.save_in_dir, msgid=args.message_id)
+            else:
+                for model in connection.search(message_id=args.message_id):
+                    print_model(model)
+
         elif args.command == 'updates':
             until = None
             if args.until is not None:
