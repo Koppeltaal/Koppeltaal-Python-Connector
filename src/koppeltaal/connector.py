@@ -151,7 +151,7 @@ class Connector(object):
         return self.transport.query_redirect(
             interfaces.OAUTH_LAUNCH_URL, params)
 
-    def updates(self):
+    def updates(self, expected_events=None):
 
         def send_back(message):
             packaging = resource.Resource(self.domain, self.integration)
@@ -178,13 +178,19 @@ class Connector(object):
             if message is None:
                 # We are out of messages
                 break
+
             update = Update(message, send_back_on_transaction)
             errors = bundle.errors()
+
             if errors:
                 logger.error('Error while reading message: {}'.format(errors))
                 with update:
                     update.fail(u', '.join([u"Resource '{}': {}".format(
                         e.fhir_link, e.error) for e in errors]))
+            elif expected_events and message.event not in expected_events:
+                logger.warn('Event "{}" not expected'.format(message.event))
+                with update:
+                    update.fail('Event not expected')
             else:
                 yield update
 
