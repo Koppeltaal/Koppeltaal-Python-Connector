@@ -43,14 +43,14 @@ class MockTransport(object):
     def query(self, url, params=None):
         url = self.relative_url(url, params)
         if not len(self.expected.get(url, [])):
-            raise AssertionError('Unexpected url call')
+            raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
     def query_redirect(self, url, params=None):
         url = self.relative_url(url, params)
         if not len(self.expected.get(url, [])):
-            raise AssertionError('Unexpected url call')
+            raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
@@ -58,7 +58,7 @@ class MockTransport(object):
         url = self.relative_url(url)
         self.called[url] = data
         if not len(self.expected.get(url, [])):
-            raise AssertionError('Unexpected url call')
+            raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
@@ -66,7 +66,7 @@ class MockTransport(object):
         url = self.relative_url(url)
         self.called[url] = data
         if not len(self.expected.get(url, [])):
-            raise AssertionError('Unexpected url call')
+            raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
