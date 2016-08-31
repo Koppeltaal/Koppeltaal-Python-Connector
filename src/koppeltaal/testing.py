@@ -15,20 +15,29 @@ class MockTransport(object):
 
     def _expect_json(self, args, url, data=None):
         return json.load(pkg_resources.resource_stream(
-            self._module_name, args['json']))
+            self._module_name, args['respond_with']))
 
     def _expect_redirect(self, args, url, data=None):
-        return args['redirect']
+        return args['redirect_to']
 
     def clear(self):
         self.expected = {}
         self.called = {}
 
     def expect(self, url, **fixture):
+        """Register an URL that the transport expects to be called for.
+
+        Fixture(s) is the contents that the transport returns when the
+        corresponding expected URL is called. When registering fixtures for
+        the same URL multiple times, they are returned in that order.
+
+        Note how the data that is to be sent to the expected URL is stored in
+        the `called` attribute when indeed the expected URL is called.
+        """
         expect_method = None
-        if 'json' in fixture:
+        if 'respond_with' in fixture:
             expect_method = functools.partial(self._expect_json, fixture)
-        elif 'redirect' in fixture:
+        elif 'redirect_to' in fixture:
             expect_method = functools.partial(self._expect_redirect, fixture)
         assert expect_method is not None
         self.expected.setdefault(url, []).append(expect_method)

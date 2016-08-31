@@ -108,13 +108,14 @@ def careplan(patient, practitioner, activity_definition):
 def careplan_from_fixture(request, transport):
     transport.expect(
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        json='fixtures/activities_game.json')
+        respond_with='fixtures/activities_game.json')
     return request.getfuncargvalue('careplan')
 
 
 @pytest.fixture
 def careplan_response(connector, careplan):
-    return connector.send('CreateOrUpdateCarePlan', careplan, careplan.patient)
+    return connector.send(
+        'CreateOrUpdateCarePlan', careplan, careplan.patient)
 
 
 @pytest.fixture(scope='session')
