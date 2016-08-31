@@ -478,3 +478,43 @@ def test_updates_unexpected_event(connector, transport):
                     '#ProcessingStatusException',
                     hamcrest.has_entry('valueString', "Event not expected"))
             )))
+
+
+def test_updates_unexpected_event_no_events_at_all(connector, transport):
+    transport.expect(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        json='fixtures/bundle_one_message.json')
+    transport.expect(
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        json='fixtures/bundle_zero_messages.json')
+    # This is the response from the KT server after sending the fail.
+    transport.expect(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        json='fixtures/resource_post_message.json')
+
+    # We ask for updates but only allow CreateOrUpdatePatient events. Since
+    # the message we'll retrieve is a CreateOrUpdateCarePlan, we should see
+    # that the message is acknowledged as "fail".
+    updates = list(connector.updates(
+        expected_events=[]))
+    assert len(updates) == 0
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            hamcrest.all_of(
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusStatus',
+                    hamcrest.has_entry('valueCode', 'Failed')),
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusException',
+                    hamcrest.has_entry('valueString', "Event not expected"))
+            )))

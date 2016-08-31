@@ -187,7 +187,8 @@ class Connector(object):
                 with update:
                     update.fail(u', '.join([u"Resource '{}': {}".format(
                         e.fhir_link, e.error) for e in errors]))
-            elif expected_events and message.event not in expected_events:
+            elif (expected_events is not None
+                  and message.event not in expected_events):
                 logger.warn('Event "{}" not expected'.format(message.event))
                 with update:
                     update.fail('Event not expected')
