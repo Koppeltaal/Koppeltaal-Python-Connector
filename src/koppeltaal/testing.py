@@ -112,3 +112,46 @@ class HasFHIRExtension(BaseMatcher):
 
 
 has_extension = HasFHIRExtension
+
+
+class HasProcessingStatusException(BaseMatcher):
+
+    def __init__(self, error, containing=None):
+        self.error = error
+        self.containing = containing
+        if containing is not None:
+            self.matcher = has_extension(
+                '#ProcessingStatus',
+                hamcrest.all_of(
+                    has_extension(
+                        '#ProcessingStatusStatus',
+                        hamcrest.has_entry('valueCode', 'Failed')),
+                    has_extension(
+                        '#ProcessingStatusException',
+                        hamcrest.has_entry(
+                            'valueString', self.error)),
+                        self.containing))
+        else:
+            self.matcher = has_extension(
+                '#ProcessingStatus',
+                hamcrest.all_of(
+                    has_extension(
+                        '#ProcessingStatusStatus',
+                        hamcrest.has_entry('valueCode', 'Failed')),
+                    has_extension(
+                        '#ProcessingStatusException',
+                        hamcrest.has_entry(
+                            'valueString', self.error))))
+
+    def _matches(self, json):
+        return self.matcher.matches(json)
+
+    def describe_to(self, description):
+        description.append_text(
+            'a valueString {} '.format(self.error))
+        if self.containing is not None:
+            description.append_text('containing ')
+            self.containing.describe_to(description)
+
+
+has_exception = HasProcessingStatusException
