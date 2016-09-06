@@ -10,7 +10,9 @@ ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
 MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
 METADATA_URL = '/FHIR/Koppeltaal/metadata'
 MAILBOX_URL = '/FHIR/Koppeltaal/Mailbox'
+OAUTH_AUTHORIZE_URL = 'OAuth2/Koppeltaal/Authorize'
 OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
+OAUTH_TOKEN_URL = '/OAuth2/Koppeltaal/Token'
 
 TIMEOUT = 60
 

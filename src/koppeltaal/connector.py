@@ -1,7 +1,8 @@
+import urllib
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
-from koppeltaal import(
+from koppeltaal import (
     interfaces,
     logger,
     models,
@@ -133,6 +134,30 @@ class Connector(object):
             careplan.patient.fhir_link,
             user.fhir_link,
             activity.identifier)
+
+    def authorize_from_parameters(
+            self,
+            application_id,
+            launch_id,
+            redirect_uri):
+        assert application_id is not None, 'Invalid activity'
+        return '{}?{}'.format(
+            self.transport.absolute_url(interfaces.OAUTH_AUTHORIZE_URL),
+            urllib.urlencode(
+                (('client_id', application_id),
+                 ('redirect_uri', redirect_uri),
+                 ('response_type', 'code'),
+                 ('scope', 'patient/*.read launch:{}'.format(launch_id)))))
+
+    def token_from_parameters(
+            self,
+            code):
+        params = {
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': 'http://example.com'}
+        return self.transport.query(
+            interfaces.OAUTH_TOKEN_URL, params)
 
     def launch_from_parameters(
             self,

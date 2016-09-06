@@ -49,6 +49,9 @@ class MockTransport(object):
             url += '?' + urllib.urlencode(params)
         return url
 
+    def absolute_url(self, url):
+        return url
+
     def query(self, url, params=None):
         url = self.relative_url(url, params)
         if not len(self.expected.get(url, [])):
