@@ -182,6 +182,16 @@ def console():
         '--failure',
         help='Fail and set the exception on the messages.')
 
+    launch = subparsers.add_parser('launch')
+    # user
+    # application_id
+    # patient_link
+    # activity_identifier
+    launch.add_argument('user_link')
+    launch.add_argument('application_id')
+    launch.add_argument('patient_link')
+    # launch.add_argument('activity_identifier')
+
     args = parser.parse_args()
 
     root = logging.getLogger()
@@ -211,9 +221,11 @@ def console():
             resource_bundle.add_payload(payload)
             for model in resource_bundle.unpack():
                 print_model(model)
+
         elif args.command == 'activities':
             for activity in connection.activities():
                 print_model(activity)
+
         elif args.command == 'messages':
             for message in connection.search(
                     event=args.event,
@@ -249,6 +261,14 @@ def console():
                     print_model(update.data)
                     if args.failure:
                         update.fail(args.failure)
+
+        elif args.command == 'launch':
+            print connection.launch_from_parameters(
+                args.application_id,
+                args.patient_link,
+                args.user_link,
+                None)
+
         else:
             sys.exit('Unknown command {}'.format(args.command))
     except Exception as error:
