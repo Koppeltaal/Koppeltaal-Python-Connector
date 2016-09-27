@@ -82,9 +82,12 @@ class Update(object):
 class Connector(object):
     _create_transport = transport.Transport
 
-    def __init__(self, server, username, password, domain, integration):
-        self.transport = self._create_transport(server, username, password)
-        self.domain = domain
+    def __init__(self, credentials, integration):
+        self.transport = self._create_transport(
+            credentials.url,
+            credentials.username,
+            credentials.password)
+        self.domain = credentials.domain
         self.integration = integration
 
     def _fetch_bundle(self, url, params=None):

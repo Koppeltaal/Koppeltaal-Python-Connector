@@ -190,11 +190,9 @@ def console():
     if args.verbose:
         root.setLevel(logging.DEBUG)
 
-    username, password, domain = get_credentials(args)
-
+    credentials = get_credentials(args)
     integration = connector.Integration(name='Python command line')
-    connection = connector.Connector(
-        args.server, username, password, domain, integration)
+    connection = connector.Connector(credentials, integration)
 
     try:
         if args.command == 'metadata':
