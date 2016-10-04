@@ -137,6 +137,12 @@ class IIntegration(zope.interface.Interface):
 
     url = zope.interface.Attribute('fhir base URL for generated resources')
 
+    client_id = zope.interface.Attribute(
+        'Application identifier for the domain')
+
+    client_secret = zope.interface.Attribute(
+        'OAUTH secret for this application client')
+
     def transaction_hook(commit_function, message):
         """Optional hook to integrate sending back a message into a
         transaction system.

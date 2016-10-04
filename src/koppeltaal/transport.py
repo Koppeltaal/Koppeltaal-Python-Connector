@@ -22,14 +22,14 @@ class Transport(object):
         parts = urlparse.urlparse(url)[2:]
         return urlparse.urlunparse((self.scheme, self.netloc) + parts)
 
-    def query(self, url, params=None):
+    def query(self, url, params=None, username=None, password=None):
         """Query a url.
         """
         try:
             response = self.session.get(
                 self.absolute_url(url),
                 params=params,
-                auth=(self.username, self.password),
+                auth=(username or self.username, password or self.password),
                 headers={'Accept': 'application/json'},
                 timeout=interfaces.TIMEOUT,
                 allow_redirects=False)

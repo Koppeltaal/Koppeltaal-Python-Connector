@@ -158,9 +158,21 @@ class Connector(object):
         params = {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://example.com'}
+            'redirect_uri': 'https://app.minddistrict.com/koppeltaalauth'}
+        # Note how for this specific request a different set of credentials
+        # ought to be used.
+        # See https://www.koppeltaal.nl/
+        #    wiki/Technical_Design_Document_Koppeltaal_1.1.1
+        #    #6._Game_retrieves_an_Access_token
+        username = self.integration.client_id
+        password = self.integration.client_secret
+        assert username is not None, 'client id missing'
+        assert password is not None, 'client secret missing'
         return self.transport.query(
-            interfaces.OAUTH_TOKEN_URL, params)
+            interfaces.OAUTH_TOKEN_URL,
+            params=params,
+            username=username,
+            password=password)
 
     def launch_from_parameters(
             self,
