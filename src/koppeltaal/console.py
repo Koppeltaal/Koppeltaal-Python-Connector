@@ -190,7 +190,7 @@ def console():
     launch.add_argument('user_link')
     launch.add_argument('application_id')
     launch.add_argument('patient_link')
-    # launch.add_argument('activity_identifier')
+    launch.add_argument('--activity', help='activity_identifier')
 
     args = parser.parse_args()
 
@@ -267,7 +267,8 @@ def console():
                 args.application_id,
                 args.patient_link,
                 args.user_link,
-                None)
+                args.activity,
+                )
 
         else:
             sys.exit('Unknown command {}'.format(args.command))

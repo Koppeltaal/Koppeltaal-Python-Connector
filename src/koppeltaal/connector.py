@@ -138,6 +138,23 @@ class Connector(object):
             user.fhir_link,
             activity.identifier)
 
+    def launch_from_parameters(
+            self,
+            application_id,
+            patient_link,
+            user_link,
+            activity_identifier):
+        assert application_id is not None, 'Invalid activity'
+        assert patient_link is not None, 'Invalid patient'
+        assert user_link is not None, 'Invalid user'
+        params = {
+            'client_id': application_id,
+            'patient': patient_link,
+            'user': user_link,
+            'resource': activity_identifier}
+        return self.transport.query_redirect(
+            interfaces.OAUTH_LAUNCH_URL, params)
+
     def authorize_from_parameters(
             self,
             application_id,
@@ -173,23 +190,6 @@ class Connector(object):
             params=params,
             username=username,
             password=password)
-
-    def launch_from_parameters(
-            self,
-            application_id,
-            patient_link,
-            user_link,
-            activity_identifier):
-        assert application_id is not None, 'Invalid activity'
-        assert patient_link is not None, 'Invalid patient'
-        assert user_link is not None, 'Invalid user'
-        params = {
-            'client_id': application_id,
-            'patient': patient_link,
-            'user': user_link,
-            'resource': activity_identifier}
-        return self.transport.query_redirect(
-            interfaces.OAUTH_LAUNCH_URL, params)
 
     def updates(self, expected_events=None):
 
