@@ -253,7 +253,7 @@ class Connector(object):
             interfaces.MESSAGE_HEADER_URL,
             params).unpack()
 
-    def send(self, event, data, patient):
+    def send(self, event, data, patient=None):
         identifier = utils.messageid()
         source = models.MessageHeaderSource(
             name=unicode(self.integration.name),
