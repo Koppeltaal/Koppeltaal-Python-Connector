@@ -1,8 +1,8 @@
 import hamcrest
-import pytest
 import koppeltaal.definitions
 import koppeltaal.interfaces
 import koppeltaal.testing
+import pytest
 import zope.interface.verify
 
 
