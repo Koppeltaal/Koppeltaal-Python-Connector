@@ -47,6 +47,20 @@ class InvalidValue(KoppeltaalError):
             self.field.name)
 
 
+class InvalidReference(InvalidValue):
+    """A value that is not a valid reference.
+    """
+
+    field = None
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return "invalid reference '{}'.".format(
+            self.value.__class__.__name__)
+
+
 class InvalidCode(InvalidValue):
     """A code appear that is not expected in its definition.
     """

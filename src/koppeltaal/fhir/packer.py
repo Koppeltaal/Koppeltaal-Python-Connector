@@ -468,13 +468,21 @@ class Packer(object):
         reference = self.resource.find(value)
         if reference:
             return reference.unpack()
-        return models.ReferredResource(value)
+        if not ('reference' in value or 'display' in value):
+            raise interfaces.InvalidReference(value)
+        return models.ReferredResource(
+            fhir_link=value.get('reference'),
+            display=value.get('display'))
 
     def pack_reference(self, value):
         if interfaces.IReferredFHIRResource.providedBy(value):
-            reference = {'reference': value.fhir_link}
+            reference = {}
+            if value.fhir_link:
+                reference['reference'] = value.fhir_link
             if value.display:
                 reference['display'] = value.display
+            if not reference:
+                raise interfaces.InvalidReference(value)
             return reference
         entry = self.resource.add_model(value)
         return {'reference': entry.fhir_link}

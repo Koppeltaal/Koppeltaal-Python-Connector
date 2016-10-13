@@ -34,7 +34,7 @@ def test_send_careplan_success_from_fixture(
         connector, transport, careplan_from_fixture):
     transport.expect(
         '/FHIR/Koppeltaal/Mailbox',
-        respond_with='fixtures/bundle_post_answer_ok.json')
+        respond_with='fixtures/bundle_post_careplan_ok.json')
     message = connector.send(
         'CreateOrUpdateCarePlan',
         careplan_from_fixture,
@@ -53,7 +53,7 @@ def test_send_careplan_fail_from_fixture(
         connector, transport, careplan_from_fixture):
     transport.expect(
         '/FHIR/Koppeltaal/Mailbox',
-        respond_with='fixtures/bundle_post_answer_failed.json')
+        respond_with='fixtures/bundle_post_careplan_failed.json')
     with pytest.raises(koppeltaal.interfaces.InvalidResponse):
         connector.send(
             'CreateOrUpdateCarePlan',

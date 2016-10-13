@@ -1,5 +1,6 @@
 import koppeltaal.definitions
 import koppeltaal.interfaces
+import koppeltaal.models
 import koppeltaal.testing
 import zope.interface.verify
 
@@ -81,3 +82,30 @@ def test_activity_from_fixture(connector, transport):
     assert activity.identifier == 'KTSTESTGAME'
     assert activity.name == 'Test game'
     assert activity.kind == 'Game'
+
+
+def test_create_activity(connector, transport):
+    transport.expect(
+        '/FHIR/Koppeltaal/Mailbox',
+        respond_with='fixtures/bundle_post_activitydefinition_ok.json')
+
+    ad = koppeltaal.models.ActivityDefinition(
+        application=koppeltaal.models.ReferredResource(display='Foobar'),
+        description=u'A First Activity Definition',
+        identifier=u'foobar',
+        kind='ELearning',
+        name=u'AD-1',
+        performer='Patient',
+        subactivities=[])
+
+    message = connector.send(
+        'CreateOrUpdateUserActivityDefinition', ad)
+
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IReferredFHIRResource, message)
+    assert message.fhir_link == (
+        'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
+        '_history/1970-01-01T01:01:01:01.1')
+
+    response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
+    assert response is not None

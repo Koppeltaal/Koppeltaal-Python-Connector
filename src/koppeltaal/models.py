@@ -11,9 +11,9 @@ class FHIRResource(object):
 class ReferredResource(FHIRResource):
     display = None
 
-    def __init__(self, value):
-        self.fhir_link = value.get('reference')
-        self.display = value.get('display')
+    def __init__(self, fhir_link=None, display=None):
+        self.fhir_link = fhir_link
+        self.display = display
 
 
 @zope.interface.implementer(definitions.SubActivityDefinition)
