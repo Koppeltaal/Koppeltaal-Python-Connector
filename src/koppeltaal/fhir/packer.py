@@ -7,17 +7,8 @@ from koppeltaal import (
     compat,
     definitions,
     interfaces,
+    models,
     utils)
-
-
-@zope.interface.implementer(interfaces.IReferredFHIRResource)
-class ReferredResource(object):
-    fhir_link = None
-    display = None
-
-    def __init__(self, value):
-        self.fhir_link = value['reference']
-        self.display = value.get('display')
 
 
 @zope.interface.implementer(interfaces.IBrokenFHIRResource)
@@ -477,7 +468,7 @@ class Packer(object):
         reference = self.resource.find(value)
         if reference:
             return reference.unpack()
-        return ReferredResource(value)
+        return models.ReferredResource(value)
 
     def pack_reference(self, value):
         if interfaces.IReferredFHIRResource.providedBy(value):
