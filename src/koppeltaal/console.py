@@ -107,7 +107,7 @@ def download(connection, directory, msgid=None, msg=None):
         url = utils.strip_history_from_link(msg.fhir_link)
         msgid = url.rsplit('/', 1)[-1]
     response = connection.transport.query(
-        interfaces.MESSAGE_HEADER_URL, {'_id': msgid})
+        interfaces.MESSAGE_HEADER_URL, {'_id': msgid}).json
     packaging = bundle.Bundle(connection.domain, connection.integration)
     packaging.add_payload(response)
     msg = packaging.unpack_message_header()

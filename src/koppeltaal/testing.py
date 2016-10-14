@@ -5,6 +5,7 @@ import functools
 import pkg_resources
 import urllib
 import urlparse
+from koppeltaal import transport
 
 
 class MockTransport(object):
@@ -13,12 +14,14 @@ class MockTransport(object):
         self._module_name = module_name
         self.clear()
 
-    def _expect_json(self, args, url, data=None):
-        return json.load(pkg_resources.resource_stream(
-            self._module_name, args['respond_with']))
-
-    def _expect_redirect(self, args, url, data=None):
-        return args['redirect_to']
+    def _expect(self, args, url, data=None):
+        response_json = None
+        if 'respond_with' in args:
+            response_json = json.load(pkg_resources.resource_stream(
+                self._module_name, args['respond_with']))
+        response_location = args.get('redirect_to')
+        return transport.Response(
+            json=response_json, location=response_location)
 
     def clear(self):
         self.expected = {}
@@ -34,12 +37,7 @@ class MockTransport(object):
         Note how the data that is to be sent to the expected URL is stored in
         the `called` attribute when indeed the expected URL is called.
         """
-        expect_method = None
-        if 'respond_with' in fixture:
-            expect_method = functools.partial(self._expect_json, fixture)
-        elif 'redirect_to' in fixture:
-            expect_method = functools.partial(self._expect_redirect, fixture)
-        assert expect_method is not None
+        expect_method = functools.partial(self._expect, fixture)
         self.expected.setdefault(url, []).append(expect_method)
 
     def relative_url(self, url, params=None):
@@ -66,7 +64,7 @@ class MockTransport(object):
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
-    def post(self, url, data):
+    def create(self, url, data):
         url = self.relative_url(url)
         self.called[url] = data
         if not len(self.expected.get(url, [])):
@@ -74,7 +72,7 @@ class MockTransport(object):
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
-    create = update = post
+    update = create
 
 
 class HasFHIRExtension(BaseMatcher):

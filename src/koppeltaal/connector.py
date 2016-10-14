@@ -96,13 +96,13 @@ class Connector(object):
         packaging = bundle.Bundle(self.domain, self.integration)
         while next_url:
             response = self.transport.query(next_url, next_params)
-            packaging.add_payload(response)
-            next_url = utils.json2links(response).get('next')
+            packaging.add_payload(response.json)
+            next_url = utils.json2links(response.json).get('next')
             next_params = None  # Parameters are already in the next link.
         return packaging
 
     def metadata(self):
-        return self.transport.query(interfaces.METADATA_URL)
+        return self.transport.query(interfaces.METADATA_URL).json
 
     def activities(self):
         return self._fetch_bundle(
@@ -115,11 +115,16 @@ class Connector(object):
                 return activity
         return None
 
-    def create_activity(self, activity):
+    def send_activity(self, activity):
         packaging = resource.Resource(self.domain, self.integration)
         packaging.add_model(activity)
+        if activity.fhir_link is not None:
+            # XXX returns the JSON data.
+            return self.transport.update(
+                activity.fhir_link, packaging.get_payload()).location
+        # XXX returns the content location URL.
         return self.transport.create(
-            interfaces.OTHER_URL, packaging.get_payload())
+            interfaces.OTHER_URL, packaging.get_payload()).location
 
     def launch(self, careplan, user=None, activity_identifier=None):
         activity = None
@@ -159,7 +164,7 @@ class Connector(object):
             'user': user_link,
             'resource': activity_identifier}
         return self.transport.query_redirect(
-            interfaces.OAUTH_LAUNCH_URL, params)
+            interfaces.OAUTH_LAUNCH_URL, params).location
 
     def authorize_from_parameters(
             self,
@@ -195,7 +200,7 @@ class Connector(object):
             interfaces.OAUTH_TOKEN_URL,
             params=params,
             username=username,
-            password=password)
+            password=password).json
 
     def updates(self, expected_events=None):
 
@@ -277,9 +282,9 @@ class Connector(object):
         send_bundle.add_model(message)
         response_bundle = bundle.Bundle(self.domain, self.integration)
         response_bundle.add_payload(
-            self.transport.post(
+            self.transport.create(
                 interfaces.MAILBOX_URL,
-                send_bundle.get_payload()))
+                send_bundle.get_payload()).json)
         response = response_bundle.unpack_message_header()
         if (response is None or
                 response.response is None or
