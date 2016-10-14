@@ -115,6 +115,12 @@ class Connector(object):
                 return activity
         return None
 
+    def create_activity(self, activity):
+        packaging = resource.Resource(self.domain, self.integration)
+        packaging.add_model(activity)
+        return self.transport.create(
+            interfaces.OTHER_URL, packaging.get_payload())
+
     def launch(self, careplan, user=None, activity_identifier=None):
         activity = None
         for candidate in careplan.activities:
@@ -271,7 +277,7 @@ class Connector(object):
         send_bundle.add_model(message)
         response_bundle = bundle.Bundle(self.domain, self.integration)
         response_bundle.add_payload(
-            self.transport.create(
+            self.transport.post(
                 interfaces.MAILBOX_URL,
                 send_bundle.get_payload()))
         response = response_bundle.unpack_message_header()

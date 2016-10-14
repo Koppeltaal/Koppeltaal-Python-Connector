@@ -58,6 +58,28 @@ class Transport(object):
             raise interfaces.InvalidResponse(response)
         return response.headers.get('location')
 
+    def post(self, url, data):
+        """Create a new resource at the given url with JSON data.
+        """
+        try:
+            response = self.session.post(
+                self.absolute_url(url),
+                auth=(self.username, self.password),
+                json=data,
+                headers={'Accept': 'application/json'},
+                timeout=interfaces.TIMEOUT,
+                allow_redirects=False)
+            response.raise_for_status()
+        except requests.RequestException as error:
+            raise interfaces.InvalidResponse(error)
+        if not response.headers['content-type'].startswith('application/json'):
+            raise interfaces.InvalidResponse(response)
+        if not (response.status_code == 200 and response.text):
+            raise interfaces.InvalidResponse(response)
+        json = response.json()
+        logger.debug_json('Create on {url}:\n {json}', json=json, url=url)
+        return json
+
     def create(self, url, data):
         """Create a new resource at the given url with JSON data.
         """
@@ -74,11 +96,9 @@ class Transport(object):
             raise interfaces.InvalidResponse(error)
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response)
-        if response.text:
-            json = response.json()
-            logger.debug_json('Create on {url}:\n {json}', json=json, url=url)
-            return json
-        return None
+        if response.status_code != 201 or response.text:
+            raise interfaces.InvalidResponse(response)
+        return response.headers.get('content-location')
 
     def update(self, url, data):
         """Update an existing resource at the given url with JSON data.

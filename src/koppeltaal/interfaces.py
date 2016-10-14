@@ -6,6 +6,7 @@ NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
 SOFTWARE = 'Koppeltaal python adapter'
 VERSION = pkg_resources.get_distribution('koppeltaal').version
 
+OTHER_URL = '/FHIR/Koppeltaal/Other'
 ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
 MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
 METADATA_URL = '/FHIR/Koppeltaal/metadata'

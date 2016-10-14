@@ -99,7 +99,7 @@ def test_create_activity(connector, transport):
         subactivities=[])
 
     message = connector.send(
-        'CreateOrUpdateUserActivityDefinition', ad)
+        'CreateOrUpdateActivityDefinition', ad)
 
     assert zope.interface.verify.verifyObject(
         koppeltaal.interfaces.IReferredFHIRResource, message)

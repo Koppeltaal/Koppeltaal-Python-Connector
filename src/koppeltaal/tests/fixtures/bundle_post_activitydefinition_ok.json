@@ -19,8 +19,8 @@
           }
         ],
         "event": {
-          "code": "CreateOrUpdateUserActivityDefinition",
-          "display": "CreateOrUpdateUserActivityDefinition",
+          "code": "CreateOrUpdateActivityDefinition",
+          "display": "CreateOrUpdateActivityDefinition",
           "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/MessageEvents"
         },
         "identifier": "urn:uuid:4dad6564-1c93-4d9f-9099-14213d603a5c",

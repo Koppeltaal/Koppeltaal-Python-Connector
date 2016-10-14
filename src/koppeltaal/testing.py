@@ -66,7 +66,7 @@ class MockTransport(object):
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
-    def create(self, url, data):
+    def post(self, url, data):
         url = self.relative_url(url)
         self.called[url] = data
         if not len(self.expected.get(url, [])):
@@ -74,13 +74,7 @@ class MockTransport(object):
         expect_method = self.expected[url].pop(0)
         return expect_method(url, None)
 
-    def update(self, url, data):
-        url = self.relative_url(url)
-        self.called[url] = data
-        if not len(self.expected.get(url, [])):
-            raise AssertionError('Unexpected url call', url)
-        expect_method = self.expected[url].pop(0)
-        return expect_method(url, None)
+    create = update = post
 
 
 class HasFHIRExtension(BaseMatcher):
