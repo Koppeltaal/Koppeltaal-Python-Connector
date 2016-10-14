@@ -82,7 +82,7 @@ class Transport(object):
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response)
         return Response(
-            json=response.json(),
+            json=response.json() if response.text else None,
             location=response.headers.get('content-location'))
 
     def update(self, url, data):
@@ -102,5 +102,5 @@ class Transport(object):
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response)
         return Response(
-            json=response.json(),
+            json=response.json() if response.text else None,
             location=response.headers.get('content-location'))

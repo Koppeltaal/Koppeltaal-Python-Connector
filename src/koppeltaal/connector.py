@@ -118,13 +118,15 @@ class Connector(object):
     def send_activity(self, activity):
         packaging = resource.Resource(self.domain, self.integration)
         packaging.add_model(activity)
+        payload = packaging.get_payload()
         if activity.fhir_link is not None:
-            # XXX returns the JSON data.
-            return self.transport.update(
-                activity.fhir_link, packaging.get_payload()).location
-        # XXX returns the content location URL.
-        return self.transport.create(
-            interfaces.OTHER_URL, packaging.get_payload()).location
+            response = self.transport.update(activity.fhir_link, payload)
+        else:
+            response = self.transport.create(interfaces.OTHER_URL, payload)
+        if response.location is None:
+            raise interfaces.InvalidResponse(response)
+        activity.fhir_link = response.location
+        return activity
 
     def launch(self, careplan, user=None, activity_identifier=None):
         activity = None
