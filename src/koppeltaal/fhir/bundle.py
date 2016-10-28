@@ -37,6 +37,11 @@ class Entry(resource.Entry):
             entry["link"] = [{"rel": "self", "href": self.fhir_link}]
         return entry
 
+    def __eq__(self, other):
+        if isinstance(other, dict) and 'reference' in other:
+            return other['reference'] in (self.fhir_link, self.atom_id)
+        return super(Entry, self).__eq__(other)
+
 
 class Bundle(resource.Resource):
     _create_entry = Entry

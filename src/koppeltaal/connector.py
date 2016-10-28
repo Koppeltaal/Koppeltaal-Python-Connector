@@ -40,8 +40,9 @@ class Integration(object):
 @zope.interface.implementer(interfaces.IUpdate)
 class Update(object):
 
-    def __init__(self, message, ack_function):
+    def __init__(self, message, resources, ack_function):
         self.message = message
+        self.resources = resources
         self.data = message.data
         self.patient = message.patient
         self._ack_function = ack_function
@@ -232,7 +233,7 @@ class Connector(object):
                 # We are out of messages
                 break
 
-            update = Update(message, send_back_on_transaction)
+            update = Update(message, bundle.unpack, send_back_on_transaction)
             errors = bundle.errors()
 
             if errors:
