@@ -107,8 +107,6 @@ class Extension(object):
             value = extension.get('valueResource')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, extension)
-            if 'reference' not in value:
-                interfaces.InvalidValue(field, extension)
             return self._packer.unpack_reference(value)
 
         if field.field_type == 'string':
@@ -298,8 +296,6 @@ class Native(object):
 
         if field.field_type == 'reference':
             if not isinstance(value, dict):
-                raise interfaces.InvalidValue(field, value)
-            if 'reference' not in value:
                 raise interfaces.InvalidValue(field, value)
             return self._packer.unpack_reference(value)
 
