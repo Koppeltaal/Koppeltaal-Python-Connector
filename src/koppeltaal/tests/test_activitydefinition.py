@@ -84,7 +84,7 @@ def test_activity_from_fixture(connector, transport):
     assert activity.kind == 'Game'
 
 
-def test_create_activity(connector, transport):
+def test_createorupdate_activity(connector, transport):
     transport.expect(
         '/FHIR/Koppeltaal/Mailbox',
         respond_with='fixtures/bundle_post_activitydefinition_ok.json')
