@@ -69,6 +69,25 @@ def test_coding(packer, NAMESPACE):
             'display': 'sponges',
             'system': NAMESPACE + 'Vertebrate'})
 
+    unknown_value = vertebrates.unpack_coding({
+        'code': 'UNK',
+        'display': 'Unkown',
+        'system': koppeltaal.codes.NULL_SYSTEM})
+
+    assert unknown_value is None
+
+    with pytest.raises(koppeltaal.interfaces.InvalidCode):
+        vertebrates.unpack_coding({
+            'code': 'UNKNOW',
+            'display': 'Unkown',
+            'system': koppeltaal.codes.NULL_SYSTEM})
+
+    with pytest.raises(koppeltaal.interfaces.InvalidSystem):
+        vertebrates.unpack_coding({
+        'code': 'reptiles',
+        'display': 'reptiles',
+        'system': 'foobarbaz'})
+
 
 def test_unpack_name(packer):
     name = packer.unpack(
