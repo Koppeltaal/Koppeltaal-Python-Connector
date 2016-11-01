@@ -14,7 +14,7 @@ class MockTransport(object):
         self._module_name = module_name
         self.clear()
 
-    def _expect(self, args, url, data=None):
+    def _expect(self, args, url):
         response_json = None
         if 'respond_with' in args:
             response_json = json.load(pkg_resources.resource_stream(
@@ -55,14 +55,14 @@ class MockTransport(object):
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
-        return expect_method(url, None)
+        return expect_method(url)
 
     def query_redirect(self, url, params=None):
         url = self.relative_url(url, params)
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
-        return expect_method(url, None)
+        return expect_method(url)
 
     def create(self, url, data):
         url = self.relative_url(url)
@@ -70,7 +70,7 @@ class MockTransport(object):
         if not len(self.expected.get(url, [])):
             raise AssertionError('Unexpected url call', url)
         expect_method = self.expected[url].pop(0)
-        return expect_method(url, None)
+        return expect_method(url)
 
     update = create
 
