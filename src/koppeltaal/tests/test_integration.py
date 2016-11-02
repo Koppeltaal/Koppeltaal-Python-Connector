@@ -1,6 +1,7 @@
 import urlparse
 import selenium.webdriver.support.wait
 import selenium.webdriver.support.expected_conditions as EC
+import koppeltaal.utils
 
 
 def test_request_metadata(connector):
@@ -77,6 +78,43 @@ def test_launch_practitioner(
         careplan.patient.fhir_link
     assert browser.find_element_by_id('userReference').text == \
         practitioner.fhir_link
+
+
+def test_send_activity(connector):
+    assert len(list(connector.activities())) == 1
+
+    uuid = koppeltaal.utils.uniqueid()
+    application = koppeltaal.models.ReferredResource(
+        display='Test Generated Application Reference {}'.format(uuid))
+    ad = koppeltaal.models.ActivityDefinition(
+        application=application,
+        description=u'Test Generated AD {}'.format(uuid),
+        identifier=u'uuid://{}'.format(uuid),
+        kind='ELearning',
+        name=u'Test Generated AD {}'.format(uuid),
+        performer='Patient',
+        subactivities=[])
+
+    updated = connector.send_activity(ad)
+    assert len(list(connector.activities())) == 2
+    assert updated.fhir_link is not None
+    assert updated.fhir_link.startswith(
+        'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal'
+        '/Other/ActivityDefinition:')
+    assert updated.is_active is True
+    assert updated.is_archived is False
+
+    fetched = connector.activity(u'uuid://{}'.format(uuid))
+    assert updated.fhir_link == fetched.fhir_link
+
+    updated.is_active = False
+    updated.is_archived = True
+
+    connector.send_activity(updated)
+    assert updated.fhir_link != fetched.fhir_link
+    assert updated.fhir_link > fetched.fhir_link
+
+    assert len(list(connector.activities())) == 1
 
 
 # def set_domain(browser):

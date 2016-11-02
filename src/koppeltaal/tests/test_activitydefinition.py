@@ -87,7 +87,7 @@ def test_activity_from_fixture(connector, transport):
     assert activity.kind == 'Game'
 
 
-def test_createorupdate_activity(connector, transport):
+def test_createorupdate_activitydefinition(connector, transport):
     transport.expect(
         'POST',
         '/FHIR/Koppeltaal/Mailbox',
@@ -113,3 +113,53 @@ def test_createorupdate_activity(connector, transport):
 
     response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
     assert response is not None
+
+
+def test_create_activitydefinition(connector, transport):
+    transport.expect(
+        'POST',
+        koppeltaal.interfaces.OTHER_URL,
+        redirect_to=
+            'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
+            '_history/1970-01-01T01:01:01:01.1')
+
+    ad = koppeltaal.models.ActivityDefinition(
+        application=koppeltaal.models.ReferredResource(display='Foobar'),
+        description=u'A First Activity Definition',
+        identifier=u'foobar',
+        kind='ELearning',
+        name=u'AD-1',
+        performer='Patient',
+        subactivities=[])
+
+    ad = connector.send_activity(ad)
+    assert ad.fhir_link == (
+        'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
+        '_history/1970-01-01T01:01:01:01.1')
+
+
+def test_update_activitydefinition(connector, transport):
+    transport.expect(
+        'PUT',
+        '/fhir/Koppeltaal/ActivityDefinition/1/'
+        '_history/1970-01-01T01:01:01:01.1',
+        redirect_to=
+            'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
+            '_history/1970-02-02T02:02:02:02.2')
+
+    ad = koppeltaal.models.ActivityDefinition(
+        application=koppeltaal.models.ReferredResource(display='Foobar'),
+        description=u'A First Activity Definition',
+        identifier=u'foobar',
+        kind='ELearning',
+        name=u'AD-1',
+        performer='Patient',
+        subactivities=[])
+    ad.fhir_link = (
+        'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
+        '_history/1970-01-01T01:01:01:01.1')
+
+    ad = connector.send_activity(ad)
+    assert ad.fhir_link == (
+        'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
+        '_history/1970-02-02T02:02:02:02.2')
