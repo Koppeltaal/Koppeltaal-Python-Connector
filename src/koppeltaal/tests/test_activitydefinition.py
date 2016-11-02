@@ -7,6 +7,7 @@ import zope.interface.verify
 
 def test_activities_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
         respond_with='fixtures/activities_game.json')
 
@@ -66,9 +67,11 @@ def test_activities_from_fixture(connector, transport):
 
 def test_activity_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
         respond_with='fixtures/activities_game.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
         respond_with='fixtures/activities_game.json')
 
@@ -86,6 +89,7 @@ def test_activity_from_fixture(connector, transport):
 
 def test_createorupdate_activity(connector, transport):
     transport.expect(
+        'POST',
         '/FHIR/Koppeltaal/Mailbox',
         respond_with='fixtures/bundle_post_activitydefinition_ok.json')
 
