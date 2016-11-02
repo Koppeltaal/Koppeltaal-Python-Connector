@@ -384,7 +384,7 @@ class Activity(zope.interface.Interface):
         extension='CarePlan#ActivityDescription')
 
     ends = Field(
-        'endDate', 'instant',
+        'endDate', 'datetime',
         optional=True,
         extension='CarePlan#EndDate')
 
