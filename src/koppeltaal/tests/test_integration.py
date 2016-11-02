@@ -81,9 +81,11 @@ def test_launch_practitioner(
 
 
 def test_send_activity(connector):
-    assert len(list(connector.activities())) == 1
-
     uuid = koppeltaal.utils.uniqueid()
+
+    assert len(list(connector.activities())) == 1
+    assert connector.activity(u'uuid://{}'.format(uuid)) is None
+
     application = koppeltaal.models.ReferredResource(
         display='Test Generated Application Reference {}'.format(uuid))
     ad = koppeltaal.models.ActivityDefinition(
@@ -113,6 +115,9 @@ def test_send_activity(connector):
     connector.send_activity(updated)
     assert updated.fhir_link != fetched.fhir_link
     assert updated.fhir_link > fetched.fhir_link
+    assert updated.is_active is False
+    assert updated.is_archived is True
+    assert connector.activity(u'uuid://{}'.format(uuid)) is None
 
     assert len(list(connector.activities())) == 1
 
