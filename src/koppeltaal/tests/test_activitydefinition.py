@@ -119,9 +119,9 @@ def test_create_activitydefinition(connector, transport):
     transport.expect(
         'POST',
         koppeltaal.interfaces.OTHER_URL,
-        redirect_to=
+        redirect_to=(
             'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
-            '_history/1970-01-01T01:01:01:01.1')
+            '_history/1970-01-01T01:01:01:01.1'))
 
     ad = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
@@ -143,9 +143,9 @@ def test_update_activitydefinition(connector, transport):
         'PUT',
         '/fhir/Koppeltaal/ActivityDefinition/1/'
         '_history/1970-01-01T01:01:01:01.1',
-        redirect_to=
+        redirect_to=(
             'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
-            '_history/1970-02-02T02:02:02:02.2')
+            '_history/1970-02-02T02:02:02:02.2'))
 
     ad = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),

@@ -84,9 +84,9 @@ def test_coding(packer, NAMESPACE):
 
     with pytest.raises(koppeltaal.interfaces.InvalidSystem):
         vertebrates.unpack_coding({
-        'code': 'reptiles',
-        'display': 'reptiles',
-        'system': 'foobarbaz'})
+            'code': 'reptiles',
+            'display': 'reptiles',
+            'system': 'foobarbaz'})
 
 
 def test_unpack_name(packer):

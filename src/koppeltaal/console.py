@@ -212,6 +212,7 @@ def console():
     try:
         if args.command == 'metadata':
             print_json(connection.metadata())
+
         elif args.command == 'validate':
             payload = None
             if args.xml:
@@ -222,7 +223,7 @@ def console():
                 print "Please provide an XML or JSON file."
                 return
             print_json(payload)
-            resource_bundle = bundle.Bundle(domain, integration)
+            resource_bundle = bundle.Bundle('validation', integration)
             resource_bundle.add_payload(payload)
             for model in resource_bundle.unpack():
                 print_model(model)
