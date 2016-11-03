@@ -108,15 +108,14 @@ class Entry(object):
         return self._content
 
     def __eq__(self, other):
-        if isinstance(other, dict):
-            return other.get('reference') in (self.fhir_link, self.atom_id)
+        if isinstance(other, dict) and 'reference' in other:
+            return other['reference'] == self.fhir_link
         if interfaces.IFHIRResource.providedBy(other):
             if self._model is not MARKER:
                 return self._model is other
             assert self.fhir_link is not None, 'Should not happen'
             return other.fhir_link == self.fhir_link
-
-        return NotImplemented()
+        return NotImplemented
 
     def __format__(self, _):
         return '<{} fhir_link="{}" type="{}">{}</{}>'.format(

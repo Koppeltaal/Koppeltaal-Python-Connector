@@ -1,0 +1,45 @@
+{
+  "resourceType": "Bundle",
+  "category": [
+    {
+      "term": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/Domain#MindDistrict",
+      "label": "MindDistrict",
+      "scheme": "http://hl7.org/fhir/tag/security"
+    },
+    {
+      "scheme": "http://hl7.org/fhir/tag",
+      "term": "http://hl7.org/fhir/tag/message"
+    }
+  ],
+  "id": "urn:uuid:a5ce6335-07df-4059-9fc0-75bea6c7c627",
+  "entry": [
+    {
+      "id": "urn:uuid:5cab9885-ea21-4ffb-be3e-42428cce91bd",
+      "content": {
+        "response": {
+          "code": "ok",
+          "identifier": "7a80ceb0-fd09-4660-9cdd-867a42809b1e"
+        },
+        "identifier": "urn:uuid:5cab9885-ea21-4ffb-be3e-42428cce91bd",
+        "event": {
+          "code": "CreateOrUpdateCarePlan",
+          "display": "CreateOrUpdateCarePlan",
+          "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/MessageEvents"
+        },
+        "timestamp": "2016-07-15T13:50:24+02:00",
+        "source": {
+          "name": "",
+          "endpoint": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Mailbox",
+          "version": "",
+          "software": ""
+        },
+        "data": [
+          {
+            "reference": "https://example.com/fhir/Koppeltaal/CarePlan/1/_history/1970-01-01T01:01:01:01.1"
+          }
+        ],
+        "resourceType": "MessageHeader"
+      }
+    }
+  ]
+}

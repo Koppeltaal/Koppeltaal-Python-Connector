@@ -1,0 +1,45 @@
+{
+  "category": [
+    {
+      "label": "MindDistrict",
+      "scheme": "http://hl7.org/fhir/tag/security",
+      "term": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/Domain#MindDistrict"
+    },
+    {
+      "scheme": "http://hl7.org/fhir/tag",
+      "term": "http://hl7.org/fhir/tag/message"
+    }
+  ],
+  "entry": [
+    {
+      "content": {
+        "data": [
+          {
+            "reference": "https://example.com/fhir/Koppeltaal/ActivityDefinition/1/_history/1970-01-01T01:01:01:01.1"
+          }
+        ],
+        "event": {
+          "code": "CreateOrUpdateActivityDefinition",
+          "display": "CreateOrUpdateActivityDefinition",
+          "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/MessageEvents"
+        },
+        "identifier": "urn:uuid:4dad6564-1c93-4d9f-9099-14213d603a5c",
+        "resourceType": "MessageHeader",
+        "response": {
+          "code": "ok",
+          "identifier": "1234-5678"
+        },
+        "source": {
+          "endpoint": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Mailbox",
+          "name": "",
+          "software": "",
+          "version": ""
+        },
+        "timestamp": "2016-07-12T14:34:12+02:00"
+      },
+      "id": "urn:uuid:4dad6564-1c93-4d9f-9099-14213d603a5c"
+    }
+  ],
+  "id": "urn:uuid:1bdbbb1f-190f-42ca-a443-9d1ea592da04",
+  "resourceType": "Bundle"
+}

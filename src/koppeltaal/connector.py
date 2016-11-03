@@ -1,7 +1,8 @@
+import urllib
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
-from koppeltaal import(
+from koppeltaal import (
     interfaces,
     logger,
     models,
@@ -39,8 +40,9 @@ class Integration(object):
 @zope.interface.implementer(interfaces.IUpdate)
 class Update(object):
 
-    def __init__(self, message, ack_function):
+    def __init__(self, message, resources, ack_function):
         self.message = message
+        self.resources = resources
         self.data = message.data
         self.patient = message.patient
         self._ack_function = ack_function
@@ -81,9 +83,13 @@ class Update(object):
 class Connector(object):
     _create_transport = transport.Transport
 
-    def __init__(self, server, username, password, domain, integration):
-        self.transport = self._create_transport(server, username, password)
-        self.domain = domain
+    def __init__(self, credentials, integration):
+        self._credentials = credentials
+        self.transport = self._create_transport(
+            self._credentials.url,
+            self._credentials.username,
+            self._credentials.password)
+        self.domain = self._credentials.domain
         self.integration = integration
 
     def _fetch_bundle(self, url, params=None):
@@ -92,13 +98,13 @@ class Connector(object):
         packaging = bundle.Bundle(self.domain, self.integration)
         while next_url:
             response = self.transport.query(next_url, next_params)
-            packaging.add_payload(response)
-            next_url = utils.json2links(response).get('next')
+            packaging.add_payload(response.json)
+            next_url = utils.json2links(response.json).get('next')
             next_params = None  # Parameters are already in the next link.
         return packaging
 
     def metadata(self):
-        return self.transport.query(interfaces.METADATA_URL)
+        return self.transport.query(interfaces.METADATA_URL).json
 
     def activities(self):
         return self._fetch_bundle(
@@ -110,6 +116,19 @@ class Connector(object):
             if activity.identifier == identifier:
                 return activity
         return None
+
+    def send_activity(self, activity):
+        packaging = resource.Resource(self.domain, self.integration)
+        packaging.add_model(activity)
+        payload = packaging.get_payload()
+        if activity.fhir_link is not None:
+            response = self.transport.update(activity.fhir_link, payload)
+        else:
+            response = self.transport.create(interfaces.OTHER_URL, payload)
+        if response.location is None:
+            raise interfaces.InvalidResponse(response)
+        activity.fhir_link = response.location
+        return activity
 
     def launch(self, careplan, user=None, activity_identifier=None):
         activity = None
@@ -149,9 +168,43 @@ class Connector(object):
             'user': user_link,
             'resource': activity_identifier}
         return self.transport.query_redirect(
-            interfaces.OAUTH_LAUNCH_URL, params)
+            interfaces.OAUTH_LAUNCH_URL, params).location
 
-    def updates(self):
+    def authorize_from_parameters(
+            self,
+            application_id,
+            launch_id,
+            redirect_uri):
+        assert application_id is not None, 'Invalid activity'
+        return '{}?{}'.format(
+            self.transport.absolute_url(interfaces.OAUTH_AUTHORIZE_URL),
+            urllib.urlencode(
+                (('client_id', application_id),
+                 ('redirect_uri', redirect_uri),
+                 ('response_type', 'code'),
+                 ('scope', 'patient/*.read launch:{}'.format(launch_id)))))
+
+    def token_from_parameters(self, code, redirect_url):
+        params = {
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': redirect_url}
+        # Note how for this specific request a different set of credentials
+        # ought to be used.
+        # See https://www.koppeltaal.nl/
+        #    wiki/Technical_Design_Document_Koppeltaal_1.1.1
+        #    #6._Game_retrieves_an_Access_token
+        username = self.integration.client_id
+        password = self.integration.client_secret
+        assert username is not None, 'client id missing'
+        assert password is not None, 'client secret missing'
+        return self.transport.query(
+            interfaces.OAUTH_TOKEN_URL,
+            params=params,
+            username=username,
+            password=password).json
+
+    def updates(self, expected_events=None):
 
         def send_back(message):
             packaging = resource.Resource(self.domain, self.integration)
@@ -178,13 +231,20 @@ class Connector(object):
             if message is None:
                 # We are out of messages
                 break
-            update = Update(message, send_back_on_transaction)
+
+            update = Update(message, bundle.unpack, send_back_on_transaction)
             errors = bundle.errors()
+
             if errors:
                 logger.error('Error while reading message: {}'.format(errors))
                 with update:
                     update.fail(u', '.join([u"Resource '{}': {}".format(
                         e.fhir_link, e.error) for e in errors]))
+            elif (expected_events is not None
+                  and message.event not in expected_events):
+                logger.warn('Event "{}" not expected'.format(message.event))
+                with update:
+                    update.fail('Event not expected')
             else:
                 yield update
 
@@ -206,7 +266,7 @@ class Connector(object):
             interfaces.MESSAGE_HEADER_URL,
             params).unpack()
 
-    def send(self, event, data, patient):
+    def send(self, event, data, patient=None):
         identifier = utils.messageid()
         source = models.MessageHeaderSource(
             name=unicode(self.integration.name),
@@ -226,7 +286,7 @@ class Connector(object):
         response_bundle.add_payload(
             self.transport.create(
                 interfaces.MAILBOX_URL,
-                send_bundle.get_payload()))
+                send_bundle.get_payload()).json)
         response = response_bundle.unpack_message_header()
         if (response is None or
                 response.response is None or

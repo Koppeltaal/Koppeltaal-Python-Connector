@@ -129,14 +129,15 @@ MESSAGE_HEADER_RESPONSE_CODE = Code(
 
 MESSAGE_HEADER_EVENTS = Code(
     'MessageEvents',
-    ['CreateOrUpdatePatient',
+    ['CreateOrUpdateActivityDefinition',
+     'CreateOrUpdateCarePlan',
+     'CreateOrUpdateCarePlanActivityResult',
+     'CreateOrUpdatePatient',
      'CreateOrUpdatePractitioner',
      'CreateOrUpdateRelatedPerson',
-     'CreateOrUpdateCarePlan',
-     'UpdateCarePlanActivityStatus',
-     'CreateOrUpdateCarePlanActivityResult',
      'CreateOrUpdateUserMessage',
-     'CreateOrUpdateActivityDefinition'])
+     'UpdateCarePlanActivityStatus',
+     ])
 
 MESSAGE_KIND = Code(
     'UserMessageKind',

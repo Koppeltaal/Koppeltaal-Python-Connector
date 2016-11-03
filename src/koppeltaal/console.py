@@ -2,6 +2,7 @@ import argparse
 import dateutil
 import json
 import logging
+import os
 import os.path
 import pdb
 import sys
@@ -12,14 +13,14 @@ from koppeltaal.fhir import xml, bundle
 
 ACTIVITY_DEFINITION_OUTPUT = """Activity: {model.identifier}
 - fhir link: {model.fhir_link}
-- application: {model.application.fhir_link}
-- name: {model.name}
-- description: {model.description}
-- kind: {model.kind}
-- performer: {model.performer}
 - active: {model.is_active}
-- domain specific: {model.is_domain_specific}
+- application: {model.application.fhir_link}
 - archived: {model.is_archived}
+- description: {model.description}
+- domain specific: {model.is_domain_specific}
+- kind: {model.kind}
+- name: {model.name}
+- performer: {model.performer}
 """
 
 ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
@@ -30,6 +31,7 @@ ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
 MESSAGE_OUTPUT = """Message: {model.identifier}
 - fhir link: {model.fhir_link}
 - event: {model.event}
+- status: {model.status.status} ({model.status.exception})
 - time stamp: {model.timestamp}
 - software: {model.source.software} ({model.source.version})
 - endpoint: {model.source.endpoint}
@@ -107,11 +109,14 @@ def download(connection, directory, msgid=None, msg=None):
         url = utils.strip_history_from_link(msg.fhir_link)
         msgid = url.rsplit('/', 1)[-1]
     response = connection.transport.query(
-        interfaces.MESSAGE_HEADER_URL, {'_id': msgid})
+        interfaces.MESSAGE_HEADER_URL, {'_id': msgid}).json
     packaging = bundle.Bundle(connection.domain, connection.integration)
     packaging.add_payload(response)
     msg = packaging.unpack_message_header()
     ts = msg.timestamp.isoformat()
+    directory = os.path.join(directory, connection.domain)
+    if not os.path.exists(directory):
+        os.mkdir(directory)
     filename = os.path.join(directory, '{}-{}.json'.format(ts, msgid))
     with open(filename, 'wb') as output:
         json.dump(
@@ -182,6 +187,16 @@ def console():
         '--failure',
         help='Fail and set the exception on the messages.')
 
+    launch = subparsers.add_parser('launch')
+    # user
+    # application_id
+    # patient_link
+    # activity_identifier
+    launch.add_argument('user_link')
+    launch.add_argument('application_id')
+    launch.add_argument('patient_link')
+    launch.add_argument('--activity', help='activity_identifier')
+
     args = parser.parse_args()
 
     root = logging.getLogger()
@@ -190,15 +205,14 @@ def console():
     if args.verbose:
         root.setLevel(logging.DEBUG)
 
-    username, password, domain = get_credentials(args)
-
+    credentials = get_credentials(args)
     integration = connector.Integration(name='Python command line')
-    connection = connector.Connector(
-        args.server, username, password, domain, integration)
+    connection = connector.Connector(credentials, integration)
 
     try:
         if args.command == 'metadata':
             print_json(connection.metadata())
+
         elif args.command == 'validate':
             payload = None
             if args.xml:
@@ -209,13 +223,15 @@ def console():
                 print "Please provide an XML or JSON file."
                 return
             print_json(payload)
-            resource_bundle = bundle.Bundle(domain, integration)
+            resource_bundle = bundle.Bundle('validation', integration)
             resource_bundle.add_payload(payload)
             for model in resource_bundle.unpack():
                 print_model(model)
+
         elif args.command == 'activities':
             for activity in connection.activities():
                 print_model(activity)
+
         elif args.command == 'messages':
             for message in connection.search(
                     event=args.event,
@@ -251,6 +267,15 @@ def console():
                     print_model(update.data)
                     if args.failure:
                         update.fail(args.failure)
+
+        elif args.command == 'launch':
+            print connection.launch_from_parameters(
+                args.application_id,
+                args.patient_link,
+                args.user_link,
+                args.activity,
+                )
+
         else:
             sys.exit('Unknown command {}'.format(args.command))
     except Exception as error:

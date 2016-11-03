@@ -7,6 +7,15 @@ class FHIRResource(object):
     fhir_link = None
 
 
+@zope.interface.implementer(interfaces.IReferredFHIRResource)
+class ReferredResource(FHIRResource):
+    display = None
+
+    def __init__(self, fhir_link=None, display=None):
+        self.fhir_link = fhir_link
+        self.display = display
+
+
 @zope.interface.implementer(definitions.SubActivityDefinition)
 class SubActivityDefinition(object):
 
@@ -166,14 +175,13 @@ class Activity(object):
 
     def __init__(
             self,
-            application=None,
             cancelled=None,
             definition=None,
             description=None,
+            ends=None,
             finished=None,
             identifier=None,
             kind=None,
-            launch_type=None,
             notes=None,
             participants=None,
             planned=None,
@@ -181,14 +189,13 @@ class Activity(object):
             status=None,
             subactivities=None,
             prohibited=False):
-        self.application = application
         self.cancelled = cancelled
         self.definition = definition
         self.description = description
         self.finished = finished
+        self.ends = ends
         self.identifier = identifier
         self.kind = kind
-        self.launch_type = launch_type
         self.notes = notes
         self.participants = participants
         self.planned = planned

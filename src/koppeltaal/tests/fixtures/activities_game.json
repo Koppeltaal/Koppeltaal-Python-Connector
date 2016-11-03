@@ -1,1 +1,469 @@
-{"resourceType":"Bundle","title":"Search on resources in collection 'Other'","id":"urn:uuid:9f20fff0-aa13-49d7-9e17-400416e75ca6","updated":"2016-07-05T11:49:24.4753084+02:00","author":[{"name":"VitalHealth Integrator FHIR Handler"}],"totalResults":"2","link":[{"rel":"fhir-base","href":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal"},{"rel":"self","href":"http://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition"},{"rel":"first","href":"http://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition&page=1"},{"rel":"last","href":"http://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition&page=1"}],"entry":[{"title":"Other resource with subtype=ActivityDefinition and IID=3","id":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:3","updated":"2016-07-04T07:49:01+02:00","link":[{"rel":"self","href":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:3/_history/2016-07-04T07:49:01:742.1933"}],"category":[{"term":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Profile/ActivityDefinition","label":"Koppeltaal ActivityDefinition profile","scheme":"http://hl7.org/fhir/tag/profile"}],"content":{"resourceType":"Other","id":"3","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityDefinitionIdentifier","valueString":"KTSTESTGAME"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#Application","valueResource":{"reference":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Device/7","display":"KTSTESTGAME"}},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityKind","valueCoding":{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityKind","code":"Game","display":"Game"}},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityName","valueString":"Test game"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityDescription","valueString":"Testtest"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#DefaultPerformer","valueCoding":{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityPerformer","code":"Patient","display":"Patient"}},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsActive","valueBoolean":false},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsDomainSpecific","valueBoolean":false},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#LaunchType","valueCode":"Web"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsArchived","valueBoolean":false}],"text":{"status":"generated","div":"<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=KTSTESTGAME</p></div>"},"identifier":[{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/Profile/ActivityDefinition#ActivityDefinitionIdentifier","value":"KTSTESTGAME"}],"code":{"coding":[{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage","code":"ActivityDefinition","display":"ActivityDefinition"}]}},"summary":"<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=KTSTESTGAME</p></div>"},{"title":"Other resource with subtype=ActivityDefinition and IID=1433","id":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:1433","updated":"2016-07-04T09:04:24+02:00","link":[{"rel":"self","href":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:1433/_history/2016-07-04T09:04:24:679.3465"}],"category":[{"term":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Profile/ActivityDefinition","label":"Koppeltaal ActivityDefinition profile","scheme":"http://hl7.org/fhir/tag/profile"}],"content":{"resourceType":"Other","id":"1433","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityDefinitionIdentifier","valueString":"RANJKA"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#Application","valueResource":{"reference":"https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Device/11","display":"RANJKA"}},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityKind","valueCoding":{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityKind","code":"Game","display":"Game"}},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityName","valueString":"Ranj Kick ASS Game"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#DefaultPerformer","valueCoding":{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityPerformer","code":"Patient","display":"Patient"}},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsActive","valueBoolean":true},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsDomainSpecific","valueBoolean":true},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#LaunchType","valueCode":"Web"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsArchived","valueBoolean":false},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Samen naar de film"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_1"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Het is vrijdagavond en je hebt met je vriend Ramsey afgesproken om naar de film te gaan. Jij hebt al twee kaartjes gekocht. Om niet te laat te komen, moeten jullie de bus van 18:30 halen, maar op de afgesproken tijd is Ramsey nergens te bekennen."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Klasgenoten in de kantine"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_2"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je begint het schooljaar in een klas waarin je niemand kent. Als je nieuwe klasgenoten tijdens een tussenuur naar de kantine gaan, krijg je de kans om met hen kennis te maken."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Toeristen voor een snackbar"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_3"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je moeder heeft je naar de snackbar gestuurd om friet te halen. Je wilt zo snel mogelijk naar huis, voordat de friet koud wordt, maar er staan twee verdwaalde toeristen bij je fiets, die jouw hulp nodig hebben."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Cadeau voor de jarige"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_4"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je komt met een cadeautje naar een feest, waar je alleen de jarige kent. Verder zijn er alleen maar onbekenden. Hoe ga je daarmee om?"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Boodschappen tegen sluitingstijd"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_5"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Tegen sluitingstijd moet je nog een paar boodschappen doen in het winkelcentrum. Onderweg word je aangesproken door een kennis die je al een hele tijd niet hebt gezien. Hoe ga je daarmee om?"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Gamen met een vriend"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_6"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je hebt met een vriend afgesproken om bij hem te komen gamen. Maar wanneer je bij hem voor de deur staat, blijkt hij de hele afspraak te zijn vergeten. Erger nog, hij heeft al met iemand anders afgesproken."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Thuis met je broer"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_7"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je ouders zijn bij kennissen op bezoek en kunnen niet thuis zijn voor het eten. Daarom moet je oudste broer het kant-en-klare eten opwarmen en mag jij na afloop de keuken opruimen. Maar je broer houdt zich niet aan de gemaakte afspraken."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Ouders op bezoek"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_8"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je bent nog maar net het huis uit en woont in een klein appartement in een andere stad. Onverwachts bellen je ouders dat ze zometeen bij je op bezoek willen komen. Daar had je niet op gerekend."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Oom en tante op bezoek"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_9"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Na een drukke week hoop je op een rustig weekend. Maar tijdens het ontbijt met je ouders, vertelt je vader dat je oom en tante en je neef op bezoek gaan komen. Daar zit je helemaal niet op te wachten"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Samenwerken aan werkstuk"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_10"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Je moet samen met een klasgenoot een presentatie maken, maar jij blijkt daar veel meer tijd in te hebben gestoken dan de ander."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Te laat voor de toets"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_11"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Door een treinvertraging kom je vijftien minuten te laat op school voor een belangrijke toets."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity","extension":[{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName","valueString":"Verjaardag op het werk"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier","valueString":"scenario_12"},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription","valueString":"Het is vrijdagmiddag en de werkweek is bijna voorbij. Maar niet voor jou, want jij moet voor vijf uur handgeschreven notulen hebben uitgewerkt. Je collega's treffen ondertussen de voorbereidingen voor het vieren van de verjaardag van hun chef."},{"url":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive","valueBoolean":false}]}],"text":{"status":"generated","div":"<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=RANJKA</p></div>"},"identifier":[{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/Profile/ActivityDefinition#ActivityDefinitionIdentifier","value":"RANJKA"}],"code":{"coding":[{"system":"http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage","code":"ActivityDefinition","display":"ActivityDefinition"}]}},"summary":"<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=RANJKA</p></div>"}]}
+{
+  "author": [
+    {
+      "name": "VitalHealth Integrator FHIR Handler"
+    }
+  ],
+  "entry": [
+    {
+      "category": [
+        {
+          "label": "Koppeltaal ActivityDefinition profile",
+          "scheme": "http://hl7.org/fhir/tag/profile",
+          "term": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Profile/ActivityDefinition"
+        }
+      ],
+      "content": {
+        "code": {
+          "coding": [
+            {
+              "code": "ActivityDefinition",
+              "display": "ActivityDefinition",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage"
+            }
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityDefinitionIdentifier",
+            "valueString": "KTSTESTGAME"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#Application",
+            "valueResource": {
+              "display": "KTSTESTGAME"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityKind",
+            "valueCoding": {
+              "code": "Game",
+              "display": "Game",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityKind"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityName",
+            "valueString": "Test game"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityDescription",
+            "valueString": "Testtest"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#DefaultPerformer",
+            "valueCoding": {
+              "code": "Patient",
+              "display": "Patient",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityPerformer"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsActive",
+            "valueBoolean": false
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsDomainSpecific",
+            "valueBoolean": false
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#LaunchType",
+            "valueCode": "Web"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsArchived",
+            "valueBoolean": false
+          }
+        ],
+        "id": "3",
+        "identifier": [
+          {
+            "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/Profile/ActivityDefinition#ActivityDefinitionIdentifier",
+            "value": "KTSTESTGAME"
+          }
+        ],
+        "resourceType": "Other",
+        "text": {
+          "div": "<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=KTSTESTGAME</p></div>",
+          "status": "generated"
+        }
+      },
+      "id": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:3",
+      "link": [
+        {
+          "href": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:3/_history/2016-07-04T07:49:01:742.1933",
+          "rel": "self"
+        }
+      ],
+      "summary": "<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=KTSTESTGAME</p></div>",
+      "title": "Other resource with subtype=ActivityDefinition and IID=3",
+      "updated": "2016-07-04T07:49:01+02:00"
+    },
+    {
+      "category": [
+        {
+          "label": "Koppeltaal ActivityDefinition profile",
+          "scheme": "http://hl7.org/fhir/tag/profile",
+          "term": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Profile/ActivityDefinition"
+        }
+      ],
+      "content": {
+        "code": {
+          "coding": [
+            {
+              "code": "ActivityDefinition",
+              "display": "ActivityDefinition",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage"
+            }
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityDefinitionIdentifier",
+            "valueString": "RANJKA"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#Application",
+            "valueResource": {
+              "display": "RANJKA",
+              "reference": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Device/11"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityKind",
+            "valueCoding": {
+              "code": "Game",
+              "display": "Game",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityKind"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#ActivityName",
+            "valueString": "Ranj Kick ASS Game"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#DefaultPerformer",
+            "valueCoding": {
+              "code": "Patient",
+              "display": "Patient",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityPerformer"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsActive",
+            "valueBoolean": true
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsDomainSpecific",
+            "valueBoolean": true
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#LaunchType",
+            "valueCode": "Web"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#IsArchived",
+            "valueBoolean": false
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Samen naar de film"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_1"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Het is vrijdagavond en je hebt met je vriend Ramsey afgesproken om naar de film te gaan. Jij hebt al twee kaartjes gekocht. Om niet te laat te komen, moeten jullie de bus van 18:30 halen, maar op de afgesproken tijd is Ramsey nergens te bekennen."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Klasgenoten in de kantine"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_2"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je begint het schooljaar in een klas waarin je niemand kent. Als je nieuwe klasgenoten tijdens een tussenuur naar de kantine gaan, krijg je de kans om met hen kennis te maken."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Toeristen voor een snackbar"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_3"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je moeder heeft je naar de snackbar gestuurd om friet te halen. Je wilt zo snel mogelijk naar huis, voordat de friet koud wordt, maar er staan twee verdwaalde toeristen bij je fiets, die jouw hulp nodig hebben."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Cadeau voor de jarige"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_4"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je komt met een cadeautje naar een feest, waar je alleen de jarige kent. Verder zijn er alleen maar onbekenden. Hoe ga je daarmee om?"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Boodschappen tegen sluitingstijd"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_5"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Tegen sluitingstijd moet je nog een paar boodschappen doen in het winkelcentrum. Onderweg word je aangesproken door een kennis die je al een hele tijd niet hebt gezien. Hoe ga je daarmee om?"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Gamen met een vriend"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_6"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je hebt met een vriend afgesproken om bij hem te komen gamen. Maar wanneer je bij hem voor de deur staat, blijkt hij de hele afspraak te zijn vergeten. Erger nog, hij heeft al met iemand anders afgesproken."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Thuis met je broer"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_7"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je ouders zijn bij kennissen op bezoek en kunnen niet thuis zijn voor het eten. Daarom moet je oudste broer het kant-en-klare eten opwarmen en mag jij na afloop de keuken opruimen. Maar je broer houdt zich niet aan de gemaakte afspraken."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Ouders op bezoek"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_8"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je bent nog maar net het huis uit en woont in een klein appartement in een andere stad. Onverwachts bellen je ouders dat ze zometeen bij je op bezoek willen komen. Daar had je niet op gerekend."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Oom en tante op bezoek"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_9"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Na een drukke week hoop je op een rustig weekend. Maar tijdens het ontbijt met je ouders, vertelt je vader dat je oom en tante en je neef op bezoek gaan komen. Daar zit je helemaal niet op te wachten"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Samenwerken aan werkstuk"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_10"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Je moet samen met een klasgenoot een presentatie maken, maar jij blijkt daar veel meer tijd in te hebben gestoken dan de ander."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Te laat voor de toets"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_11"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Door een treinvertraging kom je vijftien minuten te laat op school voor een belangrijke toets."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          },
+          {
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityName",
+                "valueString": "Verjaardag op het werk"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIdentifier",
+                "valueString": "scenario_12"
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityDescription",
+                "valueString": "Het is vrijdagmiddag en de werkweek is bijna voorbij. Maar niet voor jou, want jij moet voor vijf uur handgeschreven notulen hebben uitgewerkt. Je collega's treffen ondertussen de voorbereidingen voor het vieren van de verjaardag van hun chef."
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivityIsActive",
+                "valueBoolean": false
+              }
+            ],
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/ActivityDefinition#SubActivity"
+          }
+        ],
+        "id": "1433",
+        "identifier": [
+          {
+            "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/Profile/ActivityDefinition#ActivityDefinitionIdentifier",
+            "value": "RANJKA"
+          }
+        ],
+        "resourceType": "Other",
+        "text": {
+          "div": "<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=RANJKA</p></div>",
+          "status": "generated"
+        }
+      },
+      "id": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:1433",
+      "link": [
+        {
+          "href": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/ActivityDefinition:1433/_history/2016-07-04T09:04:24:679.3465",
+          "rel": "self"
+        }
+      ],
+      "summary": "<div><p xmlns=\"http://www.w3.org/1999/xhtml\">ActivityDefinition with type=Game and Identifier=RANJKA</p></div>",
+      "title": "Other resource with subtype=ActivityDefinition and IID=1433",
+      "updated": "2016-07-04T09:04:24+02:00"
+    }
+  ],
+  "id": "urn:uuid:9f20fff0-aa13-49d7-9e17-400416e75ca6",
+  "link": [
+    {
+      "href": "https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal",
+      "rel": "fhir-base"
+    },
+    {
+      "href": "http://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition",
+      "rel": "self"
+    },
+    {
+      "href": "http://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition&page=1",
+      "rel": "first"
+    },
+    {
+      "href": "http://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition&page=1",
+      "rel": "last"
+    }
+  ],
+  "resourceType": "Bundle",
+  "title": "Search on resources in collection 'Other'",
+  "totalResults": "2",
+  "updated": "2016-07-05T11:49:24.4753084+02:00"
+}

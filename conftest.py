@@ -1,6 +1,5 @@
 import datetime
 import pytest
-import urlparse
 import uuid
 import selenium.webdriver
 import koppeltaal.connector
@@ -21,24 +20,11 @@ def pytest_addoption(parser):
 def connector(request):
     server = request.config.option.server
     if not server:
-        raise ValueError("No server defined.")
-
-    parsed = urlparse.urlparse(server)
-    if parsed.scheme != 'https' or \
-            parsed.netloc == '' or \
-            parsed.path != '' or \
-            parsed.params != '' or \
-            parsed.query != '' or \
-            parsed.fragment != '':
-        raise ValueError('Incorrect server URL.')
-
-    username, password, domain = koppeltaal.utils.get_credentials_from_file(
-        server)
-
+        raise ValueError("No server name defined.")
+    credentials = koppeltaal.utils.get_credentials_from_file(server)
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')
-    return koppeltaal.connector.Connector(
-        server, username, password, domain, integration)
+    return koppeltaal.connector.Connector(credentials, integration)
 
 
 @pytest.fixture
@@ -107,14 +93,16 @@ def careplan(patient, practitioner, activity_definition):
 @pytest.fixture
 def careplan_from_fixture(request, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        json='fixtures/activities_game.json')
+        respond_with='fixtures/activities_game.json')
     return request.getfuncargvalue('careplan')
 
 
 @pytest.fixture
 def careplan_response(connector, careplan):
-    return connector.send('CreateOrUpdateCarePlan', careplan, careplan.patient)
+    return connector.send(
+        'CreateOrUpdateCarePlan', careplan, careplan.patient)
 
 
 @pytest.fixture(scope='session')

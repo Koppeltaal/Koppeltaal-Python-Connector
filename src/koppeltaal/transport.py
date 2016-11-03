@@ -4,6 +4,13 @@ import requests
 from koppeltaal import (interfaces, logger)
 
 
+class Response(object):
+
+    def __init__(self, json=None, location=None):
+        self.json = json
+        self.location = location
+
+
 class Transport(object):
 
     def __init__(self, server, username, password):
@@ -22,14 +29,14 @@ class Transport(object):
         parts = urlparse.urlparse(url)[2:]
         return urlparse.urlunparse((self.scheme, self.netloc) + parts)
 
-    def query(self, url, params=None):
+    def query(self, url, params=None, username=None, password=None):
         """Query a url.
         """
         try:
             response = self.session.get(
                 self.absolute_url(url),
                 params=params,
-                auth=(self.username, self.password),
+                auth=(username or self.username, password or self.password),
                 headers={'Accept': 'application/json'},
                 timeout=interfaces.TIMEOUT,
                 allow_redirects=False)
@@ -40,7 +47,7 @@ class Transport(object):
             raise interfaces.InvalidResponse(response)
         json = response.json()
         logger.debug_json('Query on {url}:\n {json}', json=json, url=url)
-        return json
+        return Response(json=json)
 
     def query_redirect(self, url, params=None):
         """Query a url for a redirect.
@@ -56,7 +63,7 @@ class Transport(object):
             raise interfaces.InvalidResponse(error)
         if not response.is_redirect:
             raise interfaces.InvalidResponse(response)
-        return response.headers.get('location')
+        return Response(location=response.headers.get('location'))
 
     def create(self, url, data):
         """Create a new resource at the given url with JSON data.
@@ -74,11 +81,9 @@ class Transport(object):
             raise interfaces.InvalidResponse(error)
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response)
-        if response.text:
-            json = response.json()
-            logger.debug_json('Create on {url}:\n {json}', json=json, url=url)
-            return json
-        return None
+        return Response(
+            json=response.json() if response.text else None,
+            location=response.headers.get('content-location'))
 
     def update(self, url, data):
         """Update an existing resource at the given url with JSON data.
@@ -96,8 +101,6 @@ class Transport(object):
             raise interfaces.InvalidResponse(error)
         if not response.headers['content-type'].startswith('application/json'):
             raise interfaces.InvalidResponse(response)
-        if response.text:
-            json = response.json()
-            logger.debug_json('Update on {url}:\n {json}', json=json, url=url)
-            return json
-        return None
+        return Response(
+            json=response.json() if response.text else None,
+            location=response.headers.get('content-location'))

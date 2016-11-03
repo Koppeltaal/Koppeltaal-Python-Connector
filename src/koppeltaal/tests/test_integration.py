@@ -1,13 +1,15 @@
 import urlparse
+import requests
 import selenium.webdriver.support.wait
 import selenium.webdriver.support.expected_conditions as EC
+import koppeltaal.utils
 
 
 def test_request_metadata(connector):
     result = connector.metadata()
     assert isinstance(result, dict)
     assert result.get('name') == 'Koppeltaal'
-    assert result.get('version') == 'v1.0'
+    assert result.get('version') >= 'v1.0'
     assert result.get('fhirVersion') == '0.0.82'
 
 
@@ -79,61 +81,86 @@ def test_launch_practitioner(
         practitioner.fhir_link
 
 
-# def set_domain(browser):
-#     browser.find_element_by_id("domain").clear()
-#     browser.find_element_by_id("domain").send_keys("MindDistrict")
-#     [b for b in browser.find_elements_by_tag_name('button') if
-#         b.text == 'set new domain'][0].click()
+def test_sso(connector):
+    connector.integration.client_id = 'MindDistrict'
+    connector.integration.client_secret = \
+        connector._credentials.options.get('oauth_secret')
+
+    patient_link = (
+        'https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515')
+    step_1 = connector.launch_from_parameters(
+        'MindDistrict', patient_link, patient_link, 'KTSTESTGAME')
+
+    parts = urlparse.urlparse(step_1)
+    query = urlparse.parse_qs(parts.query)
+
+    assert query['application_id'][0] == 'MindDistrict'
+    assert query['launch_id'][0] != ''
+
+    step_2 = connector.authorize_from_parameters(
+        query['application_id'][0],
+        query['launch_id'][0],
+        'https://example.com/koppeltaalauth')
+
+    step_6 = requests.get(
+        step_2, allow_redirects=False).headers.get('Location')
+
+    parts = urlparse.urlparse(step_6)
+    query = urlparse.parse_qs(parts.query)
+
+    token = connector.token_from_parameters(
+        query['code'][0],
+        'https://example.com/koppeltaalauth')
+
+    assert 'access_token' in token
+    assert 'refresh_token' in token
+
+    assert 'domain' in token and token['domain'] == connector.domain
+    assert 'expires_in' in token and token['expires_in'] == 3600
+    assert 'patient' in token and token['patient'] == patient_link
+    assert 'resource' in token and token['resource'] == 'KTSTESTGAME'
+    assert 'scope' in token and token['scope'] == 'patient/*.read'
+    assert 'token_type' in token and token['token_type'] == 'Bearer'
+    assert 'user' in token and token['user'] == patient_link
 
 
-# def post_sub_activities(browser):
-#     [b for b in browser.find_elements_by_tag_name('button') if
-#         b.text == 'post sub activities'][0].click()
-#     selenium.webdriver.support.wait.WebDriverWait(
-#         browser, 10).until(
-#             EC.text_to_be_present_in_element(
-#                 ('id', 'carePlanOutput'), 'scenario_'))
+def test_send_activity(connector):
+    uuid = koppeltaal.utils.uniqueid()
 
+    assert len(list(connector.activities())) == 1
+    assert connector.activity(u'uuid://{}'.format(uuid)) is None
 
-# def post_update(browser):
-#     [b for b in browser.find_elements_by_tag_name('button') if
-#         b.text == 'post update'][0].click()
+    application = koppeltaal.models.ReferredResource(
+        display='Test Generated Application Reference {}'.format(uuid))
+    ad = koppeltaal.models.ActivityDefinition(
+        application=application,
+        description=u'Test Generated AD {}'.format(uuid),
+        identifier=u'uuid://{}'.format(uuid),
+        kind='ELearning',
+        name=u'Test Generated AD {}'.format(uuid),
+        performer='Patient',
+        subactivities=[])
 
+    updated = connector.send_activity(ad)
+    assert len(list(connector.activities())) == 2
+    assert updated.fhir_link is not None
+    assert updated.fhir_link.startswith(
+        'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal'
+        '/Other/ActivityDefinition:')
+    assert updated.is_active is True
+    assert updated.is_archived is False
 
-# def test_send_message_from_game_to_server(
-#         connector, careplan, careplan_sent, patient, browser):
+    fetched = connector.activity(u'uuid://{}'.format(uuid))
+    assert updated.fhir_link == fetched.fhir_link
 
-#     launch_url = connector.launch(careplan)
+    updated.is_active = False
+    updated.is_archived = True
 
-#     # The message to koppeltaal server needs to be acked.
-#     headers = list(parse(
-#         connector.messages(
-#             patient=patient,
-#             processing_status=koppeltaal.interfaces.STATUS_NEW)))
-#     assert len(headers) == 1
+    connector.send_activity(updated)
+    assert updated.fhir_link != fetched.fhir_link
+    assert updated.fhir_link > fetched.fhir_link
+    assert updated.is_active is False
+    assert updated.is_archived is True
+    assert connector.activity(u'uuid://{}'.format(uuid)) is None
 
-#     connector.claim(headers[0].__version__)
-#     connector.success(headers[0].__version__)
-
-#     # Acked indeed.
-#     headers2 = list(parse(
-#         connector.messages(
-#             patient=patient,
-#             processing_status=koppeltaal.interfaces.STATUS_NEW)))
-#     assert len(headers2) == 0
-
-#     browser.get(launch_url)
-#     wait_for_application(browser)
-#     login_with_oauth(browser)
-
-#     set_domain(browser)
-#     request_care_plan(browser)
-#     post_sub_activities(browser)
-#     headers3 = list(parse(
-#         connector.messages(
-#             patient=patient,
-#             processing_status=koppeltaal.interfaces.STATUS_NEW)))
-#     assert len(headers3) == 1
-
-#     message = connector.message(headers3[0].__version__)
-#     assert 'CarePlan#SubActivity' in message
+    assert len(list(connector.activities())) == 1

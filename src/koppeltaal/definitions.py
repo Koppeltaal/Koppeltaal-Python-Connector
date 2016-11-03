@@ -360,11 +360,6 @@ class ActivityParticipant(zope.interface.Interface):
 
 class Activity(zope.interface.Interface):
 
-    application = Field(
-        'application', 'reference',
-        extension='CarePlan#Application',
-        optional=True)
-
     # This is optional in the specification but cannot be in practice,
     # or other messages won't be able to refer to it.
     identifier = Field(
@@ -388,6 +383,11 @@ class Activity(zope.interface.Interface):
         optional=True,
         extension='CarePlan#ActivityDescription')
 
+    ends = Field(
+        'endDate', 'datetime',
+        optional=True,
+        extension='CarePlan#EndDate')
+
     finished = Field(
         'finished', 'instant',
         optional=True,
@@ -399,12 +399,6 @@ class Activity(zope.interface.Interface):
         'type', 'coding',
         binding=codes.ACTIVITY_KIND,
         extension='CarePlan#ActivityKind')
-
-    launch_type = Field(
-        'launchType', 'code',
-        binding=codes.ACTIVITY_LAUNCH_TYPE,
-        extension='CarePlan#LaunchType',
-        optional=True)
 
     notes = Field(
         'notes', 'string',

@@ -8,6 +8,7 @@ import koppeltaal.fhir.resource
 import koppeltaal.interfaces
 import koppeltaal.models
 import koppeltaal.utils
+import koppeltaal.codes
 import zope.interface.verify
 
 
@@ -23,6 +24,69 @@ def packer():
 @pytest.fixture
 def NAMESPACE():
     return koppeltaal.interfaces.NAMESPACE
+
+
+def test_coding(packer, NAMESPACE):
+
+    vertebrates = koppeltaal.codes.Code(
+        'Vertebrate',
+        ['amphibians',
+         'birds',
+         'mammals',
+         'reptiles'])
+
+    packed = vertebrates.pack_code('amphibians')
+    assert packed == 'amphibians'
+
+    with pytest.raises(koppeltaal.interfaces.InvalidCode):
+        vertebrates.pack_code('sponges')
+
+    coding = vertebrates.pack_coding('amphibians')
+    assert coding == {
+        'code': 'amphibians',
+        'display': 'amphibians',
+        'system': NAMESPACE + 'Vertebrate'}
+
+    with pytest.raises(koppeltaal.interfaces.InvalidCode):
+        vertebrates.pack_coding('sponges')
+
+    unpacked = vertebrates.unpack_code('amphibians')
+    assert unpacked == 'amphibians'
+
+    with pytest.raises(koppeltaal.interfaces.InvalidCode):
+        vertebrates.unpack_code('sponges')
+
+    unpacked_coding = vertebrates.unpack_coding({
+        'code': 'amphibians',
+        'display': 'amphibians',
+        'system': NAMESPACE + 'Vertebrate'})
+
+    assert 'amphibians' == unpacked_coding
+
+    with pytest.raises(koppeltaal.interfaces.InvalidCode):
+        vertebrates.unpack_coding({
+            'code': 'sponges',
+            'display': 'sponges',
+            'system': NAMESPACE + 'Vertebrate'})
+
+    unknown_value = vertebrates.unpack_coding({
+        'code': 'UNK',
+        'display': 'Unkown',
+        'system': koppeltaal.codes.NULL_SYSTEM})
+
+    assert unknown_value is None
+
+    with pytest.raises(koppeltaal.interfaces.InvalidCode):
+        vertebrates.unpack_coding({
+            'code': 'UNKNOW',
+            'display': 'Unkown',
+            'system': koppeltaal.codes.NULL_SYSTEM})
+
+    with pytest.raises(koppeltaal.interfaces.InvalidSystem):
+        vertebrates.unpack_coding({
+            'code': 'reptiles',
+            'display': 'reptiles',
+            'system': 'foobarbaz'})
 
 
 def test_unpack_name(packer):

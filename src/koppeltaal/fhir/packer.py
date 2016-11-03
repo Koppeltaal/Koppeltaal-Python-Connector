@@ -7,17 +7,8 @@ from koppeltaal import (
     compat,
     definitions,
     interfaces,
+    models,
     utils)
-
-
-@zope.interface.implementer(interfaces.IReferredFHIRResource)
-class ReferredResource(object):
-    fhir_link = None
-    display = None
-
-    def __init__(self, value):
-        self.fhir_link = value['reference']
-        self.display = value.get('display')
 
 
 @zope.interface.implementer(interfaces.IBrokenFHIRResource)
@@ -116,8 +107,6 @@ class Extension(object):
             value = extension.get('valueResource')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, extension)
-            if 'reference' not in value:
-                interfaces.InvalidValue(field, extension)
             return self._packer.unpack_reference(value)
 
         if field.field_type == 'string':
@@ -308,8 +297,6 @@ class Native(object):
         if field.field_type == 'reference':
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
-            if 'reference' not in value:
-                raise interfaces.InvalidValue(field, value)
             return self._packer.unpack_reference(value)
 
         if field.field_type == 'string':
@@ -477,13 +464,21 @@ class Packer(object):
         reference = self.resource.find(value)
         if reference:
             return reference.unpack()
-        return ReferredResource(value)
+        if not ('reference' in value or 'display' in value):
+            raise interfaces.InvalidReference(value)
+        return models.ReferredResource(
+            fhir_link=value.get('reference'),
+            display=value.get('display'))
 
     def pack_reference(self, value):
         if interfaces.IReferredFHIRResource.providedBy(value):
-            reference = {'reference': value.fhir_link}
+            reference = {}
+            if value.fhir_link:
+                reference['reference'] = value.fhir_link
             if value.display:
                 reference['display'] = value.display
+            if not reference:
+                raise interfaces.InvalidReference(value)
             return reference
         entry = self.resource.add_model(value)
         return {'reference': entry.fhir_link}

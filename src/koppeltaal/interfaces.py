@@ -6,11 +6,14 @@ NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
 SOFTWARE = 'Koppeltaal python adapter'
 VERSION = pkg_resources.get_distribution('koppeltaal').version
 
+OTHER_URL = '/FHIR/Koppeltaal/Other'
 ACTIVITY_DEFINITION_URL = '/FHIR/Koppeltaal/Other/_search'
 MESSAGE_HEADER_URL = '/FHIR/Koppeltaal/MessageHeader/_search'
 METADATA_URL = '/FHIR/Koppeltaal/metadata'
 MAILBOX_URL = '/FHIR/Koppeltaal/Mailbox'
+OAUTH_AUTHORIZE_URL = 'OAuth2/Koppeltaal/Authorize'
 OAUTH_LAUNCH_URL = '/OAuth2/Koppeltaal/Launch'
+OAUTH_TOKEN_URL = '/OAuth2/Koppeltaal/Token'
 
 TIMEOUT = 60
 
@@ -43,6 +46,20 @@ class InvalidValue(KoppeltaalError):
         return "{}: invalid value for '{}'.".format(
             self.__class__.__name__,
             self.field.name)
+
+
+class InvalidReference(InvalidValue):
+    """A value that is not a valid reference.
+    """
+
+    field = None
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return "invalid reference '{}'.".format(
+            self.value.__class__.__name__)
 
 
 class InvalidCode(InvalidValue):
@@ -134,6 +151,12 @@ class IIntegration(zope.interface.Interface):
     name = zope.interface.Attribute('application name using the connector')
 
     url = zope.interface.Attribute('fhir base URL for generated resources')
+
+    client_id = zope.interface.Attribute(
+        'Application identifier for the domain')
+
+    client_secret = zope.interface.Attribute(
+        'OAUTH secret for this application client')
 
     def transaction_hook(commit_function, message):
         """Optional hook to integrate sending back a message into a

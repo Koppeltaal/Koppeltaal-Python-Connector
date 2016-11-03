@@ -1,8 +1,8 @@
 import hamcrest
-import pytest
 import koppeltaal.definitions
 import koppeltaal.interfaces
 import koppeltaal.testing
+import pytest
 import zope.interface.verify
 
 
@@ -12,89 +12,11 @@ def test_connector(connector):
         koppeltaal.interfaces.IConnector, connector)
 
 
-def test_activities_from_fixture(connector, transport):
-    transport.expect(
-        '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        json='fixtures/activities_game.json')
-
-    activities = list(connector.activities())
-    assert len(activities) == 2
-
-    activity1, activity2 = activities
-
-    assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.ActivityDefinition, activity1)
-    assert activity1.identifier == 'KTSTESTGAME'
-    assert activity1.name == 'Test game'
-    assert activity1.kind == 'Game'
-    assert zope.interface.verify.verifyObject(
-        koppeltaal.interfaces.IReferredFHIRResource, activity1.application)
-
-    assert activity1.description == 'Testtest'
-    assert activity1.fhir_link == (
-        'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/'
-        'ActivityDefinition:3/_history/2016-07-04T07:49:01:742.1933')
-    assert activity1.is_active is False
-    assert activity1.is_archived is False
-    assert activity1.is_domain_specific is False
-    assert activity1.launch_type == 'Web'
-    assert activity1.performer == 'Patient'
-    assert activity1.subactivities == []
-
-    assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.ActivityDefinition, activity2)
-    assert activity2.identifier == 'RANJKA'
-    assert activity2.name == 'Ranj Kick ASS Game'
-    assert activity2.kind == 'Game'
-
-    assert activity2.description is None
-    assert activity2.fhir_link == (
-        'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal/Other/'
-        'ActivityDefinition:1433/_history/2016-07-04T09:04:24:679.3465')
-    assert activity2.is_active is True
-    assert activity2.is_archived is False
-    assert activity2.is_domain_specific is True
-    assert activity2.launch_type == u'Web'
-    assert activity2.performer == u'Patient'
-    assert len(activity2.subactivities) == 12
-    for subactivity in activity2.subactivities:
-        assert zope.interface.verify.verifyObject(
-            koppeltaal.definitions.SubActivityDefinition, subactivity)
-
-    assert subactivity.active is False
-    assert subactivity.description == (
-        u"Het is vrijdagmiddag en de werkweek is bijna voorbij. Maar niet "
-        "voor jou, want jij moet voor vijf uur handgeschreven notulen "
-        "hebben uitgewerkt. Je collega's treffen ondertussen de "
-        "voorbereidingen voor het vieren van de verjaardag van hun chef.")
-    assert subactivity.identifier == u'scenario_12'
-    assert subactivity.name == u'Verjaardag op het werk'
-
-
-def test_activity_from_fixture(connector, transport):
-    transport.expect(
-        '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        json='fixtures/activities_game.json')
-    transport.expect(
-        '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
-        json='fixtures/activities_game.json')
-
-    activity = connector.activity('FOO')
-    assert activity is None
-
-    activity = connector.activity('KTSTESTGAME')
-    assert activity is not None
-    assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.ActivityDefinition, activity)
-    assert activity.identifier == 'KTSTESTGAME'
-    assert activity.name == 'Test game'
-    assert activity.kind == 'Game'
-
-
 def test_search_message_id_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?_id=45909',
-        json='fixtures/bundle_one_message.json')
+        respond_with='fixtures/bundle_one_message.json')
 
     models = list(connector.search(message_id='45909'))
     assert len(models) > 1
@@ -112,8 +34,9 @@ def test_search_message_id_from_fixture(connector, transport):
 def test_send_careplan_success_from_fixture(
         connector, transport, careplan_from_fixture):
     transport.expect(
+        'POST',
         '/FHIR/Koppeltaal/Mailbox',
-        json='fixtures/bundle_post_answer_ok.json')
+        respond_with='fixtures/bundle_post_careplan_ok.json')
     message = connector.send(
         'CreateOrUpdateCarePlan',
         careplan_from_fixture,
@@ -131,8 +54,9 @@ def test_send_careplan_success_from_fixture(
 def test_send_careplan_fail_from_fixture(
         connector, transport, careplan_from_fixture):
     transport.expect(
+        'POST',
         '/FHIR/Koppeltaal/Mailbox',
-        json='fixtures/bundle_post_answer_failed.json')
+        respond_with='fixtures/bundle_post_careplan_failed.json')
     with pytest.raises(koppeltaal.interfaces.InvalidResponse):
         connector.send(
             'CreateOrUpdateCarePlan',
@@ -145,17 +69,20 @@ def test_send_careplan_fail_from_fixture(
 
 def test_updates_implicit_success_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_one_message.json')
+        respond_with='fixtures/bundle_one_message.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_zero_messages.json')
+        respond_with='fixtures/bundle_zero_messages.json')
     transport.expect(
+        'PUT',
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        json='fixtures/resource_post_message.json')
+        respond_with='fixtures/resource_put_message.json')
 
     updates = list(connector.updates())
     assert len(updates) == 1
@@ -186,17 +113,20 @@ def test_updates_implicit_success_from_fixture(connector, transport):
 
 def test_updates_explicit_success_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_one_message.json')
+        respond_with='fixtures/bundle_one_message.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_zero_messages.json')
+        respond_with='fixtures/bundle_zero_messages.json')
     transport.expect(
+        'PUT',
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        json='fixtures/resource_post_message.json')
+        respond_with='fixtures/resource_put_message.json')
 
     updates = list(connector.updates())
     assert len(updates) == 1
@@ -228,17 +158,20 @@ def test_updates_explicit_success_from_fixture(connector, transport):
 
 def test_updates_explicit_fail_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_one_message.json')
+        respond_with='fixtures/bundle_one_message.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_zero_messages.json')
+        respond_with='fixtures/bundle_zero_messages.json')
     transport.expect(
+        'PUT',
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        json='fixtures/resource_post_message.json')
+        respond_with='fixtures/resource_put_message.json')
 
     updates = list(connector.updates())
     assert len(updates) == 1
@@ -275,17 +208,20 @@ def test_updates_explicit_fail_from_fixture(connector, transport):
 
 def test_updates_implicit_success_exception_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_one_message.json')
+        respond_with='fixtures/bundle_one_message.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_zero_messages.json')
+        respond_with='fixtures/bundle_zero_messages.json')
     transport.expect(
+        'PUT',
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        json='fixtures/resource_post_message.json')
+        respond_with='fixtures/resource_put_message.json')
 
     updates = list(connector.updates())
     assert len(updates) == 1
@@ -319,17 +255,20 @@ def test_updates_implicit_success_exception_from_fixture(connector, transport):
 
 def test_updates_explicit_success_exception_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_one_message.json')
+        respond_with='fixtures/bundle_one_message.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_zero_messages.json')
+        respond_with='fixtures/bundle_zero_messages.json')
     transport.expect(
+        'PUT',
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        json='fixtures/resource_post_message.json')
+        respond_with='fixtures/resource_put_message.json')
 
     updates = list(connector.updates())
     assert len(updates) == 1
@@ -368,17 +307,20 @@ def test_updates_explicit_success_exception_from_fixture(connector, transport):
 
 def test_updates_error_from_fixture(connector, transport):
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_one_error.json')
+        respond_with='fixtures/bundle_one_error.json')
     transport.expect(
+        'GET',
         '/FHIR/Koppeltaal/MessageHeader/_search?'
         '_query=MessageHeader.GetNextNewAndClaim',
-        json='fixtures/bundle_zero_messages.json')
+        respond_with='fixtures/bundle_zero_messages.json')
     transport.expect(
+        'PUT',
         '/FHIR/Koppeltaal/MessageHeader/45909'
         '/_history/2016-07-15T11:50:24:494.7839',
-        json='fixtures/resource_post_message.json')
+        respond_with='fixtures/resource_put_message.json')
 
     updates = list(connector.updates())
     assert len(updates) == 0
@@ -403,4 +345,126 @@ def test_updates_error_from_fixture(connector, transport):
                         hamcrest.ends_with(
                             "RequiredMissing: 'startDate' "
                             "required but missing.")))
+            )))
+
+
+def test_updates_expected_event(connector, transport):
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_one_message.json')
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_zero_messages.json')
+    transport.expect(
+        'PUT',
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        respond_with='fixtures/resource_put_message.json')
+
+    updates = list(connector.updates(
+        expected_events=['CreateOrUpdateCarePlan']))
+    assert len(updates) == 1
+    for update in updates:
+        with update:
+            assert update.message.event == 'CreateOrUpdateCarePlan'
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'Success'))))
+
+
+def test_updates_unexpected_event(connector, transport):
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_one_message.json')
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_zero_messages.json')
+    # This is the response from the KT server after sending the fail.
+    transport.expect(
+        'PUT',
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        respond_with='fixtures/resource_put_message.json')
+
+    # We ask for updates but only allow CreateOrUpdatePatient events. Since
+    # the message we'll retrieve is a CreateOrUpdateCarePlan, we should see
+    # that the message is acknowledged as "fail".
+    updates = list(connector.updates(
+        expected_events=['CreateOrUpdatePatient']))
+    assert len(updates) == 0
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            hamcrest.all_of(
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusStatus',
+                    hamcrest.has_entry('valueCode', 'Failed')),
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusException',
+                    hamcrest.has_entry('valueString', "Event not expected"))
+            )))
+
+
+def test_updates_unexpected_event_no_events_at_all(connector, transport):
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_one_message.json')
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_zero_messages.json')
+    # This is the response from the KT server after sending the fail.
+    transport.expect(
+        'PUT',
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        respond_with='fixtures/resource_put_message.json')
+
+    # We ask for updates but do not allow any events. Since the message we'll
+    # retrieve is a CreateOrUpdateCarePlan, we should see that the message is
+    # acknowledged as "fail".
+    updates = list(connector.updates(expected_events=[]))
+    assert len(updates) == 0
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            hamcrest.all_of(
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusStatus',
+                    hamcrest.has_entry('valueCode', 'Failed')),
+                koppeltaal.testing.has_extension(
+                    '#ProcessingStatusException',
+                    hamcrest.has_entry('valueString', "Event not expected"))
             )))

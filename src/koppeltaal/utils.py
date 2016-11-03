@@ -1,3 +1,5 @@
+import urlparse
+import collections
 import ConfigParser
 import datetime
 import uuid
@@ -45,18 +47,34 @@ def now():
     return datetime.datetime.utcnow().replace(microsecond=0, tzinfo=utc)
 
 
-def get_credentials_from_file(server):
+Credentials = collections.namedtuple(
+    'Credentials',
+    ['url', 'username', 'password', 'domain', 'options'])
+
+
+def get_credentials_from_file(name):
     # They're not passed in, so now look at ~/.koppeltaal.cfg.
     config = os.path.expanduser('~/.koppeltaal.cfg')
     if not os.path.isfile(config):
         raise ValueError("Can't find ~/.koppeltaal.cfg")
     parser = ConfigParser.ConfigParser()
     parser.read(config)
-    if not parser.has_section(server):
+    if not parser.has_section(name):
         raise ValueError('No user credentials found in ~/.koppeltaal.cfg')
-    username = parser.get(server, 'username')
-    password = parser.get(server, 'password')
-    domain = parser.get(server, 'domain')
+    url = parser.get(name, 'url')
+    parsed = urlparse.urlparse(url)
+    if parsed.scheme != 'https' or \
+            parsed.netloc == '' or \
+            parsed.path != '' or \
+            parsed.params != '' or \
+            parsed.query != '' or \
+            parsed.fragment != '':
+        raise ValueError('Incorrect server URL.')
+    username = parser.get(name, 'username')
+    password = parser.get(name, 'password')
+    domain = parser.get(name, 'domain')
     if not username or not password or not domain:
         raise ValueError('No user credentials found in ~/.koppeltaal.cfg')
-    return username, password, domain
+    return Credentials(
+        url, username, password, domain,
+        dict(parser.items(name)))
