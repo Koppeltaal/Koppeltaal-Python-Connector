@@ -1,4 +1,5 @@
 import urlparse
+import requests
 import selenium.webdriver.support.wait
 import selenium.webdriver.support.expected_conditions as EC
 import koppeltaal.utils
@@ -78,6 +79,49 @@ def test_launch_practitioner(
         careplan.patient.fhir_link
     assert browser.find_element_by_id('userReference').text == \
         practitioner.fhir_link
+
+
+def test_sso(connector):
+    connector.integration.client_id = 'MindDistrict'
+    connector.integration.client_secret = \
+        connector._credentials.options.get('oauth_secret')
+
+    patient_link = (
+        'https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515')
+    step_1 = connector.launch_from_parameters(
+        'MindDistrict', patient_link, patient_link, 'KTSTESTGAME')
+
+    parts = urlparse.urlparse(step_1)
+    query = urlparse.parse_qs(parts.query)
+
+    assert query['application_id'][0] == 'MindDistrict'
+    assert query['launch_id'][0] != ''
+
+    step_2 = connector.authorize_from_parameters(
+        query['application_id'][0],
+        query['launch_id'][0],
+        'https://example.com/koppeltaalauth')
+
+    step_6 = requests.get(
+        step_2, allow_redirects=False).headers.get('Location')
+
+    parts = urlparse.urlparse(step_6)
+    query = urlparse.parse_qs(parts.query)
+
+    token = connector.token_from_parameters(
+        query['code'][0],
+        'https://example.com/koppeltaalauth')
+
+    assert 'access_token' in token
+    assert 'refresh_token' in token
+
+    assert 'domain' in token and token['domain'] == connector.domain
+    assert 'expires_in' in token and token['expires_in'] == 3600
+    assert 'patient' in token and token['patient'] == patient_link
+    assert 'resource' in token and token['resource'] == 'KTSTESTGAME'
+    assert 'scope' in token and token['scope'] == 'patient/*.read'
+    assert 'token_type' in token and token['token_type'] == 'Bearer'
+    assert 'user' in token and token['user'] == patient_link
 
 
 def test_send_activity(connector):

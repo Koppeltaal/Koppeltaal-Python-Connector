@@ -84,11 +84,12 @@ class Connector(object):
     _create_transport = transport.Transport
 
     def __init__(self, credentials, integration):
+        self._credentials = credentials
         self.transport = self._create_transport(
-            credentials.url,
-            credentials.username,
-            credentials.password)
-        self.domain = credentials.domain
+            self._credentials.url,
+            self._credentials.username,
+            self._credentials.password)
+        self.domain = self._credentials.domain
         self.integration = integration
 
     def _fetch_bundle(self, url, params=None):

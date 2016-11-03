@@ -49,7 +49,7 @@ def now():
 
 Credentials = collections.namedtuple(
     'Credentials',
-    ['url', 'username', 'password', 'domain'])
+    ['url', 'username', 'password', 'domain', 'options'])
 
 
 def get_credentials_from_file(name):
@@ -75,4 +75,6 @@ def get_credentials_from_file(name):
     domain = parser.get(name, 'domain')
     if not username or not password or not domain:
         raise ValueError('No user credentials found in ~/.koppeltaal.cfg')
-    return Credentials(url, username, password, domain)
+    return Credentials(
+        url, username, password, domain,
+        dict(parser.items(name)))
