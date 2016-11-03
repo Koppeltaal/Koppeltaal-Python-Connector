@@ -1,3 +1,9 @@
+General todo topics
+===================
+
+- Expand test coverage
+- API documentation
+
 Definitions that need to be added
 =================================
 
