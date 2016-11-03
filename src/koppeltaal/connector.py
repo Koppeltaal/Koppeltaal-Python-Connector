@@ -183,13 +183,11 @@ class Connector(object):
                  ('response_type', 'code'),
                  ('scope', 'patient/*.read launch:{}'.format(launch_id)))))
 
-    def token_from_parameters(
-            self,
-            code):
+    def token_from_parameters(self, code, redirect_url):
         params = {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'https://app.minddistrict.com/koppeltaalauth'}
+            'redirect_uri': redirect_url}
         # Note how for this specific request a different set of credentials
         # ought to be used.
         # See https://www.koppeltaal.nl/
