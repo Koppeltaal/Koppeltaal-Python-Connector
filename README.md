@@ -2,7 +2,7 @@
 
 ## Buildout
 
-The dependencies for the koppeltaal python connector is put together using [buildout].
+The dependencies for the Koppeltaal Python connector is put together using [buildout].
 
 On Linux/OSX, run:
 
@@ -20,10 +20,10 @@ $ bin\buildout.exe
 
 ## Tests
 
-We use the [pytest] framework. The tests are run against a Koppeltaal server, for instance:
+We use the [pytest] framework. The tests are run against a Koppeltaal server and domain setup specifically for testing the connector code base. This domain is called `edge`:
 
 ```sh
-$ bin/py.test --server https://edgekoppeltaal.vhscloud.nl
+$ bin/py.test --server=edge
 ```
 
 ## Command line interface
@@ -37,25 +37,24 @@ $ bin/koppeltaal --help
 Arguments:
 
 The first argument to the *koppeltaal* script is the server to connect to, for
-example *https://edgekoppeltaal.vhscloud.nl*. The username, password and
+example *edge*. The username, password and
 domain can be passed in as arguments or taken from *~/.koppeltaal.cfg*. The
 format of ~/.koppeltaal.cfg looks like this:
 
 ```
-[https://edgekoppeltaal.vhscloud.nl]
-username = MindDistrict
-password = gele-haas (replace with your own)
-domain = MindDistrict Kickass
+[edge]
+url = https://edgekoppeltaal.vhscloud.nl
+username = PA@PythonAdapterTesting4Edge
+password = <secret here>
+domain = PythonAdapterTesting
 ```
-
-If you want to see verbose output, use the *--verbose* flag.
 
 ### Metadata / Conformance statement
 
 To retrieve the Conformance statement from the server:
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl metadata
+$ bin/koppeltaal [servername] metadata
 ```
 
 ### Activity definition
@@ -63,7 +62,7 @@ $ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl metadata
 To get the activity definition from the server:
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl activities
+$ bin/koppeltaal [servername] activities
 ```
 
 ### Messages
@@ -71,47 +70,27 @@ $ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl activities
 To get a list of messages in the mailbox:
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl messages
+$ bin/koppeltaal [servername] messages
 ```
 
 You can filter on a patient (with *--patient*), or event (with
 *--event*) or status (with *--status*):
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl messages --status New --event CreateOrUpdateCarePlan
+$ bin/koppeltaal [servername] messages --status=New --event=CreateOrUpdateCarePlan
 ```
 
 To get a specific message:
 
 ```sh
-$ bin/koppeltaal https://edgekoppeltaal.vhscloud.nl message message_url
+$ bin/koppeltaal [servername] message [message URL or id]
 ```
 
 ## Python API
 
-Use the following API in your integration code to talk to a koppeltaal server:
+Use the following API in your integration code to talk to a Koppeltaal server:
 
-```python
-from koppeltaal.connect import Connector
-
-# takes server, username and password as arguments.
-c = Connector('https://edgekoppeltaal.vhscloud.nl', 'username', 'password', 'domain')
-
-# metadata from the server, Conformance statement.
-c.metadata()
-
-# get all the activity definitions from server.
-activities = c.activities()
-
-# get a specific activity definition from server.
-activity = c.activity('KTSTESTGAME')
-
-# search for messages in the mailbox.
-messages = c.search(status='New', event='CreateOrUpdateCarePlan')
-
-# send an update.
-c.send('CreateOrUpdateCarePlan', careplan, patient)
-```
+T.B.D.
 
 [buildout]: http://www.buildout.org
 [pytest]: https://pytest.org
