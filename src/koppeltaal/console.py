@@ -13,14 +13,14 @@ from koppeltaal.fhir import xml, bundle
 
 ACTIVITY_DEFINITION_OUTPUT = """Activity: {model.identifier}
 - fhir link: {model.fhir_link}
-- application: {model.application.fhir_link}
-- name: {model.name}
-- description: {model.description}
-- kind: {model.kind}
-- performer: {model.performer}
 - active: {model.is_active}
-- domain specific: {model.is_domain_specific}
+- application: {model.application.fhir_link}
 - archived: {model.is_archived}
+- description: {model.description}
+- domain specific: {model.is_domain_specific}
+- kind: {model.kind}
+- name: {model.name}
+- performer: {model.performer}
 """
 
 ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
@@ -31,6 +31,7 @@ ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
 MESSAGE_OUTPUT = """Message: {model.identifier}
 - fhir link: {model.fhir_link}
 - event: {model.event}
+- status: {model.status.status} ({model.status.exception})
 - time stamp: {model.timestamp}
 - software: {model.source.software} ({model.source.version})
 - endpoint: {model.source.endpoint}
