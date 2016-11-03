@@ -2,6 +2,7 @@ import argparse
 import dateutil
 import json
 import logging
+import os
 import os.path
 import pdb
 import sys
@@ -112,6 +113,9 @@ def download(connection, directory, msgid=None, msg=None):
     packaging.add_payload(response)
     msg = packaging.unpack_message_header()
     ts = msg.timestamp.isoformat()
+    directory = os.path.join(directory, connection.domain)
+    if not os.path.exists(directory):
+        os.mkdir(directory)
     filename = os.path.join(directory, '{}-{}.json'.format(ts, msgid))
     with open(filename, 'wb') as output:
         json.dump(
