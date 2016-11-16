@@ -39,9 +39,10 @@ def transport(monkeypatch, connector):
 @pytest.fixture
 def patient(request, connector):
     patient = koppeltaal.models.Patient(
-        name=koppeltaal.models.Name(
-            family=u"Doe",
-            given=u"John"),
+        name=[
+            koppeltaal.models.Name(
+                family=[u"Doe"],
+                given=[u"John"])],
         age=42,
         gender="M",
         active=True)
@@ -60,8 +61,8 @@ def patient(request, connector):
 def practitioner():
     return koppeltaal.models.Practitioner(
         name=koppeltaal.models.Name(
-            given=u'John',
-            family=u'Q. Practitioner'))
+            given=[u'John'],
+            family=[u'Q.', u'Practitioner']))
 
 
 @pytest.fixture
