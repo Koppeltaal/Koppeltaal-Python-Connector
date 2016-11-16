@@ -195,15 +195,27 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
 
 class Name(zope.interface.Interface):
 
+    # http://hl7.org/fhir/DSTU1/datatypes.html#HumanName
+
     given = Field(
         'given', 'string',
         optional=True,
-        multiple=FIRST_ITEM)
+        multiple=ALL_ITEMS)
 
     family = Field(
         'family', 'string',
         optional=True,
-        multiple=FIRST_ITEM)
+        multiple=ALL_ITEMS)
+
+    prefix = Field(
+        'prefix', 'string',
+        optional=True,
+        multiple=ALL_ITEMS)
+
+    suffix = Field(
+        'suffix', 'string',
+        optional=True,
+        multiple=ALL_ITEMS)
 
     use = Field(
         'use', 'code',
@@ -280,7 +292,7 @@ class Patient(interfaces.IIdentifiedFHIRResource):
     name = Field(
         'name', 'object',
         binding=Name,
-        multiple=FIRST_ITEM)
+        multiple=ALL_ITEMS)
 
 
 @resource_type('Practitioner')

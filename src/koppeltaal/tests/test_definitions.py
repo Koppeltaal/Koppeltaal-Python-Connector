@@ -95,19 +95,31 @@ def test_unpack_name(packer):
          'family': [u'Bonaparte'],
          'use': u'official'},
         koppeltaal.definitions.Name)
-
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, name)
-    assert name.given == u'Napoleon'
-    assert name.family == u'Bonaparte'
+    assert name.given == [u'Napoleon']
+    assert name.family == [u'Bonaparte']
+    assert name.use == 'official'
+
+    name = packer.unpack(
+        {'given': [u'Thea'],
+         'family': [u'van', u'de', u'Bovenburen'],
+         'suffix': [u'van', u'den', u'Overkant'],
+         'use': u'official'},
+        koppeltaal.definitions.Name)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Name, name)
+    assert name.given == [u'Thea']
+    assert name.family == [u'van', u'de', u'Bovenburen']
+    assert name.suffix == [u'van', u'den', u'Overkant']
     assert name.use == 'official'
 
 
 def test_pack_name(packer):
     name1 = packer.pack(
         koppeltaal.models.Name(
-            given=u'Napoleon',
-            family=u'Bonaparte',
+            given=[u'Napoleon'],
+            family=[u'Bonaparte'],
             use='old'),
         koppeltaal.definitions.Name)
 
@@ -119,10 +131,27 @@ def test_pack_name(packer):
 
     name2 = packer.pack(
         koppeltaal.models.Name(
-            given=u'Nathan'),
+            given=[u'Nathan']),
         koppeltaal.definitions.Name)
 
-    assert name2 == {'given': ['Nathan'], 'id': mock.ANY, 'use': 'official'}
+    assert name2 == {
+        'given': ['Nathan'],
+        'id': mock.ANY,
+        'use': 'official'}
+
+    name3 = packer.pack(
+        koppeltaal.models.Name(
+            given=[u'Nathan'],
+            family=[u'der', u'Fantasten'],
+            suffix=[u'tot', u'Daarhelemalië']),
+        koppeltaal.definitions.Name)
+
+    assert name3 == {
+        'given': ['Nathan'],
+        'family': [u'der', u'Fantasten'],
+        'id': mock.ANY,
+        'suffix': [u'tot', u'Daarhelemalië'],
+        'use': 'official'}
 
     with pytest.raises(koppeltaal.interfaces.InvalidResource):
         packer.pack(
@@ -132,8 +161,8 @@ def test_pack_name(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue):
         packer.pack(
             koppeltaal.models.Name(
-                given=u'Napoleon',
-                family=u'Bonaparte',
+                given=[u'Napoleon'],
+                family=[u'Bonaparte'],
                 use='cool name'),
             koppeltaal.definitions.Name)
 
@@ -156,11 +185,12 @@ def test_unpack_patient(packer, NAMESPACE):
 
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Patient, patient1)
+    name = patient1.name[0]
     assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.Name, patient1.name)
-    assert patient1.name.given == u'Paul'
-    assert patient1.name.family == u'Roger'
-    assert patient1.name.use == 'official'
+        koppeltaal.definitions.Name, name)
+    assert name.given == [u'Paul']
+    assert name.family == [u'Roger']
+    assert name.use == 'official'
     assert len(patient1.contacts) == 0
     assert len(patient1.identifiers) == 0
     assert patient1.age == 42
@@ -180,11 +210,12 @@ def test_unpack_patient(packer, NAMESPACE):
         koppeltaal.definitions.Patient)
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Patient, patient2)
+    name2 = patient2.name[0]
     assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.Name, patient2.name)
-    assert patient2.name.given == u'Paul'
-    assert patient2.name.family == u'Roger'
-    assert patient2.name.use == 'official'
+        koppeltaal.definitions.Name, name2)
+    assert name2.given == [u'Paul']
+    assert name2.family == [u'Roger']
+    assert name2.use == 'official'
     assert len(patient2.contacts) == 0
     assert len(patient2.identifiers) == 0
     assert patient2.age is None
@@ -198,10 +229,11 @@ def test_pack_patient(packer):
         koppeltaal.models.Patient(
             active=True,
             age=42,
-            name=koppeltaal.models.Name(
-                given=u'Paul',
-                family=u'Roger',
-                use='official'),
+            name=[
+                koppeltaal.models.Name(
+                    given=[u'Paul'],
+                    family=[u'Roger'],
+                    use='official')],
             gender='M'),
         koppeltaal.definitions.Patient)
 
@@ -234,9 +266,10 @@ def test_pack_patient(packer):
                     system=u'http://fhir.nl/fhir/NamingSystem/bsn',
                     value=u'640563569',
                     use='official')],
-            name=koppeltaal.models.Name(
-                given=u'Petra',
-                use='temp'),
+            name=[
+                koppeltaal.models.Name(
+                    given=[u'Petra'],
+                    use='temp')],
             gender='F'),
         koppeltaal.definitions.Patient)
 
@@ -278,8 +311,8 @@ def test_unpack_practitioner(packer):
         koppeltaal.definitions.Practitioner, practitioner1)
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, practitioner1.name)
-    assert practitioner1.name.given == u'Paul'
-    assert practitioner1.name.family == u'Cézanne'
+    assert practitioner1.name.given == [u'Paul']
+    assert practitioner1.name.family == [u'Cézanne']
     assert practitioner1.name.use == 'official'
     assert len(practitioner1.contacts) == 1
     assert zope.interface.verify.verifyObject(
@@ -304,8 +337,8 @@ def test_pack_practitioner(packer):
                     value=u'154694496',
                     use='official')],
             name=koppeltaal.models.Name(
-                given=u'Paul',
-                family=u'Cézanne')),
+                given=[u'Paul'],
+                family=[u'Cézanne'])),
         koppeltaal.definitions.Practitioner)
 
     assert practitioner1 == {

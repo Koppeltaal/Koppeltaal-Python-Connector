@@ -67,9 +67,13 @@ class Name(object):
             self,
             family=None,
             given=None,
+            prefix=None,
+            suffix=None,
             use="official"):
         self.family = family
         self.given = given
+        self.prefix = prefix
+        self.suffix = suffix
         self.use = use
 
 
