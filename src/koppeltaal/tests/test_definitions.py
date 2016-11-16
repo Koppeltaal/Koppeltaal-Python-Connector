@@ -143,14 +143,14 @@ def test_pack_name(packer):
         koppeltaal.models.Name(
             given=[u'Nathan'],
             family=[u'der', u'Fantasten'],
-            suffix=[u'tot', u'Daarhelemalië']),
+            suffix=[u'tot', u'Daarhelemaalië']),
         koppeltaal.definitions.Name)
 
     assert name3 == {
         'given': ['Nathan'],
         'family': [u'der', u'Fantasten'],
         'id': mock.ANY,
-        'suffix': [u'tot', u'Daarhelemalië'],
+        'suffix': [u'tot', u'Daarhelemaalië'],
         'use': 'official'}
 
     with pytest.raises(koppeltaal.interfaces.InvalidResource):
