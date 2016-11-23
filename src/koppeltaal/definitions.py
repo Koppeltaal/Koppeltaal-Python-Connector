@@ -80,7 +80,7 @@ class SubActivityDefinition(zope.interface.Interface):
         extension='ActivityDefinition#SubActivityIdentifier')
 
     description = Field(
-        'identifier', 'string',
+        'description', 'string',
         optional=True,
         extension='ActivityDefinition#SubActivityDescription')
 
