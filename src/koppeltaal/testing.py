@@ -111,6 +111,44 @@ class MockTransport(object):
         return response
 
 
+class HasFHIRResource(BaseMatcher):
+
+    def __init__(self, resourcetype, containing=None):
+        self.resourcetype = resourcetype
+        self.containing = containing
+        if containing is not None:
+            self.matcher = hamcrest.has_entry(
+                'entry',
+                hamcrest.has_item(
+                    hamcrest.has_entry(
+                        'content',
+                        hamcrest.all_of(
+                            hamcrest.has_entry(
+                                'resourceType', self.resourcetype),
+                            self.containing))))
+        else:
+            self.matcher = hamcrest.has_entry(
+                'entry',
+                hamcrest.has_item(
+                    hamcrest.has_entry(
+                        'content',
+                        hamcrest.has_entry(
+                            'resourceType', self.resourcetype))))
+
+    def _matches(self, json):
+        return self.matcher.matches(json)
+
+    def describe_to(self, description):
+        description.append_text(
+            'a FHIR resource entry of type {} '.format(self.resourcetype))
+        if self.containing is not None:
+            description.append_text('containing ')
+            self.containing.describe_to(description)
+
+
+has_resource = HasFHIRResource
+
+
 class HasFHIRExtension(BaseMatcher):
 
     def __init__(self, url, containing=None):
