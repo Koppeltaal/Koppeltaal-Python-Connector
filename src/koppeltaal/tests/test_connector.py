@@ -468,3 +468,39 @@ def test_updates_unexpected_event_no_events_at_all(connector, transport):
                     '#ProcessingStatusException',
                     hamcrest.has_entry('valueString', "Event not expected"))
             )))
+
+
+def test_updates_same_source_acked(connector, transport):
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_one_message_same_source.json')
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim',
+        respond_with='fixtures/bundle_zero_messages.json')
+    transport.expect(
+        'PUT',
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        respond_with='fixtures/resource_put_message.json')
+
+    # The one incoming messages is from our "own" endpoint. This is not a
+    # message we will process, but it is "acked" as success.
+
+    updates = list(connector.updates())
+    assert len(updates) == 0
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'Success'))))

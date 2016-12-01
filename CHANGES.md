@@ -4,6 +4,8 @@ Changes
 1.0b2 (unreleased)
 ------------------
 
+- Skip and ACK messages that originated from "own" endpoint.
+
 - Improve test coverage. Now at 80%.
 
 - Create and update `ActivityDefinition` resources.
