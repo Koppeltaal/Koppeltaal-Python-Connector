@@ -246,6 +246,9 @@ class Connector(object):
                 with update:
                     update.fail('Event not expected')
             elif message.source.endpoint == self.integration.url:
+                logger.info(
+                    'Event "{}" originated from our endpoint '
+                    '"{}"'.format(message.event, self.integration.url))
                 with update:
                     # We are the sender ourselves. Ack those messages.
                     update.success()
