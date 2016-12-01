@@ -4,6 +4,16 @@ Changes
 1.0b2 (unreleased)
 ------------------
 
+- Improve test coverage. Now at 80%.
+
+- Create and update `ActivityDefinition` resources.
+
+- Pass on the sequence of resources in the bundle next to the focal resource as part of the `Update()` context manager.
+
+- Improve parsing human name sequences.
+
+- API to Request launch URLs and SSO tokens.
+
 - Option to save retrieved messages to file for introspection.
 
 1.0b1 (2016-07-22)
@@ -11,7 +21,7 @@ Changes
 
 - Complete rewrite of the connector code. This includes:
 
-  - Integration hooks for application frameworks (transaction management, URL     and id generation).
+  - Integration hooks for application frameworks (transaction management, URL and id generation).
 
   - Automatic message status handling
 
