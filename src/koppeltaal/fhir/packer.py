@@ -10,6 +10,8 @@ from koppeltaal import (
     models,
     utils)
 
+from past.builtins import unicode, basestring
+
 
 @zope.interface.implementer(interfaces.IBrokenFHIRResource)
 class BrokenResource(object):

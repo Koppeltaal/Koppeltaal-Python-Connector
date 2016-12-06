@@ -1,6 +1,7 @@
 import lxml.etree
 
 from koppeltaal import fhir
+from past.builtins import unicode
 
 
 TYPES = [

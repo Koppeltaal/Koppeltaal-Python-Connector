@@ -1,8 +1,11 @@
-import urlparse
 import requests
 import selenium.webdriver.support.wait
 import selenium.webdriver.support.expected_conditions as EC
 import koppeltaal.utils
+
+from future.standard_library import hooks
+with hooks():
+    from urllib.parse import urlparse, parse_qs
 
 
 def test_request_metadata(connector):
@@ -38,8 +41,8 @@ def request_care_plan(browser):
 
 
 def parse_launch_url(url):
-    parsed_url = urlparse.urlparse(url)
-    query = urlparse.parse_qs(parsed_url.query)
+    parsed_url = urlparse(url)
+    query = parse_qs(parsed_url.query)
     return query.get('iss', [''])[0]
 
 
@@ -91,8 +94,8 @@ def test_sso(connector):
     step_1 = connector.launch_from_parameters(
         'MindDistrict', patient_link, patient_link, 'KTSTESTGAME')
 
-    parts = urlparse.urlparse(step_1)
-    query = urlparse.parse_qs(parts.query)
+    parts = urlparse(step_1)
+    query = parse_qs(parts.query)
 
     assert query['application_id'][0] == 'MindDistrict'
     assert query['launch_id'][0] != ''
@@ -105,8 +108,8 @@ def test_sso(connector):
     step_6 = requests.get(
         step_2, allow_redirects=False).headers.get('Location')
 
-    parts = urlparse.urlparse(step_6)
-    query = urlparse.parse_qs(parts.query)
+    parts = urlparse(step_6)
+    query = parse_qs(parts.query)
 
     token = connector.token_from_parameters(
         query['code'][0],

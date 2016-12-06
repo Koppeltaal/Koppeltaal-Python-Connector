@@ -7,6 +7,8 @@ import koppeltaal.models
 import koppeltaal.testing
 import koppeltaal.utils
 
+from past.builtins import unicode
+
 
 def pytest_addoption(parser):
     '''Add server URL to be passed in.'''
