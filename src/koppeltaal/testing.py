@@ -57,7 +57,7 @@ class MockTransport(object):
         self.expected.setdefault(url, []).append(expect)
 
     def relative_url(self, url, params=None):
-        parts = map(unicode, urlparse(url)[2:])
+        parts = list(map(unicode, urlparse(url)[2:]))
         url = urlunparse([unicode(''), unicode('')] + parts)
         if params:
             url += '?' + urlencode(params)

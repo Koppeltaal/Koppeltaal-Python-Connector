@@ -30,7 +30,7 @@ class Transport(object):
 
     def absolute_url(self, url):
         # Make sure we talk to the proper server by updating the URL.
-        parts = map(unicode, urlparse(url)[2:])
+        parts = list(map(unicode, urlparse(url)[2:]))
         return urlunparse([unicode(self.scheme), unicode(self.netloc)] + parts)
 
     def query(self, url, params=None, username=None, password=None):
