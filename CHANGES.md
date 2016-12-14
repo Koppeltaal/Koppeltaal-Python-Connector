@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.0b2 (unreleased)
+1.0b2 (2016-12-14)
 ------------------
 
 - Skip and ACK messages that originated from "own" endpoint.
