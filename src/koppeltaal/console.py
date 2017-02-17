@@ -7,7 +7,7 @@ import os.path
 import pdb
 import sys
 
-from koppeltaal import (connector, codes, models, utils, interfaces)
+from koppeltaal import (connector, codes, interfaces, models, logger, utils)
 from koppeltaal.fhir import xml, bundle
 
 
@@ -204,6 +204,10 @@ def console():
 
     if args.verbose:
         root.setLevel(logging.DEBUG)
+        logger.set_log_level(logging.DEBUG)
+    else:
+        root.setLevel(logging.CRITICAL)
+        logger.set_log_level(logging.CRITICAL)
 
     credentials = get_credentials(args)
     integration = connector.Integration(name='Python command line')
