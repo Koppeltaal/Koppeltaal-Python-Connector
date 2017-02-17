@@ -1,4 +1,3 @@
-import urllib
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
@@ -8,6 +7,11 @@ from koppeltaal import (
     models,
     transport,
     utils)
+
+from past.builtins import unicode
+from future.standard_library import hooks
+with hooks():
+    from urllib.parse import urlencode
 
 DEFAULT_COUNT = 100
 
@@ -178,7 +182,7 @@ class Connector(object):
         assert application_id is not None, 'Invalid activity'
         return '{}?{}'.format(
             self.transport.absolute_url(interfaces.OAUTH_AUTHORIZE_URL),
-            urllib.urlencode(
+            urlencode(
                 (('client_id', application_id),
                  ('redirect_uri', redirect_uri),
                  ('response_type', 'code'),

@@ -1,9 +1,13 @@
-import urlparse
 import collections
-import ConfigParser
 import datetime
 import uuid
 import os.path
+
+from configparser import ConfigParser
+from past.builtins import unicode
+from future.standard_library import hooks
+with hooks():
+    from urllib.parse import urlparse
 
 
 class UTC(datetime.tzinfo):
@@ -57,12 +61,12 @@ def get_credentials_from_file(name):
     config = os.path.expanduser('~/.koppeltaal.cfg')
     if not os.path.isfile(config):
         raise ValueError("Can't find ~/.koppeltaal.cfg")
-    parser = ConfigParser.ConfigParser()
+    parser = ConfigParser()
     parser.read(config)
     if not parser.has_section(name):
         raise ValueError('No user credentials found in ~/.koppeltaal.cfg')
     url = parser.get(name, 'url')
-    parsed = urlparse.urlparse(url)
+    parsed = urlparse(url)
     if parsed.scheme != 'https' or \
             parsed.netloc == '' or \
             parsed.path != '' or \

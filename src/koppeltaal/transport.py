@@ -1,7 +1,11 @@
-import urlparse
 import requests
 
 from koppeltaal import (interfaces, logger)
+
+from past.builtins import unicode
+from future.standard_library import hooks
+with hooks():
+    from urllib.parse import urlparse, urlunparse
 
 
 class Response(object):
@@ -14,7 +18,7 @@ class Response(object):
 class Transport(object):
 
     def __init__(self, server, username, password):
-        parts = urlparse.urlparse(server)
+        parts = urlparse(server)
 
         self.server = server
         self.scheme = parts.scheme
@@ -26,8 +30,8 @@ class Transport(object):
 
     def absolute_url(self, url):
         # Make sure we talk to the proper server by updating the URL.
-        parts = urlparse.urlparse(url)[2:]
-        return urlparse.urlunparse((self.scheme, self.netloc) + parts)
+        parts = list(map(unicode, urlparse(url)[2:]))
+        return urlunparse([unicode(self.scheme), unicode(self.netloc)] + parts)
 
     def query(self, url, params=None, username=None, password=None):
         """Query a url.
