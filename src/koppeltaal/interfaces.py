@@ -212,11 +212,11 @@ class IConnector(zope.interface.Interface):
         """Return the conformance statement.
         """
 
-    def activities():
+    def activities(archived=False):
         """Return a list of activity definitions.
         """
 
-    def activity(identifier):
+    def activity(identifier, archived=False):
         """Return a specific activity definition identified by `identifier` or
         None.
         """
