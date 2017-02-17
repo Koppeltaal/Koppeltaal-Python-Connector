@@ -1,8 +1,8 @@
 Changes
 =======
 
-1.0b3 (unreleased)
-------------------
+1.0 (2017-02-17)
+----------------
 
 - Add `includearchived` support to list archived `ActivityDefinition`.
 
