@@ -106,13 +106,15 @@ class Connector(object):
     def metadata(self):
         return self.transport.query(interfaces.METADATA_URL).json
 
-    def activities(self):
+    def activities(self, archived=False):
+        params = {'code': 'ActivityDefinition'}
+        if archived:
+            params['includearchived'] = 'yes'
         return self._fetch_bundle(
-            interfaces.ACTIVITY_DEFINITION_URL,
-            {'code': 'ActivityDefinition'}).unpack()
+            interfaces.ACTIVITY_DEFINITION_URL, params).unpack()
 
-    def activity(self, identifier):
-        for activity in self.activities():
+    def activity(self, identifier, archived=False):
+        for activity in self.activities(archived=archived):
             if activity.identifier == identifier:
                 return activity
         return None

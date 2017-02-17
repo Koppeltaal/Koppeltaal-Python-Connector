@@ -4,8 +4,10 @@ Changes
 1.0b3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add `includearchived` support to list archived `ActivityDefinition`.
 
+- Do not log everything in the console script unless the verbose
+  option is used.
 
 1.0b2 (2016-12-14)
 ------------------
@@ -16,7 +18,8 @@ Changes
 
 - Create and update `ActivityDefinition` resources.
 
-- Pass on the sequence of resources in the bundle next to the focal resource as part of the `Update()` context manager.
+- Pass on the sequence of resources in the bundle next to the focal
+  resource as part of the `Update()` context manager.
 
 - Improve parsing human name sequences.
 
@@ -29,7 +32,8 @@ Changes
 
 - Complete rewrite of the connector code. This includes:
 
-  - Integration hooks for application frameworks (transaction management, URL and id generation).
+  - Integration hooks for application frameworks (transaction
+    management, URL and id generation).
 
   - Automatic message status handling
 
