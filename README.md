@@ -7,14 +7,14 @@ The dependencies for the Koppeltaal Python connector is put together using [buil
 On Linux/OSX, run:
 
 ```sh
-$ python2.7 bootstrap.py
+$ python2.7 bootstrap-buildout.py
 $ bin/buildout
 ```
 
 On Windows, run (this works best in a git shell):
 
 ```sh
-$ C:\Python27\Python.exe bootstrap.py
+$ C:\Python27\Python.exe bootstrap-buildout.py
 $ bin\buildout.exe
 ```
 
