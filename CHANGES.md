@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.1 (unreleased)
+1.1 (2017-05-15)
 ----------------
 
 - Packaging fixes in preparation for the first public release on
