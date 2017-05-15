@@ -1,10 +1,17 @@
-from hamcrest.core.base_matcher import BaseMatcher
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: APGL, see `LICENSE.md` for more details.
+"""
+
 import hamcrest
 import json
 import functools
 import pkg_resources
 import urllib
 import urlparse
+
+from hamcrest.core.base_matcher import BaseMatcher
 from koppeltaal import transport
 
 
