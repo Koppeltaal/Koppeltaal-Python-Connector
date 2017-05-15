@@ -2,6 +2,9 @@ from setuptools import setup, find_packages
 
 version = '1.1.dev0'
 
+with open('README.md') as file:
+    long_description = file.read()
+
 setup(
     name='koppeltaal',
     version=version,
@@ -10,6 +13,7 @@ setup(
     packages=find_packages('src'),
     include_package_data=True,
     zip_safe=False,
+    long_description=long_description,
     install_requires=[
         'setuptools',
         'lxml',

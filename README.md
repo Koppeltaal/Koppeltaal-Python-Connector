@@ -1,4 +1,5 @@
-# Koppeltaal Python connector
+Koppeltaal Python connector
+===========================
 
 “Koppeltaal” (Ducth for "Connect language") is a technical solution based on
 the international HL7/FHIR standard. It enables the exchange of e-health
@@ -18,7 +19,8 @@ work is being done.
 
 This Koppeltaal connector was initially developed by Minddistrict Development B.V. for Stichting Koppeltaal.
 
-## Buildout
+Buildout
+--------
 
 The dependencies for the Koppeltaal Python connector is put together using [buildout].
 
@@ -36,7 +38,8 @@ $ C:\Python27\Python.exe bootstrap-buildout.py
 $ bin\buildout.exe
 ```
 
-## Tests
+Tests
+-----
 
 We use the [pytest] framework. The tests are run against a Koppeltaal server and domain setup specifically for testing the connector code base. This domain is called `edge`:
 
@@ -44,7 +47,8 @@ We use the [pytest] framework. The tests are run against a Koppeltaal server and
 $ bin/py.test --server=edge
 ```
 
-## Command line interface
+Command line interface
+----------------------
 
 To use the koppeltaal connector command line interface:
 
@@ -67,7 +71,8 @@ password = <secret here>
 domain = PythonAdapterTesting
 ```
 
-### Metadata / Conformance statement
+Metadata / Conformance statement
+--------------------------------
 
 To retrieve the Conformance statement from the server:
 
@@ -75,7 +80,8 @@ To retrieve the Conformance statement from the server:
 $ bin/koppeltaal [servername] metadata
 ```
 
-### Activity definition
+Activity definition
+-------------------
 
 To get the activity definition from the server:
 
@@ -83,7 +89,8 @@ To get the activity definition from the server:
 $ bin/koppeltaal [servername] activities
 ```
 
-### Messages
+Messages
+--------
 
 To get a list of messages in the mailbox:
 
@@ -104,7 +111,8 @@ To get a specific message:
 $ bin/koppeltaal [servername] message [message URL or id]
 ```
 
-## Python API
+Python API
+------------------
 
 Use the following API in your integration code to talk to a Koppeltaal server:
 
