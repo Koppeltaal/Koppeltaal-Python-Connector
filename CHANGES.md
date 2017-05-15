@@ -4,8 +4,8 @@ Changes
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Packaging fixes in preparation for the first public release on
+  https://pypi.python.org/pypi.
 
 1.0 (2017-02-17)
 ----------------
