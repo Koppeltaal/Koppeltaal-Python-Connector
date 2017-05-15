@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import datetime
 import mock
 import pytest
+import zope.interface.verify
+import koppeltaal.codes
 import koppeltaal.definitions
 import koppeltaal.fhir.packer
 import koppeltaal.fhir.resource
 import koppeltaal.interfaces
 import koppeltaal.models
 import koppeltaal.utils
-import koppeltaal.codes
-import zope.interface.verify
 
 
 @pytest.fixture

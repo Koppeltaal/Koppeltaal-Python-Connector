@@ -1,9 +1,15 @@
-import urlparse
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import collections
 import ConfigParser
 import datetime
-import uuid
 import os.path
+import urlparse
+import uuid
 
 
 class UTC(datetime.tzinfo):

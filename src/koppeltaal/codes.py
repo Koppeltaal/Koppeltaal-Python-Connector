@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import koppeltaal.interfaces
 
 NULL_SYSTEM = 'http://hl7.org/fhir/v3/NullFlavor'

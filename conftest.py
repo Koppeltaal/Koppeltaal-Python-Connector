@@ -1,6 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import datetime
-import pytest
 import uuid
+import pytest
 import selenium.webdriver
 import koppeltaal.connector
 import koppeltaal.models

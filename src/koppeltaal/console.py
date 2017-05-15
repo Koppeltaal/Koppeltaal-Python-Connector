@@ -1,11 +1,17 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import argparse
-import dateutil
 import json
 import logging
 import os
 import os.path
 import pdb
 import sys
+import dateutil
 
 from koppeltaal import (connector, codes, interfaces, models, logger, utils)
 from koppeltaal.fhir import xml, bundle
