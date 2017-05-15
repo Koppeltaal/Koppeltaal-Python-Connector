@@ -1,5 +1,23 @@
 # Koppeltaal Python connector
 
+“Koppeltaal” (Ducth for "Connect language") is a technical solution based on
+the international HL7/FHIR standard. It enables the exchange of e-health
+interventions. Koppeltaal enables organizations to connect e-health
+interventions from other providers to their own IT environment. With
+Koppeltaal organizations can more easily mix and match the best of the
+available e-health interventions and applications.
+
+See https://koppeltaal.nl/
+
+This connector acts as an intermediary or adapter between application and framework code and a Koppeltaal server. It is written in the Python programming language.
+
+See https://python.org
+
+The initial development was done using Python 2.7. Python 3.6 compatibility
+work is being done.
+
+This Koppeltaal connector was initially developed by Minddistrict Development B.V. for Stichting Koppeltaal.
+
 ## Buildout
 
 The dependencies for the Koppeltaal Python connector is put together using [buildout].
