@@ -5,8 +5,8 @@
 """
 
 import datetime
-import pytest
 import uuid
+import pytest
 import selenium.webdriver
 import koppeltaal.connector
 import koppeltaal.models

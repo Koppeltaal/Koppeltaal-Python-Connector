@@ -4,12 +4,12 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
+import pytest
 import hamcrest
+import zope.interface.verify
 import koppeltaal.definitions
 import koppeltaal.interfaces
 import koppeltaal.testing
-import pytest
-import zope.interface.verify
 
 
 def test_connector(connector):

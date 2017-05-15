@@ -5,6 +5,7 @@
 """
 
 import zope.interface
+
 from koppeltaal import (definitions, interfaces)
 
 

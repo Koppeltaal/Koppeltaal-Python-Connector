@@ -4,12 +4,12 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import hamcrest
-import json
 import functools
-import pkg_resources
+import json
 import urllib
 import urlparse
+import hamcrest
+import pkg_resources
 
 from hamcrest.core.base_matcher import BaseMatcher
 from koppeltaal import transport

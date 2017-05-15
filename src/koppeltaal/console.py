@@ -5,13 +5,13 @@
 """
 
 import argparse
-import dateutil
 import json
 import logging
 import os
 import os.path
 import pdb
 import sys
+import dateutil
 
 from koppeltaal import (connector, codes, interfaces, models, logger, utils)
 from koppeltaal.fhir import xml, bundle

@@ -4,11 +4,11 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
+import zope.interface.verify
 import koppeltaal.definitions
 import koppeltaal.interfaces
 import koppeltaal.models
 import koppeltaal.testing
-import zope.interface.verify
 
 
 def test_activities_from_fixture(connector, transport):
