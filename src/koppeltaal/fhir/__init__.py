@@ -22,6 +22,8 @@ REGISTRY = Registry({
     definitions.MessageHeaderResponse: models.MessageHeaderResponse,
     definitions.MessageHeaderSource: models.MessageHeaderSource,
     definitions.Name: models.Name,
+    definitions.Organization: models.Organization,
+    definitions.OrganizationContactPerson: models.OrganizationContactPerson,
     definitions.Participant: models.Participant,
     definitions.Patient: models.Patient,
     definitions.Practitioner: models.Practitioner,

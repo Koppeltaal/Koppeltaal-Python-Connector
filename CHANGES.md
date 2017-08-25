@@ -4,7 +4,14 @@ Changes
 1.2 (unreleased)
 ----------------
 
-- Add support for careProviders on Patient resource.
+- Add Organization resource.
+
+- Add support for careProvider and managingOrganization on Patient
+  resource.
+
+- Add support for birthDate, gender and organization on Practitioner
+  resource.
+
 
 1.1 (2017-05-15)
 ----------------

@@ -122,6 +122,42 @@ class Participant(object):
         self.role = role
 
 
+@zope.interface.implementer(definitions.OrganizationContactPerson)
+class OrganizationContactPerson(object):
+
+    def __init__(
+            self,
+            contacts=None,
+            gender=None,
+            name=None,
+            purpose=None):
+        self.contacts = contacts
+        self.gender = gender
+        self.name = name
+        self.purpose
+
+
+@zope.interface.implementer(definitions.Organization)
+class Organization(FHIRResource):
+
+    def __init__(
+            self,
+            active=None,
+            category=None,
+            contacts=None,
+            contact_persons=None,
+            identifiers=None,
+            name=None,
+            part_of=None):
+        self.active = active
+        self.category = category
+        self.contacts = contacts
+        self.contact_persons = contact_persons
+        self.identifiers = identifiers
+        self.name = name
+        self.part_of = part_of
+
+
 @zope.interface.implementer(definitions.Patient)
 class Patient(FHIRResource):
 
@@ -134,7 +170,8 @@ class Patient(FHIRResource):
             contacts=None,
             identifiers=None,
             gender=None,
-            name=None):
+            name=None,
+            managing_organization=None):
         self.active = active
         self.age = age
         self.birth_date = birth_date
@@ -143,6 +180,7 @@ class Patient(FHIRResource):
         self.identifiers = identifiers
         self.gender = gender
         self.name = name
+        self.managing_organization = managing_organization
 
 
 @zope.interface.implementer(definitions.Practitioner)
@@ -150,12 +188,18 @@ class Practitioner(FHIRResource):
 
     def __init__(
             self,
+            birth_date=None,
             contacts=None,
             identifiers=None,
-            name=None):
+            name=None,
+            gender=None,
+            organization=None):
+        self.birth_date = birth_date
         self.contacts = contacts
         self.identifiers = identifiers
         self.name = name
+        self.gender = gender
+        self.organization = organization
 
 
 @zope.interface.implementer(definitions.Goal)
