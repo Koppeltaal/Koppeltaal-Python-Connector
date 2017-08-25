@@ -130,6 +130,7 @@ class Patient(FHIRResource):
             active=None,
             age=None,
             birth_date=None,
+            care_providers=None,
             contacts=None,
             identifiers=None,
             gender=None,
@@ -137,6 +138,7 @@ class Patient(FHIRResource):
         self.active = active
         self.age = age
         self.birth_date = birth_date
+        self.care_providers = care_providers
         self.contacts = contacts
         self.identifiers = identifiers
         self.gender = gender

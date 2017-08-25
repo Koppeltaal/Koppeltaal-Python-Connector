@@ -278,6 +278,11 @@ class Patient(interfaces.IIdentifiedFHIRResource):
         'birthDate', 'datetime',
         optional=True)
 
+    care_providers = Field(
+        'careProviders', 'reference',
+        multiple=ALL_ITEMS,
+        optional=True)
+
     contacts = Field(
         'telecom', 'object',
         binding=Contact,

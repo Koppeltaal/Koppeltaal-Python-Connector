@@ -4,8 +4,7 @@ Changes
 1.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Add support for careProviders on Patient resource.
 
 1.1 (2017-05-15)
 ----------------
