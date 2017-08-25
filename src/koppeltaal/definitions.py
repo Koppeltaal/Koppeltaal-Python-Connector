@@ -279,7 +279,7 @@ class Patient(interfaces.IIdentifiedFHIRResource):
         optional=True)
 
     care_providers = Field(
-        'careProviders', 'reference',
+        'careProvider', 'reference',
         multiple=ALL_ITEMS,
         optional=True)
 
