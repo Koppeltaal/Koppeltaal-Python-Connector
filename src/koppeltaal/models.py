@@ -134,7 +134,7 @@ class OrganizationContactPerson(object):
         self.contacts = contacts
         self.gender = gender
         self.name = name
-        self.purpose
+        self.purpose = purpose
 
 
 @zope.interface.implementer(definitions.Organization)

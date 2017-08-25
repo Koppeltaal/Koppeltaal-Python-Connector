@@ -278,7 +278,7 @@ class OrganizationContactPerson(zope.interface.Interface):
     name = Field(
         'name', 'object',
         binding=Name,
-        multiple=ALL_ITEMS)
+        optional=True)
 
     purpose = Field(
         'purpose', 'code',
@@ -317,7 +317,7 @@ class Organization(interfaces.IIdentifiedFHIRResource):
         optional=True)
 
     name = Field(
-        'value', 'string',
+        'name', 'string',
         optional=True)
 
     part_of = Field(
