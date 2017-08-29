@@ -12,6 +12,9 @@ Changes
 - Add support for birthDate, gender and organization on Practitioner
   resource.
 
+- Add a DummyConnector. This has the same API than a connector but
+  does not do anything. That's useful when you want to make sure your
+  application works, but cannot talk to the Koppeltaal server.
 
 1.1 (2017-05-15)
 ----------------
