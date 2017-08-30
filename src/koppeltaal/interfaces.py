@@ -34,6 +34,15 @@ class InvalidResponse(KoppeltaalError):
     """
 
 
+class DummyError(KoppeltaalError):
+    """Error generated when you ask the dummy connector to perform an action.
+    """
+
+    def __str__(self):
+        return "{}: connector in dummy mode.".format(
+            self.__class__.__name__)
+
+
 class InvalidBundle(KoppeltaalError):
     """A malformed bundle was obtain from the koppeltaal server.
     """

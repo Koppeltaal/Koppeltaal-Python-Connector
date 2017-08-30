@@ -309,3 +309,61 @@ class Connector(object):
                 response.response.code != "ok"):
             raise interfaces.InvalidResponse(response)
         return response.data
+
+
+@zope.interface.implementer(interfaces.IConnector)
+class DummyConnector(object):
+    """A dummy connector follows the API of a connector but do not do
+    anything.
+    """
+    _create_transport = None
+
+    def __init__(self, credentials, integration):
+        self.transport = None
+        self.domain = credentials.domain
+        self.integration = integration
+
+    def metadata(self):
+        return  {'name': 'Koppeltaal',
+                 'version': 'v1.1',
+                 'fhirVersion': '0.0.82'}
+
+    def activities(self, archived=False):
+        return []
+
+    def activity(self, identifier, archived=False):
+        return None
+
+    def send_activity(self, activity):
+        raise interfaces.DummyError()
+
+    def launch(self, careplan, user=None, activity_identifier=None):
+        raise interfaces.DummyError()
+
+    def launch_from_parameters(
+            self,
+            application_id,
+            patient_link,
+            user_link,
+            activity_identifier):
+        raise interfaces.DummyError()
+
+    def authorize_from_parameters(
+            self,
+            application_id,
+            launch_id,
+            redirect_uri):
+        raise interfaces.DummyError()
+
+    def token_from_parameters(self, code, redirect_url):
+        return {}
+
+    def updates(self, expected_events=None):
+        return []
+
+    def search(
+            self, message_id=None, event=None, status=None, patient=None):
+        return None
+
+    def send(self, event, data, patient=None):
+        raise interfaces.DummyError()
