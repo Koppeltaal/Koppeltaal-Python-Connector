@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.2 (unreleased)
+1.2 (2017-08-30)
 ----------------
 
 - Add Organization resource.
