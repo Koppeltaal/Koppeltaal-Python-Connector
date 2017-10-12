@@ -656,4 +656,5 @@ class MessageHeader(interfaces.IFHIRResource):
 
     source = Field(
         'source', 'object',
+        optional=True,
         binding=MessageHeaderSource)

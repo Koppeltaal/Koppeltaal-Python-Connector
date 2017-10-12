@@ -253,7 +253,8 @@ class Connector(object):
                 logger.warn('Event "{}" not expected'.format(message.event))
                 with update:
                     update.fail('Event not expected')
-            elif message.source.endpoint == self.integration.url:
+            elif (message.source is not None and
+                  message.source.endpoint == self.integration.url):
                 logger.info(
                     'Event "{}" originated from our endpoint '
                     '"{}"'.format(message.event, self.integration.url))
