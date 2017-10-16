@@ -4,8 +4,9 @@ Changes
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Koppeltaal server does not properly format message headers for
+  CreateOrUpdateActivityDefinition, add a fix to still allow those
+  messages.
 
 1.2 (2017-08-30)
 ----------------
