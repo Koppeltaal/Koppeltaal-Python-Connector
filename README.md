@@ -112,7 +112,7 @@ $ bin/koppeltaal [servername] message [message URL or id]
 ```
 
 Python API
-------------------
+----------
 
 Use the following API in your integration code to talk to a Koppeltaal server:
 

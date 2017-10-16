@@ -14,6 +14,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     long_description=long_description,
+    author='Koppeltaal community',
+    url='https://github.com/Koppeltaal/Koppeltaal-Python-Connector',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
