@@ -15,11 +15,26 @@ import koppeltaal.utils
 
 
 def pytest_addoption(parser):
-    '''Add server URL to be passed in.'''
+    '''Add server identifier to be passed in. Looks for corresponding part in
+    ~/.koppeltaal.cfg
+    '''
     parser.addoption(
         '--server',
-        help='Koppeltaal server URL',
-        default="https://edgekoppeltaal.vhscloud.nl")
+        help=("""\
+Koppeltaal server identifier. URL and credentials should be
+defined in the part identified by that name in ~/.koppeltaal.cfg.
+
+For example:
+
+[edge]
+url = https://edgekoppeltaal.vhscloud.nl
+username = [username]
+password = [password]
+domain = PythonAdapterTesting
+oauth_secret = [oauth password]
+
+"""),
+        default="edge")
 
 
 @pytest.fixture(scope='session')
