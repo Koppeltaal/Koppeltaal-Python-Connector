@@ -7,14 +7,14 @@
 import collections
 import datetime
 import os.path
+import six
 import uuid
 
 from configparser import ConfigParser
-from past.builtins import unicode
+from six.moves.urllib.parse import urlparse
 
-from future.standard_library import hooks
-with hooks():
-    from urllib.parse import urlparse
+
+unicode = six.text_type
 
 
 class UTC(datetime.tzinfo):

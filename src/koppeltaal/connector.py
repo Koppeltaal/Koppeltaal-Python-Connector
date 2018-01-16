@@ -4,6 +4,7 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
+import six
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
@@ -13,11 +14,10 @@ from koppeltaal import (
     models,
     transport,
     utils)
+from six.moves.urllib.parse import urlencode
 
-from past.builtins import unicode
-from future.standard_library import hooks
-with hooks():
-    from urllib.parse import urlencode
+
+unicode = six.text_type
 
 
 DEFAULT_COUNT = 100

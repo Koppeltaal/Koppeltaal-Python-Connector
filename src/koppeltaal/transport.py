@@ -5,13 +5,13 @@
 """
 
 import requests
+import six
 
 from koppeltaal import (interfaces, logger)
-from past.builtins import unicode
+from six.moves.urllib.parse import urlparse, urlunparse
 
-from future.standard_library import hooks
-with hooks():
-    from urllib.parse import urlparse, urlunparse
+
+unicode = six.text_type
 
 
 class Response(object):

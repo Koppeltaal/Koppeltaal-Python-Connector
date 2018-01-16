@@ -9,9 +9,7 @@ import requests
 import selenium.webdriver.support.expected_conditions as EC
 import selenium.webdriver.support.wait
 
-from future.standard_library import hooks
-with hooks():
-    from urllib.parse import urlparse, parse_qs
+from six.moves.urllib.parse import urlparse, parse_qs
 
 
 def test_request_metadata(connector):

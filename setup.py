@@ -10,6 +10,16 @@ with open('README.md') as file:
     long_description = file.read()
 
 
+install_requires = [
+    'six',
+    'lxml',
+    'python-dateutil',
+    'requests',
+    'setuptools',
+    'zope.interface >= 4.4',
+    ]
+
+
 tests_require = [
     'PyHamcrest >= 1.9',
     'selenium >= 3.8',
@@ -17,6 +27,7 @@ tests_require = [
 
 
 if sys.version_info.major == 2:
+    install_requires.append('configparser')
     tests_require.append('mock==1.0.1')
 
 
@@ -48,15 +59,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    install_requires=[
-        'configparser',
-        'future',
-        'lxml',
-        'python-dateutil',
-        'requests',
-        'setuptools',
-        'zope.interface >= 4.4',
-        ],
+    install_requires=install_requires,
     extras_require={'test': tests_require},
     entry_points={
         'console_scripts': [

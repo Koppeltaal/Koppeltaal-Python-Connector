@@ -8,14 +8,14 @@ import functools
 import hamcrest
 import json
 import pkg_resources
+import six
 
 from hamcrest.core.base_matcher import BaseMatcher
 from koppeltaal import transport
-from past.builtins import unicode
+from six.moves.urllib.parse import urlparse, urlunparse, urlencode
 
-from future.standard_library import hooks
-with hooks():
-    from urllib.parse import urlparse, urlunparse, urlencode
+
+unicode = six.text_type
 
 
 class Response(transport.Response):

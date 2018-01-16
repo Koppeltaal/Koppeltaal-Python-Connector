@@ -8,12 +8,14 @@ import datetime
 import uuid
 import pytest
 import selenium.webdriver
+import six
 import koppeltaal.connector
 import koppeltaal.models
 import koppeltaal.testing
 import koppeltaal.utils
 
-from past.builtins import unicode
+
+unicode = six.text_type
 
 
 def pytest_addoption(parser):
