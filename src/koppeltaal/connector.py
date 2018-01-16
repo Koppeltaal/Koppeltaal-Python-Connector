@@ -330,9 +330,10 @@ class DummyConnector(object):
         self.integration = integration
 
     def metadata(self):
-        return  {'name': 'Koppeltaal',
-                 'version': 'v1.1',
-                 'fhirVersion': '0.0.82'}
+        return {
+            'name': 'Koppeltaal',
+            'version': 'v1.1',
+            'fhirVersion': '0.0.82'}
 
     def activities(self, archived=False):
         return []
