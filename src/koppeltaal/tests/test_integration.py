@@ -61,10 +61,17 @@ def test_launch_patient(
     # does.
     browser.get(launch_url)
     wait_for_application(browser)
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            lambda d: browser.find_element_by_id('patientReference'))
+
     assert browser.find_element_by_id('patientReference').text == ''
     assert browser.find_element_by_id('userReference').text == ''
 
     login_with_oauth(browser)
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            lambda d: browser.find_element_by_id('patientReference'))
     assert browser.find_element_by_id('patientReference').text == \
         careplan.patient.fhir_link
     assert browser.find_element_by_id('userReference').text == \
