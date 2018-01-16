@@ -28,6 +28,7 @@ class UTC(datetime.tzinfo):
     def dst(self, dt):
         return datetime.timedelta(0)
 
+
 utc = UTC()
 
 
