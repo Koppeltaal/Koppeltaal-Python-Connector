@@ -4,7 +4,6 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import urllib
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
@@ -19,6 +18,7 @@ from past.builtins import unicode
 from future.standard_library import hooks
 with hooks():
     from urllib.parse import urlencode
+
 
 DEFAULT_COUNT = 100
 

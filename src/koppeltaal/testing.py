@@ -5,17 +5,14 @@
 """
 
 import functools
-import json
-import urllib
-import urlparse
 import hamcrest
+import json
 import pkg_resources
 
 from hamcrest.core.base_matcher import BaseMatcher
 from koppeltaal import transport
-from hamcrest.core.base_matcher import BaseMatcher
-
 from past.builtins import unicode
+
 from future.standard_library import hooks
 with hooks():
     from urllib.parse import urlparse, urlunparse, urlencode

@@ -7,14 +7,12 @@
 import collections
 import datetime
 import os.path
-import urlparse
 import uuid
 
 from configparser import ConfigParser
 from past.builtins import unicode
+
 from future.standard_library import hooks
-
-
 with hooks():
     from urllib.parse import urlparse
 

@@ -47,6 +47,12 @@ We use the [pytest] framework. The tests are run against a Koppeltaal server and
 $ bin/py.test --server=edge
 ```
 
+Note how there're two webdriver/selenium tests. They require a Firefox "driver" to be available on your system. For MacOS using brew, this can be installed like so:
+
+```sh
+$ brew install geckodriver
+```
+
 Command line interface
 ----------------------
 

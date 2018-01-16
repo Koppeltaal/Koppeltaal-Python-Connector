@@ -4,11 +4,10 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import urlparse
-import requests
-import selenium.webdriver.support.wait
-import selenium.webdriver.support.expected_conditions as EC
 import koppeltaal.utils
+import requests
+import selenium.webdriver.support.expected_conditions as EC
+import selenium.webdriver.support.wait
 
 from future.standard_library import hooks
 with hooks():
