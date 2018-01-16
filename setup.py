@@ -1,9 +1,24 @@
+import sys
+
 from setuptools import setup, find_packages
+
 
 version = '1.2.2.dev0'
 
+
 with open('README.md') as file:
     long_description = file.read()
+
+
+tests_require = [
+    'PyHamcrest >= 1.9',
+    'selenium >= 3.8',
+    ]
+
+
+if sys.version_info.major == 2:
+    tests_require.append('mock==1.0.1')
+
 
 setup(
     name='koppeltaal',
@@ -38,17 +53,11 @@ setup(
         'future',
         'lxml',
         'python-dateutil',
-        'requests >= 2.5.1',
+        'requests',
         'setuptools',
-        'zope.interface >= 3.7.0',
+        'zope.interface >= 4.4',
         ],
-    extras_require={
-        'test': [
-            'PyHamcrest',
-            'mock',
-            'selenium',
-            ],
-        },
+    extras_require={'test': tests_require},
     entry_points={
         'console_scripts': [
             'koppeltaal = koppeltaal.console:console'
