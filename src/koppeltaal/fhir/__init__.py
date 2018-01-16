@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
 
 from koppeltaal.fhir.registry import Registry
 from koppeltaal import definitions, models
@@ -17,6 +22,8 @@ REGISTRY = Registry({
     definitions.MessageHeaderResponse: models.MessageHeaderResponse,
     definitions.MessageHeaderSource: models.MessageHeaderSource,
     definitions.Name: models.Name,
+    definitions.Organization: models.Organization,
+    definitions.OrganizationContactPerson: models.OrganizationContactPerson,
     definitions.Participant: models.Participant,
     definitions.Patient: models.Patient,
     definitions.Practitioner: models.Practitioner,

@@ -1,13 +1,19 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import argparse
-import dateutil
 import json
 import logging
 import os
 import os.path
 import pdb
 import sys
+import dateutil
 
-from koppeltaal import (connector, codes, models, utils, interfaces)
+from koppeltaal import (connector, codes, interfaces, models, logger, utils)
 from koppeltaal.fhir import xml, bundle
 
 
@@ -204,6 +210,10 @@ def console():
 
     if args.verbose:
         root.setLevel(logging.DEBUG)
+        logger.set_log_level(logging.DEBUG)
+    else:
+        root.setLevel(logging.CRITICAL)
+        logger.set_log_level(logging.CRITICAL)
 
     credentials = get_credentials(args)
     integration = connector.Integration(name='Python command line')

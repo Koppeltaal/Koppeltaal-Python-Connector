@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import zope.interface
 
 from koppeltaal import (interfaces, codes)
@@ -256,6 +262,69 @@ class Identifier(zope.interface.Interface):
         binding=codes.IDENTIFIER_USE)
 
 
+class OrganizationContactPerson(zope.interface.Interface):
+
+    contacts = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    gender = Field(
+        'gender', 'codeable',
+        binding=codes.GENDER,
+        optional=True)
+
+    name = Field(
+        'name', 'object',
+        binding=Name,
+        optional=True)
+
+    purpose = Field(
+        'purpose', 'code',
+        optional=True,
+        binding=codes.CONTACT_ENTITY_TYPE)
+
+
+@resource_type('Organization')
+class Organization(interfaces.IIdentifiedFHIRResource):
+
+    active = Field(
+        'active', 'boolean',
+        optional=True)
+
+    category = Field(
+        'type', 'code',
+        optional=True,
+        binding=codes.ORGANIZATION_TYPE)
+
+    contacts = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    contact_persons = Field(
+        'contact', 'object',
+        binding=OrganizationContactPerson,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    identifiers = Field(
+        'identifier', 'object',
+        binding=Identifier,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    name = Field(
+        'name', 'string',
+        optional=True)
+
+    part_of = Field(
+        'partOf', 'reference',
+        optional=True)
+
+
 @resource_type('Patient')
 class Patient(interfaces.IIdentifiedFHIRResource):
 
@@ -270,6 +339,11 @@ class Patient(interfaces.IIdentifiedFHIRResource):
 
     birth_date = Field(
         'birthDate', 'datetime',
+        optional=True)
+
+    care_providers = Field(
+        'careProvider', 'reference',
+        multiple=ALL_ITEMS,
         optional=True)
 
     contacts = Field(
@@ -294,9 +368,17 @@ class Patient(interfaces.IIdentifiedFHIRResource):
         binding=Name,
         multiple=ALL_ITEMS)
 
+    managing_organization = Field(
+        'managingOrganization', 'reference',
+        optional=True)
+
 
 @resource_type('Practitioner')
 class Practitioner(interfaces.IIdentifiedFHIRResource):
+
+    birth_date = Field(
+        'birthDate', 'datetime',
+        optional=True)
 
     contacts = Field(
         'telecom', 'object',
@@ -313,6 +395,15 @@ class Practitioner(interfaces.IIdentifiedFHIRResource):
     name = Field(
         'name', 'object',
         binding=Name,
+        optional=True)
+
+    gender = Field(
+        'gender', 'codeable',
+        binding=codes.GENDER,
+        optional=True)
+
+    organization = Field(
+        'organization', 'reference',
         optional=True)
 
 
@@ -565,4 +656,5 @@ class MessageHeader(interfaces.IFHIRResource):
 
     source = Field(
         'source', 'object',
+        optional=True,
         binding=MessageHeaderSource)

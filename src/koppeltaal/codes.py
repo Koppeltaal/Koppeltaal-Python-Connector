@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import koppeltaal.interfaces
 
 NULL_SYSTEM = 'http://hl7.org/fhir/v3/NullFlavor'
@@ -108,10 +114,22 @@ CONTACT_USE = Code(
      'old',
      'mobile'])
 
+CONTACT_ENTITY_TYPE = Code(
+    'http://hl7.org/fhir/contactentity-type',
+    ['BILL',
+     'ADMIN',
+     'HR',
+     'PAYOR',
+     'PATINF',
+     'PRESS'])
+
 DEVICE_KIND = Code(
     'DeviceKind',
     ['Application'])
 
+GENDER = Code(
+    'http://hl7.org/fhir/v3/AdministrativeGender',
+    ['F', 'M', 'UN'])
 
 IDENTIFIER_USE = Code(
     'http://hl7.org/fhir/identifier-use',
@@ -159,6 +177,17 @@ NAME_USE = Code(
      'old',
      'maiden'])
 
+ORGANIZATION_TYPE = Code(
+    'http://hl7.org/fhir/organization-type',
+    ['dept',
+     'icu',
+     'team',
+     'fed',
+     'ins',
+     'edu',
+     'reli',
+     'pharm'])
+
 PROCESSING_STATUS = Code(
     'ProcessingStatus',
     ['Claimed',
@@ -167,10 +196,6 @@ PROCESSING_STATUS = Code(
      'New',
      'ReplacedByNewVersion',
      'Success'])
-
-GENDER = Code(
-    'http://hl7.org/fhir/v3/AdministrativeGender',
-    ['F', 'M', 'UN'])
 
 # BlackBoxState is not valid, but the javascript connector generate
 # some of those.

@@ -1,6 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import datetime
-import pytest
 import uuid
+import pytest
 import selenium.webdriver
 import koppeltaal.connector
 import koppeltaal.models
@@ -11,11 +17,26 @@ from past.builtins import unicode
 
 
 def pytest_addoption(parser):
-    '''Add server URL to be passed in.'''
+    '''Add server identifier to be passed in. Looks for corresponding part in
+    ~/.koppeltaal.cfg
+    '''
     parser.addoption(
         '--server',
-        help='Koppeltaal server URL',
-        default="https://edgekoppeltaal.vhscloud.nl")
+        help=("""\
+Koppeltaal server identifier. URL and credentials should be
+defined in the part identified by that name in ~/.koppeltaal.cfg.
+
+For example:
+
+[edge]
+url = https://edgekoppeltaal.vhscloud.nl
+username = [username]
+password = [password]
+domain = PythonAdapterTesting
+oauth_secret = [oauth password]
+
+"""),
+        default="edge")
 
 
 @pytest.fixture(scope='session')

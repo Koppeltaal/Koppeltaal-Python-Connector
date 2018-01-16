@@ -1,24 +1,45 @@
-# Koppeltaal Python connector
+Koppeltaal Python connector
+===========================
 
-## Buildout
+“Koppeltaal” (Ducth for "Connect language") is a technical solution based on
+the international HL7/FHIR standard. It enables the exchange of e-health
+interventions. Koppeltaal enables organizations to connect e-health
+interventions from other providers to their own IT environment. With
+Koppeltaal organizations can more easily mix and match the best of the
+available e-health interventions and applications.
+
+See https://koppeltaal.nl/
+
+This connector acts as an intermediary or adapter between application and framework code and a Koppeltaal server. It is written in the Python programming language.
+
+See https://python.org
+
+The initial development was done using Python 2.7. Python 3.6 compatibility
+work is being done.
+
+This Koppeltaal connector was initially developed by Minddistrict Development B.V. for Stichting Koppeltaal.
+
+Buildout
+--------
 
 The dependencies for the Koppeltaal Python connector is put together using [buildout].
 
 On Linux/OSX, run:
 
 ```sh
-$ python2.7 bootstrap.py
+$ python2.7 bootstrap-buildout.py
 $ bin/buildout
 ```
 
 On Windows, run (this works best in a git shell):
 
 ```sh
-$ C:\Python27\Python.exe bootstrap.py
+$ C:\Python27\Python.exe bootstrap-buildout.py
 $ bin\buildout.exe
 ```
 
-## Tests
+Tests
+-----
 
 We use the [pytest] framework. The tests are run against a Koppeltaal server and domain setup specifically for testing the connector code base. This domain is called `edge`:
 
@@ -26,7 +47,8 @@ We use the [pytest] framework. The tests are run against a Koppeltaal server and
 $ bin/py.test --server=edge
 ```
 
-## Command line interface
+Command line interface
+----------------------
 
 To use the koppeltaal connector command line interface:
 
@@ -49,7 +71,8 @@ password = <secret here>
 domain = PythonAdapterTesting
 ```
 
-### Metadata / Conformance statement
+Metadata / Conformance statement
+--------------------------------
 
 To retrieve the Conformance statement from the server:
 
@@ -57,7 +80,8 @@ To retrieve the Conformance statement from the server:
 $ bin/koppeltaal [servername] metadata
 ```
 
-### Activity definition
+Activity definition
+-------------------
 
 To get the activity definition from the server:
 
@@ -65,7 +89,8 @@ To get the activity definition from the server:
 $ bin/koppeltaal [servername] activities
 ```
 
-### Messages
+Messages
+--------
 
 To get a list of messages in the mailbox:
 
@@ -86,7 +111,8 @@ To get a specific message:
 $ bin/koppeltaal [servername] message [message URL or id]
 ```
 
-## Python API
+Python API
+----------
 
 Use the following API in your integration code to talk to a Koppeltaal server:
 

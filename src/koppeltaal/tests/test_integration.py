@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
+import urlparse
 import requests
 import selenium.webdriver.support.wait
 import selenium.webdriver.support.expected_conditions as EC

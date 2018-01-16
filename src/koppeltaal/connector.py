@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
+import urllib
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
@@ -110,13 +117,15 @@ class Connector(object):
     def metadata(self):
         return self.transport.query(interfaces.METADATA_URL).json
 
-    def activities(self):
+    def activities(self, archived=False):
+        params = {'code': 'ActivityDefinition'}
+        if archived:
+            params['includearchived'] = 'yes'
         return self._fetch_bundle(
-            interfaces.ACTIVITY_DEFINITION_URL,
-            {'code': 'ActivityDefinition'}).unpack()
+            interfaces.ACTIVITY_DEFINITION_URL, params).unpack()
 
-    def activity(self, identifier):
-        for activity in self.activities():
+    def activity(self, identifier, archived=False):
+        for activity in self.activities(archived=archived):
             if activity.identifier == identifier:
                 return activity
         return None
@@ -249,7 +258,8 @@ class Connector(object):
                 logger.warn('Event "{}" not expected'.format(message.event))
                 with update:
                     update.fail('Event not expected')
-            elif message.source.endpoint == self.integration.url:
+            elif (message.source is not None and
+                  message.source.endpoint == self.integration.url):
                 logger.info(
                     'Event "{}" originated from our endpoint '
                     '"{}"'.format(message.event, self.integration.url))
@@ -305,3 +315,61 @@ class Connector(object):
                 response.response.code != "ok"):
             raise interfaces.InvalidResponse(response)
         return response.data
+
+
+@zope.interface.implementer(interfaces.IConnector)
+class DummyConnector(object):
+    """A dummy connector follows the API of a connector but do not do
+    anything.
+    """
+    _create_transport = None
+
+    def __init__(self, credentials, integration):
+        self.transport = None
+        self.domain = credentials.domain
+        self.integration = integration
+
+    def metadata(self):
+        return  {'name': 'Koppeltaal',
+                 'version': 'v1.1',
+                 'fhirVersion': '0.0.82'}
+
+    def activities(self, archived=False):
+        return []
+
+    def activity(self, identifier, archived=False):
+        return None
+
+    def send_activity(self, activity):
+        raise interfaces.DummyError()
+
+    def launch(self, careplan, user=None, activity_identifier=None):
+        raise interfaces.DummyError()
+
+    def launch_from_parameters(
+            self,
+            application_id,
+            patient_link,
+            user_link,
+            activity_identifier):
+        raise interfaces.DummyError()
+
+    def authorize_from_parameters(
+            self,
+            application_id,
+            launch_id,
+            redirect_uri):
+        raise interfaces.DummyError()
+
+    def token_from_parameters(self, code, redirect_url):
+        return {}
+
+    def updates(self, expected_events=None):
+        return []
+
+    def search(
+            self, message_id=None, event=None, status=None, patient=None):
+        return None
+
+    def send(self, event, data, patient=None):
+        raise interfaces.DummyError()

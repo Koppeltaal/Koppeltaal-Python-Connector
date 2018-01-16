@@ -1,11 +1,20 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import collections
 import datetime
-import uuid
 import os.path
+import urlparse
+import uuid
 
 from configparser import ConfigParser
 from past.builtins import unicode
 from future.standard_library import hooks
+
+
 with hooks():
     from urllib.parse import urlparse
 

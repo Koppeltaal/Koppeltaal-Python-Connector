@@ -1,9 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
+import urlparse
 import requests
 
 from koppeltaal import (interfaces, logger)
 
 from past.builtins import unicode
 from future.standard_library import hooks
+
+
 with hooks():
     from urllib.parse import urlparse, urlunparse
 

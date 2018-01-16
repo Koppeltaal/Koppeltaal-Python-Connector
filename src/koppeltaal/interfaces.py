@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import pkg_resources
 import zope.interface
 
@@ -26,6 +32,15 @@ class KoppeltaalError(ValueError):
 class InvalidResponse(KoppeltaalError):
     """Invalid response from transport to the koppeltaal server.
     """
+
+
+class DummyError(KoppeltaalError):
+    """Error generated when you ask the dummy connector to perform an action.
+    """
+
+    def __str__(self):
+        return "{}: connector in dummy mode.".format(
+            self.__class__.__name__)
 
 
 class InvalidBundle(KoppeltaalError):
@@ -212,11 +227,11 @@ class IConnector(zope.interface.Interface):
         """Return the conformance statement.
         """
 
-    def activities():
+    def activities(archived=False):
         """Return a list of activity definitions.
         """
 
-    def activity(identifier):
+    def activity(identifier, archived=False):
         """Return a specific activity definition identified by `identifier` or
         None.
         """

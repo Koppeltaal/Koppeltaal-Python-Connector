@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+:copyright: (c) 2015 - 2017 Stichting Koppeltaal
+:license: AGPL, see `LICENSE.md` for more details.
+"""
+
 import logging
 import json
 
-
 logger = logging.getLogger('koppeltaal.connector')
-logger.setLevel(logging.DEBUG)
-
+requests_logger = logging.getLogger("requests.packages.urllib3")
 
 critical = logger.critical
 debug = logger.debug
@@ -13,8 +17,9 @@ info = logger.info
 warn = logger.warn
 
 
-requests_logger = logging.getLogger("requests.packages.urllib3")
-requests_logger.setLevel(logging.DEBUG)
+def set_log_level(level):
+    logger.setLevel(level)
+    requests_logger.setLevel(level)
 
 
 def debug_json(message, **data):
