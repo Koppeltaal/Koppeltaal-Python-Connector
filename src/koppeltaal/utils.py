@@ -66,7 +66,7 @@ Credentials = collections.namedtuple(
 
 def get_credentials_from_file(name):
     # They're not passed in, so now look at ~/.koppeltaal.cfg.
-    config = os.path.expanduser('~/.koppeltaal.cfg')
+    config = unicode(os.path.expanduser('~/.koppeltaal.cfg'))
     if not os.path.isfile(config):
         raise ValueError("Can't find ~/.koppeltaal.cfg")
     parser = ConfigParser()
