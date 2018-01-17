@@ -4,11 +4,12 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import urlparse
-import requests
-import selenium.webdriver.support.wait
-import selenium.webdriver.support.expected_conditions as EC
 import koppeltaal.utils
+import requests
+import selenium.webdriver.support.expected_conditions as EC
+import selenium.webdriver.support.wait
+
+from six.moves.urllib.parse import urlparse, parse_qs
 
 
 def test_request_metadata(connector):
@@ -44,8 +45,8 @@ def request_care_plan(browser):
 
 
 def parse_launch_url(url):
-    parsed_url = urlparse.urlparse(url)
-    query = urlparse.parse_qs(parsed_url.query)
+    parsed_url = urlparse(url)
+    query = parse_qs(parsed_url.query)
     return query.get('iss', [''])[0]
 
 
@@ -58,10 +59,17 @@ def test_launch_patient(
     # does.
     browser.get(launch_url)
     wait_for_application(browser)
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            lambda d: browser.find_element_by_id('patientReference'))
+
     assert browser.find_element_by_id('patientReference').text == ''
     assert browser.find_element_by_id('userReference').text == ''
 
     login_with_oauth(browser)
+    selenium.webdriver.support.wait.WebDriverWait(
+        browser, 10).until(
+            lambda d: browser.find_element_by_id('patientReference'))
     assert browser.find_element_by_id('patientReference').text == \
         careplan.patient.fhir_link
     assert browser.find_element_by_id('userReference').text == \
@@ -97,8 +105,8 @@ def test_sso(connector):
     step_1 = connector.launch_from_parameters(
         'MindDistrict', patient_link, patient_link, 'KTSTESTGAME')
 
-    parts = urlparse.urlparse(step_1)
-    query = urlparse.parse_qs(parts.query)
+    parts = urlparse(step_1)
+    query = parse_qs(parts.query)
 
     assert query['application_id'][0] == 'MindDistrict'
     assert query['launch_id'][0] != ''
@@ -111,8 +119,8 @@ def test_sso(connector):
     step_6 = requests.get(
         step_2, allow_redirects=False).headers.get('Location')
 
-    parts = urlparse.urlparse(step_6)
-    query = urlparse.parse_qs(parts.query)
+    parts = urlparse(step_6)
+    query = parse_qs(parts.query)
 
     token = connector.token_from_parameters(
         query['code'][0],

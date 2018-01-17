@@ -4,10 +4,14 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import urlparse
 import requests
+import six
 
 from koppeltaal import (interfaces, logger)
+from six.moves.urllib.parse import urlparse, urlunparse
+
+
+unicode = six.text_type
 
 
 class Response(object):
@@ -20,7 +24,7 @@ class Response(object):
 class Transport(object):
 
     def __init__(self, server, username, password):
-        parts = urlparse.urlparse(server)
+        parts = urlparse(server)
 
         self.server = server
         self.scheme = parts.scheme
@@ -32,8 +36,8 @@ class Transport(object):
 
     def absolute_url(self, url):
         # Make sure we talk to the proper server by updating the URL.
-        parts = urlparse.urlparse(url)[2:]
-        return urlparse.urlunparse((self.scheme, self.netloc) + parts)
+        parts = list(map(unicode, urlparse(url)[2:]))
+        return urlunparse([unicode(self.scheme), unicode(self.netloc)] + parts)
 
     def query(self, url, params=None, username=None, password=None):
         """Query a url.

@@ -5,8 +5,12 @@
 """
 
 import lxml.etree
+import six
 
 from koppeltaal import fhir
+
+
+unicode = six.text_type
 
 
 TYPES = [

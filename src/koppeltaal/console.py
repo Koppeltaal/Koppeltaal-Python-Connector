@@ -68,11 +68,11 @@ OUTPUT = {
 def print_model(model):
     output = OUTPUT.get(model.__class__)
     if output:
-        print output.format(model=model)
+        print(output.format(model=model))
 
 
 def print_json(data):
-    print json.dumps(data, indent=2, sort_keys=True)
+    print(json.dumps(data, indent=2, sort_keys=True))
 
 
 def get_credentials(args):
@@ -130,7 +130,7 @@ def download(connection, directory, msgid=None, msg=None):
             output,
             indent=2,
             sort_keys=True)
-    print 'Wrote message "{}" to "{}"'.format(msgid, filename)
+    print('Wrote message "{}" to "{}"'.format(msgid, filename))
 
 
 def console():
@@ -230,7 +230,7 @@ def console():
             if args.json:
                 payload = json.load(args.json)
             if payload is None:
-                print "Please provide an XML or JSON file."
+                print("Please provide an XML or JSON file.")
                 return
             print_json(payload)
             resource_bundle = bundle.Bundle('validation', integration)
@@ -279,17 +279,18 @@ def console():
                         update.fail(args.failure)
 
         elif args.command == 'launch':
-            print connection.launch_from_parameters(
-                args.application_id,
-                args.patient_link,
-                args.user_link,
-                args.activity,
-                )
+            print(
+                connection.launch_from_parameters(
+                    args.application_id,
+                    args.patient_link,
+                    args.user_link,
+                    args.activity,
+                    ))
 
         else:
             sys.exit('Unknown command {}'.format(args.command))
     except Exception as error:
         if args.post_mortem:
-            print error
+            print(error)
             pdb.post_mortem()
         raise

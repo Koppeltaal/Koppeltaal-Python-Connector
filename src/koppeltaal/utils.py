@@ -5,11 +5,16 @@
 """
 
 import collections
-import ConfigParser
 import datetime
 import os.path
-import urlparse
+import six
 import uuid
+
+from configparser import ConfigParser
+from six.moves.urllib.parse import urlparse
+
+
+unicode = six.text_type
 
 
 class UTC(datetime.tzinfo):
@@ -22,6 +27,7 @@ class UTC(datetime.tzinfo):
 
     def dst(self, dt):
         return datetime.timedelta(0)
+
 
 utc = UTC()
 
@@ -63,12 +69,12 @@ def get_credentials_from_file(name):
     config = os.path.expanduser('~/.koppeltaal.cfg')
     if not os.path.isfile(config):
         raise ValueError("Can't find ~/.koppeltaal.cfg")
-    parser = ConfigParser.ConfigParser()
+    parser = ConfigParser()
     parser.read(config)
     if not parser.has_section(name):
         raise ValueError('No user credentials found in ~/.koppeltaal.cfg')
     url = parser.get(name, 'url')
-    parsed = urlparse.urlparse(url)
+    parsed = urlparse(url)
     if parsed.scheme != 'https' or \
             parsed.netloc == '' or \
             parsed.path != '' or \

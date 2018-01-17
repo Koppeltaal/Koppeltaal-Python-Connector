@@ -4,7 +4,7 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import urllib
+import six
 import zope.interface
 
 from koppeltaal.fhir import bundle, resource
@@ -14,6 +14,11 @@ from koppeltaal import (
     models,
     transport,
     utils)
+from six.moves.urllib.parse import urlencode
+
+
+unicode = six.text_type
+
 
 DEFAULT_COUNT = 100
 
@@ -186,7 +191,7 @@ class Connector(object):
         assert application_id is not None, 'Invalid activity'
         return '{}?{}'.format(
             self.transport.absolute_url(interfaces.OAUTH_AUTHORIZE_URL),
-            urllib.urlencode(
+            urlencode(
                 (('client_id', application_id),
                  ('redirect_uri', redirect_uri),
                  ('response_type', 'code'),
@@ -325,9 +330,10 @@ class DummyConnector(object):
         self.integration = integration
 
     def metadata(self):
-        return  {'name': 'Koppeltaal',
-                 'version': 'v1.1',
-                 'fhirVersion': '0.0.82'}
+        return {
+            'name': 'Koppeltaal',
+            'version': 'v1.1',
+            'fhirVersion': '0.0.82'}
 
     def activities(self, archived=False):
         return []

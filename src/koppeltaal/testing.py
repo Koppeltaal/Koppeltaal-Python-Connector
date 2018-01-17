@@ -5,14 +5,17 @@
 """
 
 import functools
-import json
-import urllib
-import urlparse
 import hamcrest
+import json
 import pkg_resources
+import six
 
 from hamcrest.core.base_matcher import BaseMatcher
 from koppeltaal import transport
+from six.moves.urllib.parse import urlparse, urlunparse, urlencode
+
+
+unicode = six.text_type
 
 
 class Response(transport.Response):
@@ -32,8 +35,10 @@ class MockTransport(object):
     def _expect(self, method, fixture, url):
         response_json = None
         if 'respond_with' in fixture:
-            response_json = json.load(pkg_resources.resource_stream(
-                self._module_name, fixture['respond_with']))
+            filename = pkg_resources.resource_filename(
+                self._module_name, fixture['respond_with'])
+            with open(filename) as fp:
+                response_json = json.load(fp)
         response_location = fixture.get('redirect_to')
         return Response(
             request_method=method,
@@ -58,10 +63,10 @@ class MockTransport(object):
         self.expected.setdefault(url, []).append(expect)
 
     def relative_url(self, url, params=None):
-        parts = urlparse.urlparse(url)[2:]
-        url = urlparse.urlunparse(('', '') + parts)
+        parts = list(map(unicode, urlparse(url)[2:]))
+        url = urlunparse([unicode(''), unicode('')] + parts)
         if params:
-            url += '?' + urllib.urlencode(params)
+            url += '?' + urlencode(params)
         return url
 
     def absolute_url(self, url):

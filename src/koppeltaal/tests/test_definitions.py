@@ -5,7 +5,6 @@
 """
 
 import datetime
-import mock
 import pytest
 import zope.interface.verify
 import koppeltaal.codes
@@ -15,6 +14,16 @@ import koppeltaal.fhir.resource
 import koppeltaal.interfaces
 import koppeltaal.models
 import koppeltaal.utils
+
+import sys
+if sys.version_info.major == 2:
+    import mock
+
+    def bytes(arg, encoding):
+        return str(arg)
+
+else:
+    from unittest import mock
 
 
 @pytest.fixture

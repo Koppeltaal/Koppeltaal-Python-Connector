@@ -6,6 +6,7 @@
 
 import datetime
 import dateutil.parser
+import six
 import zope.interface
 
 from koppeltaal import (
@@ -15,6 +16,10 @@ from koppeltaal import (
     interfaces,
     models,
     utils)
+
+
+basestring = six.string_types
+unicode = six.text_type
 
 
 @zope.interface.implementer(interfaces.IBrokenFHIRResource)
