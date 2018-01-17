@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.2.2 (unreleased)
+1.3.2.2 (2018-01-17)
 --------------------
 
 - Make sure to pass a unicode filename to ConfigParser. This prevents a    
