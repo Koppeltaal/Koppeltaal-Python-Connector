@@ -4,13 +4,14 @@ Changes
 1.3.2.2 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Make sure to pass a unicode filename to ConfigParser. This prevents a    
+  warning under Python 2.7.14.
 
 1.3.2.1 (2018-01-17)
 --------------------
 
-- Python 3 compatibility. The adapter now formally supports Python 2.7 and Python 3.6 through the `six` compatibility layer..
+- Python 3 compatibility. The adapter now formally supports Python 2.7 and
+  Python 3.6 through the `six` compatibility layer..
 
 1.2.1 (2017-10-16)
 ------------------
