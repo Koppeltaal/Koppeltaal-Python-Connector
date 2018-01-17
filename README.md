@@ -124,5 +124,12 @@ Use the following API in your integration code to talk to a Koppeltaal server:
 
 T.B.D.
 
+Development
+-----------
+
+* Formally support Python 2.7 and Python 3.6
+* Use the [six] library for the compatibility layer
+
 [buildout]: http://www.buildout.org
 [pytest]: https://pytest.org
+[six]: http://six.readthedocs.io/

@@ -4,8 +4,7 @@ Changes
 1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Python 3 compatibility. The adpater now formally supports Python 2.7 and Python 3.6 through the `six` compatibility layer..
 
 1.2.1 (2017-10-16)
 ------------------
