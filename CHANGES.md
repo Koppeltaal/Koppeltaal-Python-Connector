@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.2.3 (unreleased)
+1.3.2.3 (2018-02-28)
 --------------------
 
 - Fix Python 3 deprecation warnings.
