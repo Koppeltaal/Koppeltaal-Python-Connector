@@ -14,7 +14,7 @@ def extensions(extensions, namespace=interfaces.NAMESPACE):
     subactivities = extensions.get(namespace + 'CarePlan#SubActivity', [])
     for subactivity in subactivities:
         if 'valueString' in subactivity:
-            logger.warn('Detected 1.0 subactivity in care plan.')
+            logger.warning('Detected 1.0 subactivity in care plan.')
             subactivity['extension'] = [{
                 'url': namespace + 'CarePlan#SubActivityIdentifier',
                 'valueString': subactivity['valueString']}

@@ -14,7 +14,7 @@ critical = logger.critical
 debug = logger.debug
 error = logger.error
 info = logger.info
-warn = logger.warn
+warning = logger.warning
 
 
 def set_log_level(level):

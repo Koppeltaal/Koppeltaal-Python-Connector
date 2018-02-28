@@ -258,3 +258,7 @@ class IConnector(zope.interface.Interface):
     def send(event, data, patient):
         """Send an update about event with data for patient.
         """
+
+    def close():
+        """Close any connection left to the server.
+        """
