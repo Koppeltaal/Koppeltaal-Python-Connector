@@ -114,3 +114,6 @@ class Transport(object):
         return Response(
             json=response.json() if response.text else None,
             location=response.headers.get('content-location'))
+
+    def close(self):
+        self.session.close()

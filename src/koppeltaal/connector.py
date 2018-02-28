@@ -255,7 +255,7 @@ class Connector(object):
                         e.fhir_link, e.error) for e in errors]))
             elif (expected_events is not None
                   and message.event not in expected_events):
-                logger.warn('Event "{}" not expected'.format(message.event))
+                logger.warning('Event "{}" not expected'.format(message.event))
                 with update:
                     update.fail('Event not expected')
             elif (message.source is not None and
@@ -316,6 +316,9 @@ class Connector(object):
             raise interfaces.InvalidResponse(response)
         return response.data
 
+    def close(self):
+        self.transport.close()
+
 
 @zope.interface.implementer(interfaces.IConnector)
 class DummyConnector(object):
@@ -374,3 +377,6 @@ class DummyConnector(object):
 
     def send(self, event, data, patient=None):
         raise interfaces.DummyError()
+
+    def close(self):
+        pass

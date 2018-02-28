@@ -4,13 +4,14 @@ Changes
 1.3.2.3 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Fix Python 3 deprecation warnings.
 
+- Add an API to explicitly close the connection to the server.
 
 1.3.2.2 (2018-01-17)
 --------------------
 
-- Make sure to pass a unicode filename to ConfigParser. This prevents a    
+- Make sure to pass a unicode filename to ConfigParser. This prevents a
   warning under Python 2.7.14.
 
 1.3.2.1 (2018-01-17)

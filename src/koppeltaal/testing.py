@@ -122,6 +122,9 @@ class MockTransport(object):
                 'should be PUT'.format(response.request_method))
         return response
 
+    def close(self):
+        pass
+
 
 class HasFHIRResource(BaseMatcher):
 
