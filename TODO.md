@@ -7,7 +7,6 @@
 ## Definitions that need to be added
 
 * `CarePlan.activity.goal`
-* `CarePlan.activity.simple.performer`
 * `CarePlan.relation.*`
 * `CarePlanActivityResult.*`
 * `CarePlanActivityStatus.blackBoxState` [1]

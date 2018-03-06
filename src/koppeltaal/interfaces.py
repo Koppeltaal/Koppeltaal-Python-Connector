@@ -58,9 +58,15 @@ class InvalidValue(KoppeltaalError):
         self.value = value
 
     def __str__(self):
+        python_name = self.field.getName()
+        extended = python_name != self.field.name
+        if self.field.interface is not None:
+            python_name = self.field.interface.getName() + '.' + python_name
+        if extended:
+            return "{}: invalid value for '{}' (FHIR name: '{}').".format(
+                self.__class__.__name__, python_name, self.field.name)
         return "{}: invalid value for '{}'.".format(
-            self.__class__.__name__,
-            self.field.name)
+            self.__class__.__name__, python_name)
 
 
 class InvalidReference(InvalidValue):

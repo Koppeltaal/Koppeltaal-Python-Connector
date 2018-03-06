@@ -11,6 +11,7 @@ from koppeltaal import definitions, models
 REGISTRY = Registry({
     definitions.Activity: models.Activity,
     definitions.ActivityDefinition: models.ActivityDefinition,
+    definitions.ActivityDetails: models.ActivityDetails,
     definitions.ActivityParticipant: models.Participant,
     definitions.CarePlan: models.CarePlan,
     definitions.CarePlanActivityStatus: models.ActivityStatus,

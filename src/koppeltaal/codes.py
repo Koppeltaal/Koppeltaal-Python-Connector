@@ -67,6 +67,18 @@ ACTIVITY_LAUNCH_TYPE = Code(
      'Mobile',
      'Node'])
 
+
+CAREPLAN_ACTIVITY_CATEGORY = Code(
+    'http://hl7.org/fhir/care-plan-activity-category',
+    ['diet',
+     'drug',
+     'encounter',
+     'observation',
+     'procedure',
+     'supply',
+     'other'])
+
+
 CAREPLAN_ACTIVITY_STATUS = Code(
     'CarePlanActivityStatus',
     ['Waiting',
