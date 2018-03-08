@@ -227,6 +227,17 @@ class SubActivity(object):
         self.status = status
 
 
+@zope.interface.implementer(definitions.ActivityDetails)
+class ActivityDetails(object):
+
+    def __init__(
+            self,
+            category=None,
+            performers=None):
+        self.category = category
+        self.performers = performers
+
+
 @zope.interface.implementer(definitions.Activity)
 class Activity(object):
 
@@ -245,6 +256,7 @@ class Activity(object):
             started=None,
             status=None,
             subactivities=None,
+            details=None,
             prohibited=False):
         self.cancelled = cancelled
         self.definition = definition
@@ -259,6 +271,7 @@ class Activity(object):
         self.started = started
         self.status = status
         self.subactivities = subactivities
+        self.details = details
         self.prohibited = prohibited
 
 

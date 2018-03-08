@@ -461,6 +461,18 @@ class ActivityParticipant(zope.interface.Interface):
         optional=True)
 
 
+class ActivityDetails(zope.interface.Interface):
+
+    category = Field(
+        'category', 'code',
+        binding=codes.CAREPLAN_ACTIVITY_CATEGORY)
+
+    performers = Field(
+        'performer', 'reference',
+        multiple=ALL_ITEMS,
+        optional=True)
+
+
 class Activity(zope.interface.Interface):
 
     # This is optional in the specification but cannot be in practice,
@@ -538,6 +550,11 @@ class Activity(zope.interface.Interface):
         optional=True,
         multiple=ALL_ITEMS,
         extension='CarePlan#SubActivity')
+
+    details = Field(
+        'simple', 'object',
+        binding=ActivityDetails,
+        optional=True)
 
     prohibited = Field(
         'prohibited', 'boolean',

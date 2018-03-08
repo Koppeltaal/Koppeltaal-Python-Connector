@@ -64,7 +64,8 @@ def fhir2json(node, repeatable_field_names):
         if child_tag in repeatable_field_names:
             result.setdefault(child_tag, []).append(child_value)
         else:
-            assert child_tag not in result, 'Invalid fhir file'
+            assert child_tag not in result, \
+                'Invalid fhir file: {} already present.'.format(child_tag)
             result[child_tag] = child_value
     return result
 

@@ -4,8 +4,10 @@ Changes
 1.3.2.4 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Add missing Activity.simple implementation (simple summary of the
+  activity details).
 
+- Improve validation errors to be more descriptive.
 
 1.3.2.3 (2018-02-28)
 --------------------

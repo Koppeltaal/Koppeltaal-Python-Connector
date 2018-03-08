@@ -470,7 +470,7 @@ def test_unpack_extension_invalid_integer(packer, NAMESPACE):
                  'valueInteger': u'forty'}],
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'age'."
+    assert str(error.value) == "InvalidValue: invalid value for 'Patient.age'."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
@@ -479,7 +479,7 @@ def test_unpack_extension_invalid_integer(packer, NAMESPACE):
                  'value': 40}],
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'age'."
+    assert str(error.value) == "InvalidValue: invalid value for 'Patient.age'."
 
 
 def test_unpack_extension_required_missing(packer, NAMESPACE):
@@ -507,7 +507,8 @@ def test_unpack_native_invalid_boolean(packer):
             {'active': u'yes!',
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'active'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Patient.active'."
 
 
 def test_unpack_native_invalid_code(packer):
@@ -523,7 +524,7 @@ def test_unpack_native_invalid_code(packer):
             {'use': None},
             koppeltaal.definitions.Name)
     assert str(error.value) == \
-        "InvalidValue: invalid value for 'use'."
+        "InvalidValue: invalid value for 'Name.use'."
 
 
 def test_unpack_native_invalid_coding(packer, NAMESPACE):
@@ -586,7 +587,7 @@ def test_unpack_native_invalid_coding(packer, NAMESPACE):
              'timestamp': u'2015-10-09T12:16:00+00:00'},
             koppeltaal.definitions.MessageHeader)
     assert str(error.value) == \
-        "InvalidValue: invalid value for 'event'."
+        "InvalidValue: invalid value for 'MessageHeader.event'."
 
 
 def test_unpack_native_invalid_datetime(packer):
@@ -595,21 +596,27 @@ def test_unpack_native_invalid_datetime(packer):
             {'birthDate': u'yesterday',
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'birthDate'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Patient.birth_date' " \
+        "(FHIR name: 'birthDate')."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'birthDate': -1,
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'birthDate'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Patient.birth_date' " \
+        "(FHIR name: 'birthDate')."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'birthDate': False,
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'birthDate'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Patient.birth_date' " \
+        "(FHIR name: 'birthDate')."
 
 
 def test_unpack_native_invalid_multiple(packer):
@@ -617,19 +624,19 @@ def test_unpack_native_invalid_multiple(packer):
         packer.unpack(
             {'given': u'Napoleon'},
             koppeltaal.definitions.Name)
-    assert str(error.value) == "InvalidValue: invalid value for 'given'."
+    assert str(error.value) == "InvalidValue: invalid value for 'Name.given'."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'family': 42},
             koppeltaal.definitions.Name)
-    assert str(error.value) == "InvalidValue: invalid value for 'family'."
+    assert str(error.value) == "InvalidValue: invalid value for 'Name.family'."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'family': [42]},
             koppeltaal.definitions.Name)
-    assert str(error.value) == "InvalidValue: invalid value for 'family'."
+    assert str(error.value) == "InvalidValue: invalid value for 'Name.family'."
 
 
 def test_unpack_native_invalid_object(packer):
@@ -638,14 +645,18 @@ def test_unpack_native_invalid_object(packer):
             {'telecom': u'by fax',
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'telecom'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Patient.contacts' " \
+        "(FHIR name: 'telecom')."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'telecom': False,
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
-    assert str(error.value) == "InvalidValue: invalid value for 'telecom'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Patient.contacts' " \
+        "(FHIR name: 'telecom')."
 
 
 def test_unpack_native_invalid_string(packer):
@@ -653,13 +664,15 @@ def test_unpack_native_invalid_string(packer):
         packer.unpack(
             {'value': 42},
             koppeltaal.definitions.Identifier)
-    assert str(error.value) == "InvalidValue: invalid value for 'value'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Identifier.value'."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'value': True},
             koppeltaal.definitions.Identifier)
-    assert str(error.value) == "InvalidValue: invalid value for 'value'."
+    assert str(error.value) == \
+        "InvalidValue: invalid value for 'Identifier.value'."
 
 
 def test_unpack_allow_broken(packer):
