@@ -442,7 +442,7 @@ class SubActivity(zope.interface.Interface):
         extension='CarePlan#SubActivityIdentifier')
 
     status = Field(
-        'status', 'code',
+        'status', 'coding',
         binding=codes.CAREPLAN_ACTIVITY_STATUS,
         extension='CarePlan#SubActivityStatus',
         optional=True)

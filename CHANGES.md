@@ -9,6 +9,8 @@ Changes
 
 - Improve validation errors to be more descriptive.
 
+- In a care plan, change sub activity status from a code to a coding.
+
 1.3.2.3 (2018-02-28)
 --------------------
 
