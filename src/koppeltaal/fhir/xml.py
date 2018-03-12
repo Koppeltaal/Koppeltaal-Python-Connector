@@ -18,10 +18,12 @@ TYPES = [
     (('extension', 'valueDecimal'), 'float'),
     (('extension', 'valueBoolean'), 'boolean'),
     (('activity', 'prohibited'), 'boolean'),
+    (('Patient', 'active'), 'boolean'),
 ]
 
 
 def type_for(node_tag, child_tag):
+    # Replace this by checking the definition.
     for key, value in TYPES:
         if (node_tag, child_tag) == key:
             return value
