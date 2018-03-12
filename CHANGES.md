@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.2.4 (unreleased)
+1.3.2.4 (2018-03-12)
 --------------------
 
 - Add missing Activity.simple implementation (simple summary of the
