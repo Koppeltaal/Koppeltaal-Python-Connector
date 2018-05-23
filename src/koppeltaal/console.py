@@ -133,6 +133,80 @@ def download(connection, directory, msgid=None, msg=None):
     print('Wrote message "{}" to "{}"'.format(msgid, filename))
 
 
+def _metadata(args, connection):
+    print_json(connection.metadata())
+
+
+def _validate(args, connection):
+    payload = None
+    if args.xml:
+        payload = xml.xml2json(args.xml)
+    if args.json:
+        payload = json.load(args.json)
+    if payload is None:
+        print("Please provide an XML or JSON file.")
+        return
+    print_json(payload)
+    resource_bundle = bundle.Bundle('validation', connection.integration)
+    resource_bundle.add_payload(payload)
+    for model in resource_bundle.unpack():
+        print_model(model)
+
+
+def _activities(args, connection):
+    for activity in connection.activities():
+        print_model(activity)
+
+
+def _messages(args, connection):
+    for message in connection.search(
+            event=args.event,
+            status=args.status,
+            patient=DummyResource(args.patient)):
+        if args.save_in_dir:
+            download(connection, args.save_in_dir, msg=message)
+        else:
+            print_model(message)
+
+
+def _message(args, connection):
+    if args.save_in_dir:
+        download(connection, args.save_in_dir, msgid=args.message_id)
+    else:
+        for model in connection.search(message_id=args.message_id):
+            print_model(model)
+
+
+def _updates(args, connection):
+    until = None
+    if args.until is not None:
+        until = dateutil.parser.parse(args.until, tzinfos=utils.UTC)
+
+    for index, update in enumerate(connection.updates()):
+        with update:
+            if until is None:
+                if not args.all_updates and index:
+                    update.postpone()
+                    break
+            else:
+                if update.message.timestamp > until:
+                    update.postpone()
+                    break
+            print_model(update.data)
+            if args.failure:
+                update.fail(args.failure)
+
+
+def _launch(args, connection):
+    print(
+        connection.launch_from_parameters(
+            args.application_id,
+            args.patient_link,
+            args.user_link,
+            args.activity,
+            ))
+
+
 def console():
     parser = argparse.ArgumentParser(description='Koppeltaal connector')
     parser.add_argument('server', help='Koppeltaal server to connect to')
@@ -194,10 +268,6 @@ def console():
         help='Fail and set the exception on the messages.')
 
     launch = subparsers.add_parser('launch')
-    # user
-    # application_id
-    # patient_link
-    # activity_identifier
     launch.add_argument('user_link')
     launch.add_argument('application_id')
     launch.add_argument('patient_link')
@@ -218,77 +288,19 @@ def console():
     credentials = get_credentials(args)
     integration = connector.Integration(name='Python command line')
     connection = connector.Connector(credentials, integration)
-
+    commands = {
+        'activities': _activities,
+        'launch': _launch,
+        'message': _message,
+        'messages': _messages,
+        'metadata': _metadata,
+        'updates': _updates,
+        'validate': _validate}
+    command = commands.get(args.command)
+    if command is None:
+        sys.exit('Unknown command {}'.format(args.command))
     try:
-        if args.command == 'metadata':
-            print_json(connection.metadata())
-
-        elif args.command == 'validate':
-            payload = None
-            if args.xml:
-                payload = xml.xml2json(args.xml)
-            if args.json:
-                payload = json.load(args.json)
-            if payload is None:
-                print("Please provide an XML or JSON file.")
-                return
-            print_json(payload)
-            resource_bundle = bundle.Bundle('validation', integration)
-            resource_bundle.add_payload(payload)
-            for model in resource_bundle.unpack():
-                print_model(model)
-
-        elif args.command == 'activities':
-            for activity in connection.activities():
-                print_model(activity)
-
-        elif args.command == 'messages':
-            for message in connection.search(
-                    event=args.event,
-                    status=args.status,
-                    patient=DummyResource(args.patient)):
-                if args.save_in_dir:
-                    download(connection, args.save_in_dir, msg=message)
-                else:
-                    print_model(message)
-
-        elif args.command == 'message':
-            if args.save_in_dir:
-                download(connection, args.save_in_dir, msgid=args.message_id)
-            else:
-                for model in connection.search(message_id=args.message_id):
-                    print_model(model)
-
-        elif args.command == 'updates':
-            until = None
-            if args.until is not None:
-                until = dateutil.parser.parse(args.until, tzinfos=utils.UTC)
-
-            for index, update in enumerate(connection.updates()):
-                with update:
-                    if until is None:
-                        if not args.all_updates and index:
-                            update.postpone()
-                            break
-                    else:
-                        if update.message.timestamp > until:
-                            update.postpone()
-                            break
-                    print_model(update.data)
-                    if args.failure:
-                        update.fail(args.failure)
-
-        elif args.command == 'launch':
-            print(
-                connection.launch_from_parameters(
-                    args.application_id,
-                    args.patient_link,
-                    args.user_link,
-                    args.activity,
-                    ))
-
-        else:
-            sys.exit('Unknown command {}'.format(args.command))
+        command(args, connection)
     except Exception as error:
         if args.post_mortem:
             print(error)
