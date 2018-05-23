@@ -28,7 +28,7 @@ REGISTRY = Registry({
     definitions.Participant: models.Participant,
     definitions.Patient: models.Patient,
     definitions.Practitioner: models.Practitioner,
-    definitions.ProcessingStatus: models.Status,
+    definitions.ProcessingStatus: models.ProcessingStatus,
     definitions.SubActivity: models.SubActivity,
     definitions.SubActivityDefinition: models.SubActivityDefinition,
 })

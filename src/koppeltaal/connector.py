@@ -75,7 +75,7 @@ class Update(object):
     def ack(self, status, exception=None):
         self.acked = True
         if self.message.status is None:
-            self.message.status = models.Status()
+            self.message.status = models.ProcessingStatus()
         self.message.status.status = status
         self.message.status.exception = exception
         self.message.status.last_changed = utils.now()
