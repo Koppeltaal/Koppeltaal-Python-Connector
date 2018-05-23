@@ -9,6 +9,18 @@ import zope.interface
 from koppeltaal import definitions
 
 
+def _inspect_definition(fields, definition):
+    for name, field in definition.namesAndDescriptions():
+        if not isinstance(field, definitions.Field):
+            continue
+        if field.extension:
+            continue
+        if field.multiple:
+            fields.add(field.name)
+        if field.field_type == 'object':
+            _inspect_definition(fields, field.binding)
+
+
 class Registry(dict):
 
     def repeatable_field_names(self, fhir_type):
@@ -16,24 +28,13 @@ class Registry(dict):
         if fhir_type == 'Other':
             return fields
 
-        def inspect_definition(definition):
-            for name, field in definition.namesAndDescriptions():
-                if not isinstance(field, definitions.Field):
-                    continue
-                if field.extension:
-                    continue
-                if field.multiple:
-                    fields.add(field.name)
-                if field.field_type == 'object':
-                    inspect_definition(field.binding)
-
         for definition in self.keys():
             defined_type = definition.queryTaggedValue('resource type')
             if not defined_type:
                 continue
             if defined_type[0] != fhir_type:
                 continue
-            inspect_definition(definition)
+            _inspect_definition(fields, definition)
 
         return fields
 
