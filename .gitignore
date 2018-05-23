@@ -3,6 +3,7 @@
 .DS_Store
 .installed.cfg
 .mr.developer.cfg
+.pytest_cache/*
 .tox
 *.egg-info
 *.pyc
