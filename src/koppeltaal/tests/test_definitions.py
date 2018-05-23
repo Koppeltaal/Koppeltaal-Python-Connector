@@ -36,11 +36,11 @@ def packer():
 
 
 @pytest.fixture
-def NAMESPACE():
+def namespace():
     return koppeltaal.interfaces.NAMESPACE
 
 
-def test_coding(packer, NAMESPACE):
+def test_coding(packer, namespace):
 
     vertebrates = koppeltaal.codes.Code(
         'Vertebrate',
@@ -59,7 +59,7 @@ def test_coding(packer, NAMESPACE):
     assert coding == {
         'code': 'amphibians',
         'display': 'amphibians',
-        'system': NAMESPACE + 'Vertebrate'}
+        'system': namespace + 'Vertebrate'}
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.pack_coding('sponges')
@@ -73,7 +73,7 @@ def test_coding(packer, NAMESPACE):
     unpacked_coding = vertebrates.unpack_coding({
         'code': 'amphibians',
         'display': 'amphibians',
-        'system': NAMESPACE + 'Vertebrate'})
+        'system': namespace + 'Vertebrate'})
 
     assert 'amphibians' == unpacked_coding
 
@@ -81,7 +81,7 @@ def test_coding(packer, NAMESPACE):
         vertebrates.unpack_coding({
             'code': 'sponges',
             'display': 'sponges',
-            'system': NAMESPACE + 'Vertebrate'})
+            'system': namespace + 'Vertebrate'})
 
     unknown_value = vertebrates.unpack_coding({
         'code': 'UNK',
@@ -181,11 +181,11 @@ def test_pack_name(packer):
             koppeltaal.definitions.Name)
 
 
-def test_unpack_patient(packer, NAMESPACE):
+def test_unpack_patient(packer, namespace):
     patient1 = packer.unpack(
         {'active': True,
          'extension': [
-             {'url': NAMESPACE + u'Patient#Age',
+             {'url': namespace + u'Patient#Age',
               'valueInteger': 42}],
          'gender': {'coding': [
              {'code': u'M',
@@ -373,20 +373,20 @@ def test_pack_practitioner(packer):
              'use': 'work'}]}
 
 
-def test_unpack_activity_definition(packer, NAMESPACE):
+def test_unpack_activity_definition(packer, namespace):
     definition1 = packer.unpack(
         {'extension': [
-            {'url': (NAMESPACE +
+            {'url': (namespace +
                      u'ActivityDefinition#ActivityDefinitionIdentifier'),
              'valueString': u'myapp'},
-            {'url': NAMESPACE + u'ActivityDefinition#ActivityName',
+            {'url': namespace + u'ActivityDefinition#ActivityName',
              'valueString': u'My APP'},
-            {'url': NAMESPACE + u'ActivityDefinition#ActivityKind',
+            {'url': namespace + u'ActivityDefinition#ActivityKind',
              'valueCoding': {
                  'code': u'Game',
                  'display': u'Game',
-                 'system': NAMESPACE + u'ActivityKind'}},
-            {'url': NAMESPACE + u'ActivityDefinition#Application',
+                 'system': namespace + u'ActivityKind'}},
+            {'url': namespace + u'ActivityDefinition#Application',
              'valueResource': {
                  'reference': 'https://example.com/refmyapp',
                  'display': u'refmyapp'}}]},
@@ -408,12 +408,12 @@ def test_unpack_activity_definition(packer, NAMESPACE):
     assert len(definition1.subactivities) == 0
 
 
-def test_unpack_message_header(packer, NAMESPACE):
+def test_unpack_message_header(packer, namespace):
     message1 = packer.unpack(
         {'data': [{'reference': 'https://example.com/data'}],
          'event': {'code': u'CreateOrUpdatePatient',
                    'display': u'CreateOrUpdatePatient',
-                   'system': NAMESPACE + u'MessageEvents'},
+                   'system': namespace + u'MessageEvents'},
          'identifier': u'42-42-42',
          'source': {'name': u'unpack message header',
                     'version': u'about 1.0',
@@ -439,7 +439,7 @@ def test_unpack_message_header(packer, NAMESPACE):
         2015, 10, 9, 12, 16, tzinfo=koppeltaal.utils.utc)
 
 
-def test_pack_message_header(packer, NAMESPACE):
+def test_pack_message_header(packer, namespace):
     message1 = packer.pack(
         koppeltaal.models.MessageHeader(
             timestamp=datetime.datetime(2015, 10, 9, 12, 4),
@@ -453,7 +453,7 @@ def test_pack_message_header(packer, NAMESPACE):
     assert message1 == {
         'event': {'code': 'CreateOrUpdatePatient',
                   'display': 'CreateOrUpdatePatient',
-                  'system': NAMESPACE + 'MessageEvents'},
+                  'system': namespace + 'MessageEvents'},
         'id': mock.ANY,
         'identifier': u'42-42',
         'source': {'endpoint': u'https://example.com/here',
@@ -462,11 +462,11 @@ def test_pack_message_header(packer, NAMESPACE):
         'timestamp': '2015-10-09T12:04:00+00:00'}
 
 
-def test_unpack_extension_invalid_integer(packer, NAMESPACE):
+def test_unpack_extension_invalid_integer(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'extension': [
-                {'url': NAMESPACE + u'Patient#Age',
+                {'url': namespace + u'Patient#Age',
                  'valueInteger': u'forty'}],
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
@@ -475,27 +475,27 @@ def test_unpack_extension_invalid_integer(packer, NAMESPACE):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'extension': [
-                {'url': NAMESPACE + u'Patient#Age',
+                {'url': namespace + u'Patient#Age',
                  'value': 40}],
              'name': [{'given': [u'Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == "InvalidValue: invalid value for 'Patient.age'."
 
 
-def test_unpack_extension_required_missing(packer, NAMESPACE):
+def test_unpack_extension_required_missing(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'extension': [
-                {'url': (NAMESPACE +
+                {'url': (namespace +
                          u'ActivityDefinition#ActivityDefinitionIdentifier'),
                  'valueString': u'myapp'},
-                {'url': NAMESPACE + u'ActivityDefinition#ActivityName',
+                {'url': namespace + u'ActivityDefinition#ActivityName',
                  'valueString': u'My APP'},
-                {'url': NAMESPACE + u'ActivityDefinition#ActivityKind',
+                {'url': namespace + u'ActivityDefinition#ActivityKind',
                  'valueCoding': {
                      'code': u'Game',
                      'display': u'Game',
-                     'system': NAMESPACE + u'ActivityKind'}}]},
+                     'system': namespace + u'ActivityKind'}}]},
             koppeltaal.definitions.ActivityDefinition)
     assert str(error.value) == \
         "RequiredMissing: 'application' required but missing."
@@ -527,12 +527,12 @@ def test_unpack_native_invalid_code(packer):
         "InvalidValue: invalid value for 'Name.use'."
 
 
-def test_unpack_native_invalid_coding(packer, NAMESPACE):
+def test_unpack_native_invalid_coding(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidCode) as error:
         packer.unpack(
             {'event': {'code': u'CreateWorld',
                        'display': u'CreateWorld',
-                       'system': NAMESPACE + u'MessageEvents'},
+                       'system': namespace + u'MessageEvents'},
              'identifier': u'42-42-42',
              'source': {'endpoint': u'https://example.com/here',
                         'software': u'pytest'},
@@ -545,7 +545,7 @@ def test_unpack_native_invalid_coding(packer, NAMESPACE):
     with pytest.raises(koppeltaal.interfaces.InvalidCode) as error:
         packer.unpack(
             {'event': {'coding': u'CreateOrUpdatePatient',
-                       'system': NAMESPACE + u'MessageEvents'},
+                       'system': namespace + u'MessageEvents'},
              'identifier': u'42-42-42',
              'source': {'endpoint': u'https://example.com/here',
                         'software': u'pytest'},
