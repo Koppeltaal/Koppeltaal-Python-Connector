@@ -71,14 +71,6 @@ def patient(request, connector):
         age=42,
         gender="M",
         active=True)
-
-    # def cleanup_patient_messages():
-    #     # XXX Fix the URL
-    #     for message in connector.search(patient='fakeurl'):
-    #         message.status = 'Success'
-    #         connector.send(message)
-
-    # request.addfinalizer(cleanup_patient_messages)
     return patient
 
 

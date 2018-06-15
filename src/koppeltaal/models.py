@@ -293,7 +293,7 @@ class CarePlan(FHIRResource):
 
 
 @zope.interface.implementer(definitions.ProcessingStatus)
-class Status(object):
+class ProcessingStatus(object):
 
     def __init__(
             self,
