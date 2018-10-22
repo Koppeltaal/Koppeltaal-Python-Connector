@@ -335,11 +335,12 @@ class MessageHeaderResponse(object):
 @zope.interface.implementer(definitions.MessageHeaderSource)
 class MessageHeaderSource(object):
 
-    def __init__(self,
-                 endpoint=None,
-                 name=None,
-                 software=None,
-                 version=None):
+    def __init__(
+            self,
+            endpoint=None,
+            name=None,
+            software=None,
+            version=None):
         self.endpoint = endpoint
         self.name = name
         self.software = software
