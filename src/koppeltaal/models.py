@@ -117,9 +117,11 @@ class Participant(object):
     def __init__(
             self,
             member=None,
-            role=None):
+            role=None,
+            careteam=None):
         self.member = member
         self.role = role
+        self.careteam = careteam
 
 
 @zope.interface.implementer(definitions.OrganizationContactPerson)

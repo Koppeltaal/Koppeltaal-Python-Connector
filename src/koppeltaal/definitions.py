@@ -417,6 +417,12 @@ class Participant(zope.interface.Interface):
         optional=True,
         binding=codes.CAREPLAN_PARTICIPANT_ROLE)
 
+    careteam = Field(
+        'careteam', 'reference',
+        extension='CarePlan#ParticipantCareTeam',
+        multiple=ALL_ITEMS,
+        optional=True)
+
 
 class Goal(zope.interface.Interface):
 
@@ -458,6 +464,12 @@ class ActivityParticipant(zope.interface.Interface):
         'role', 'codeable',
         binding=codes.CAREPLAN_PARTICIPANT_ROLE,
         extension='CarePlan#ParticipantRole',
+        optional=True)
+
+    careteam = Field(
+        'careteam', 'reference',
+        extension='CarePlan#ParticipantCareTeam',
+        multiple=ALL_ITEMS,
         optional=True)
 
 
