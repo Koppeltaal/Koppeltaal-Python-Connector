@@ -712,3 +712,61 @@ def test_unpack_allow_broken(packer):
         koppeltaal.interfaces.IBrokenFHIRResource, broken)
     assert str(broken.error) == \
         "InvalidCode: 'cool name' not in 'http://hl7.org/fhir/name-use'."
+
+
+def test_unpack_organization(packer, namespace):
+    org1 = packer.unpack(
+        {'active': True,
+         'address': [{
+             'city': 'Rotterdam',
+             'country': 'The Netherlands',
+             'period': {
+                 'start': '2013-06-01T12:34:00',
+                 },
+             'state': 'Zuid-Holland',
+             'text': 'Rotterdam, ken je dat nie horen dan?',
+             'use': 'work',
+             'zip': '3033CH'
+             }, {
+             'city': 'Den Haag',
+             'country': 'The Netherlands',
+             'period': {
+                 'start': '2010-06-01T12:34:00',
+                 'end': '2013-06-01T12:33:00',
+                 },
+             'state': 'Zuid-Holland',
+             'text': 'Achter de duinuh',
+             'use': 'work',
+             'zip': '2564TT'}]},
+        koppeltaal.definitions.Organization)
+
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Organization, org1)
+
+    addresses = org1.address
+    assert 2 == len(addresses)
+
+    address1 = addresses[0]
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Address, address1)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Address, address1)
+    assert address1.city == 'Rotterdam'
+    assert address1.country == 'The Netherlands'
+    assert address1.state == 'Zuid-Holland'
+    assert address1.text == 'Rotterdam, ken je dat nie horen dan?'
+    assert address1.use == 'work'
+    assert address1.zip == '3033CH'
+
+    period1 = address1.period
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Period, period1)
+    assert period1.start == datetime.datetime(2013, 6, 1, 12, 34)
+    assert period1.end is None
+
+    address2 = addresses[1]
+    period2 = address2.period
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Period, period2)
+    assert period2.start == datetime.datetime(2010, 6, 1, 12, 34)
+    assert period2.end == datetime.datetime(2013, 6, 1, 12, 33)
