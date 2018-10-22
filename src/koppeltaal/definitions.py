@@ -285,45 +285,6 @@ class OrganizationContactPerson(zope.interface.Interface):
         optional=True)
 
 
-@resource_type('Organization')
-class Organization(interfaces.IIdentifiedFHIRResource):
-
-    active = Field(
-        'active', 'boolean',
-        optional=True)
-
-    category = Field(
-        'type', 'code',
-        binding=codes.ORGANIZATION_TYPE,
-        optional=True)
-
-    contacts = Field(
-        'telecom', 'object',
-        binding=Contact,
-        multiple=ALL_ITEMS,
-        optional=True)
-
-    contact_persons = Field(
-        'contact', 'object',
-        binding=OrganizationContactPerson,
-        multiple=ALL_ITEMS,
-        optional=True)
-
-    identifiers = Field(
-        'identifier', 'object',
-        binding=Identifier,
-        multiple=ALL_ITEMS,
-        optional=True)
-
-    name = Field(
-        'name', 'string',
-        optional=True)
-
-    part_of = Field(
-        'partOf', 'reference',
-        optional=True)
-
-
 class Period(zope.interface.Interface):
 
     start = Field(
@@ -375,6 +336,51 @@ class Address(zope.interface.Interface):
 
     zip = Field(
         'zip', 'string',
+        optional=True)
+
+
+@resource_type('Organization')
+class Organization(interfaces.IIdentifiedFHIRResource):
+
+    active = Field(
+        'active', 'boolean',
+        optional=True)
+
+    address = Field(
+        'address', 'object',
+        binding=Address,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    category = Field(
+        'type', 'code',
+        binding=codes.ORGANIZATION_TYPE,
+        optional=True)
+
+    contacts = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    contact_persons = Field(
+        'contact', 'object',
+        binding=OrganizationContactPerson,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    identifiers = Field(
+        'identifier', 'object',
+        binding=Identifier,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    name = Field(
+        'name', 'string',
+        optional=True)
+
+    part_of = Field(
+        'partOf', 'reference',
         optional=True)
 
 
