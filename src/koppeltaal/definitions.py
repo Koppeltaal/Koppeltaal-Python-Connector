@@ -121,8 +121,8 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     description = Field(
         'description', 'string',
-        optional=True,
-        extension='ActivityDefinition#ActivityDescription')
+        extension='ActivityDefinition#ActivityDescription',
+        optional=True)
 
     subactivities = Field(
         'subActivity', 'object',
@@ -133,9 +133,9 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     performer = Field(
         'defaultPerformer', 'coding',
-        optional=True,
         binding=codes.ACTIVITY_PERFORMER,
-        extension='ActivityDefinition#DefaultPerformer')
+        extension='ActivityDefinition#DefaultPerformer',
+        optional=True)
 
     launch_type = Field(
         'launchType', 'code',
@@ -152,8 +152,8 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
 
     is_domain_specific = Field(
         'isDomainSpecific', 'boolean',
-        optional=True,
-        extension='ActivityDefinition#IsDomainSpecific')
+        extension='ActivityDefinition#IsDomainSpecific',
+        optional=True)
 
     is_archived = Field(
         'isArchived', 'boolean',
@@ -195,7 +195,6 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
 
     percentage = Field(
         'percentageCompleted', 'integer',
-        optional=True,
         extension='CarePlanActivityStatus#PercentageCompleted')
 
 
@@ -205,36 +204,36 @@ class Name(zope.interface.Interface):
 
     given = Field(
         'given', 'string',
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     family = Field(
         'family', 'string',
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     prefix = Field(
         'prefix', 'string',
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     suffix = Field(
         'suffix', 'string',
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     use = Field(
         'use', 'code',
-        optional=True,
-        binding=codes.NAME_USE)
+        binding=codes.NAME_USE,
+        optional=True)
 
 
 class Contact(zope.interface.Interface):
 
     system = Field(
         'system', 'code',
-        optional=True,
-        binding=codes.CONTACT_SYSTEM)
+        binding=codes.CONTACT_SYSTEM,
+        optional=True)
 
     value = Field(
         'value', 'string',
@@ -242,8 +241,8 @@ class Contact(zope.interface.Interface):
 
     use = Field(
         'use', 'code',
-        optional=True,
-        binding=codes.CONTACT_USE)
+        binding=codes.CONTACT_USE,
+        optional=True)
 
 
 class Identifier(zope.interface.Interface):
@@ -258,8 +257,8 @@ class Identifier(zope.interface.Interface):
 
     use = Field(
         'use', 'code',
-        optional=True,
-        binding=codes.IDENTIFIER_USE)
+        binding=codes.IDENTIFIER_USE,
+        optional=True)
 
 
 class OrganizationContactPerson(zope.interface.Interface):
@@ -282,8 +281,8 @@ class OrganizationContactPerson(zope.interface.Interface):
 
     purpose = Field(
         'purpose', 'code',
-        optional=True,
-        binding=codes.CONTACT_ENTITY_TYPE)
+        binding=codes.CONTACT_ENTITY_TYPE,
+        optional=True)
 
 
 @resource_type('Organization')
@@ -295,8 +294,8 @@ class Organization(interfaces.IIdentifiedFHIRResource):
 
     category = Field(
         'type', 'code',
-        optional=True,
-        binding=codes.ORGANIZATION_TYPE)
+        binding=codes.ORGANIZATION_TYPE,
+        optional=True)
 
     contacts = Field(
         'telecom', 'object',
@@ -414,8 +413,8 @@ class Participant(zope.interface.Interface):
 
     role = Field(
         'role', 'codeable',
-        optional=True,
-        binding=codes.CAREPLAN_PARTICIPANT_ROLE)
+        binding=codes.CAREPLAN_PARTICIPANT_ROLE,
+        optional=True)
 
     careteam = Field(
         'careteam', 'reference',
@@ -495,30 +494,30 @@ class Activity(zope.interface.Interface):
 
     cancelled = Field(
         'cancelled', 'instant',
-        optional=True,
-        extension='CarePlan#Cancelled')
+        extension='CarePlan#Cancelled',
+        optional=True)
 
     # Note how this definition "points" to the `identifier` one of the
     # `ActivityDefinition`.
     definition = Field(
         'definition', 'string',
-        optional=True,
-        extension='CarePlan#ActivityDefinition')
+        extension='CarePlan#ActivityDefinition',
+        optional=True)
 
     description = Field(
         'description', 'string',
-        optional=True,
-        extension='CarePlan#ActivityDescription')
+        extension='CarePlan#ActivityDescription',
+        optional=True)
 
     ends = Field(
         'endDate', 'datetime',
-        optional=True,
-        extension='CarePlan#EndDate')
+        extension='CarePlan#EndDate',
+        optional=True)
 
     finished = Field(
         'finished', 'instant',
-        optional=True,
-        extension='CarePlan#Finished')
+        extension='CarePlan#Finished',
+        optional=True)
 
     # Note the `kind` should match the `kind` of the `ActivityDefinition`
     # we're pointing to.
@@ -559,9 +558,9 @@ class Activity(zope.interface.Interface):
     subactivities = Field(
         'subactivity', 'object',
         binding=SubActivity,
-        optional=True,
+        extension='CarePlan#SubActivity',
         multiple=ALL_ITEMS,
-        extension='CarePlan#SubActivity')
+        optional=True)
 
     details = Field(
         'simple', 'object',
@@ -570,8 +569,8 @@ class Activity(zope.interface.Interface):
 
     prohibited = Field(
         'prohibited', 'boolean',
-        optional=True,
-        default=False)
+        default=False,
+        optional=True)
 
 
 @resource_type('CarePlan')
@@ -580,20 +579,20 @@ class CarePlan(interfaces.IIdentifiedFHIRResource):
     activities = Field(
         'activity', 'object',
         binding=Activity,
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     goals = Field(
         'goal', 'object',
         binding=Goal,
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     participants = Field(
         'participant', 'object',
         binding=Participant,
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
     patient = Field(
         'patient', 'reference',
@@ -608,9 +607,9 @@ class ProcessingStatus(zope.interface.Interface):
 
     status = Field(
         'status', 'code',
-        optional=True,
         binding=codes.PROCESSING_STATUS,
-        extension='MessageHeader#ProcessingStatusStatus')
+        extension='MessageHeader#ProcessingStatusStatus',
+        optional=True)
 
     last_changed = Field(
         'statusLastChanged', 'instant',
@@ -618,8 +617,8 @@ class ProcessingStatus(zope.interface.Interface):
 
     exception = Field(
         'exception', 'string',
-        optional=True,
-        extension='MessageHeader#ProcessingStatusException')
+        extension='MessageHeader#ProcessingStatusException',
+        optional=True)
 
 
 class MessageHeaderSource(zope.interface.Interface):
@@ -628,21 +627,18 @@ class MessageHeaderSource(zope.interface.Interface):
         'name', 'string',
         optional=True)
 
-    software = Field(
-        'software', 'string')
+    software = Field('software', 'string')
 
     version = Field(
         'version', 'string',
         optional=True)
 
-    endpoint = Field(
-        'endpoint', 'string')
+    endpoint = Field('endpoint', 'string')
 
 
 class MessageHeaderResponse(zope.interface.Interface):
 
-    identifier = Field(
-        'identifier', 'string')
+    identifier = Field('identifier', 'string')
 
     code = Field(
         'code', 'code',
@@ -665,8 +661,8 @@ class MessageHeader(interfaces.IFHIRResource):
 
     patient = Field(
         'patient', 'reference',
-        optional=True,
-        extension='MessageHeader#Patient')
+        extension='MessageHeader#Patient',
+        optional=True)
 
     event = Field(
         'event', 'coding',
@@ -674,19 +670,19 @@ class MessageHeader(interfaces.IFHIRResource):
 
     response = Field(
         'response', 'object',
-        optional=True,
-        binding=MessageHeaderResponse)
+        binding=MessageHeaderResponse,
+        optional=True)
 
     status = Field(
         'processingStatus', 'object',
-        optional=True,
         binding=ProcessingStatus,
-        extension='MessageHeader#ProcessingStatus')
+        extension='MessageHeader#ProcessingStatus',
+        optional=True)
 
     source = Field(
         'source', 'object',
-        optional=True,
-        binding=MessageHeaderSource)
+        binding=MessageHeaderSource,
+        optional=True)
 
 
 class Period(zope.interface.Interface):
@@ -705,15 +701,15 @@ class CareTeam(interfaces.IIdentifiedFHIRResource):
 
     identifier = Field(
         'careTeamIdentifier', 'object',
-        extension='CareTeam#CareTeamIdentifier',
         binding=Identifier,
+        extension='CareTeam#CareTeamIdentifier',
         multiple=ALL_ITEMS,
         optional=True)
 
     status = Field(
         'status', 'coding',
-        extension='CareTeam#Status',
         binding=codes.CARE_TEAM_STATUS,
+        extension='CareTeam#Status',
         optional=True)
 
     name = Field(
@@ -735,8 +731,8 @@ class CareTeam(interfaces.IIdentifiedFHIRResource):
     managing_organization = Field(
         'managingOrganization', 'reference',
         extension='CareTeam#ManagingOrganization',
-        optional=True,
-        multiple=ALL_ITEMS)
+        multiple=ALL_ITEMS,
+        optional=True)
 
 
 # class Address(zope.interface.Interface):
