@@ -365,3 +365,33 @@ class MessageHeader(FHIRResource):
         self.source = source
         self.status = status
         self.timestamp = timestamp
+
+
+@zope.interface.implementer(definitions.Period)
+class Period(object):
+
+    def __init__(
+            self,
+            start=None,
+            end=None):
+        self.start = start
+        self.end = end
+
+
+@zope.interface.implementer(definitions.CareTeam)
+class CareTeam(FHIRResource):
+
+    def __init__(
+            self,
+            identifier=None,
+            status=None,
+            name=None,
+            subject=None,
+            period=None,
+            managing_organization=None):
+        self.identifier = identifier
+        self.status = status
+        self.name = name
+        self.subject = subject
+        self.period = period
+        self.managing_organization = managing_organization

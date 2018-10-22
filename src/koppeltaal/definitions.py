@@ -675,3 +675,65 @@ class MessageHeader(interfaces.IFHIRResource):
         'source', 'object',
         optional=True,
         binding=MessageHeaderSource)
+
+
+class Period(zope.interface.Interface):
+
+    start = Field(
+        'start', 'datetime',
+        optional=True)
+
+    end = Field(
+        'end', 'datetime',
+        optional=True)
+
+
+@resource_type('CareTeam')
+class CareTeam(interfaces.IIdentifiedFHIRResource):
+
+    identifier = Field(
+        'careTeamIdentifier', 'object',
+        extension='CareTeam#CareTeamIdentifier',
+        binding=Identifier,
+        multiple=ALL_ITEMS,
+        optional=True)
+
+    status = Field(
+        'status', 'coding',
+        extension='CareTeam#Status',
+        binding=codes.CARE_TEAM_STATUS,
+        optional=True)
+
+    name = Field(
+        'name', 'string',
+        extension='CareTeam#Name',
+        optional=True)
+
+    subject = Field(
+        'subject', 'reference',
+        extension='CareTeam#Subject',
+        optional=True)
+
+    period = Field(
+        'period', 'object',
+        binding=Period,
+        extension='CareTeam#Period',
+        optional=True)
+
+    managing_organization = Field(
+        'managingOrganization', 'reference',
+        extension='CareTeam#ManagingOrganization',
+        optional=True,
+        multiple=ALL_ITEMS)
+
+
+# class Address(zope.interface.Interface):
+#
+#     use
+#     text
+#     line
+#     city
+#     state
+#     zip
+#     country
+#     period

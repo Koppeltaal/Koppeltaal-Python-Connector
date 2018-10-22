@@ -221,3 +221,10 @@ OTHER_RESOURCE_USAGE = Code(
      'StorageItem': 'StorageItem',
      'UserMessage': 'UserMessage'})
 
+CARE_TEAM_STATUS = Code(
+    'CareTeamStatus',
+    {'proposed': 'Proposed',
+     'active': 'Active',
+     'suspended': 'Suspended',
+     'inactive': 'Inactive',
+     'entered-in-error': 'Entered in error'})
