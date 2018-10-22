@@ -44,10 +44,10 @@ def test_coding(packer, namespace):
 
     vertebrates = koppeltaal.codes.Code(
         'Vertebrate',
-        ['amphibians',
-         'birds',
-         'mammals',
-         'reptiles'])
+        {'amphibians': 'Amphibians',
+         'birds': 'Birds',
+         'mammals': 'Mammals',
+         'reptiles': 'Reptiles'})
 
     packed = vertebrates.pack_code('amphibians')
     assert packed == 'amphibians'
@@ -58,7 +58,7 @@ def test_coding(packer, namespace):
     coding = vertebrates.pack_coding('amphibians')
     assert coding == {
         'code': 'amphibians',
-        'display': 'amphibians',
+        'display': 'Amphibians',
         'system': namespace + 'Vertebrate'}
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
@@ -72,7 +72,7 @@ def test_coding(packer, namespace):
 
     unpacked_coding = vertebrates.unpack_coding({
         'code': 'amphibians',
-        'display': 'amphibians',
+        'display': 'Amphibians',
         'system': namespace + 'Vertebrate'})
 
     assert 'amphibians' == unpacked_coding
@@ -80,12 +80,12 @@ def test_coding(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_coding({
             'code': 'sponges',
-            'display': 'sponges',
+            'display': 'Sponges',
             'system': namespace + 'Vertebrate'})
 
     unknown_value = vertebrates.unpack_coding({
         'code': 'UNK',
-        'display': 'Unkown',
+        'display': 'Unknown',
         'system': koppeltaal.codes.NULL_SYSTEM})
 
     assert unknown_value is None
@@ -93,13 +93,13 @@ def test_coding(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_coding({
             'code': 'UNKNOW',
-            'display': 'Unkown',
+            'display': 'Unknown',
             'system': koppeltaal.codes.NULL_SYSTEM})
 
     with pytest.raises(koppeltaal.interfaces.InvalidSystem):
         vertebrates.unpack_coding({
             'code': 'reptiles',
-            'display': 'reptiles',
+            'display': 'Reptiles',
             'system': 'foobarbaz'})
 
 
@@ -259,7 +259,7 @@ def test_pack_patient(packer):
         'id': mock.ANY,
         'gender': {'coding': [
             {'code': 'M',
-             'display': 'M',
+             'display': 'Male',
              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
         'name': [
             {'id': mock.ANY,
@@ -291,7 +291,7 @@ def test_pack_patient(packer):
         'birthDate': '1976-06-01T12:34:00',
         'gender': {'coding': [
             {'code': 'F',
-             'display': 'F',
+             'display': 'Female',
              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
         'id': mock.ANY,
         'identifier': [
