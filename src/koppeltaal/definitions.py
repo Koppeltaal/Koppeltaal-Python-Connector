@@ -324,11 +324,70 @@ class Organization(interfaces.IIdentifiedFHIRResource):
         optional=True)
 
 
+class Period(zope.interface.Interface):
+
+    start = Field(
+        'start', 'datetime',
+        optional=True)
+
+    end = Field(
+        'end', 'datetime',
+        optional=True)
+
+
+class Address(zope.interface.Interface):
+
+    city = Field(
+        'city', 'string',
+        optional=True)
+
+    country = Field(
+        'country', 'string',
+        optional=True)
+
+    line = Field(
+        'line', 'string',
+        optional=True)
+
+    period = Field(
+        'period', 'object',
+        binding=Period,
+        extension='CareTeam#Period',
+        optional=True)
+
+    state = Field(
+        'state', 'string',
+        optional=True)
+
+    text = Field(
+        'text', 'string',
+        optional=True,
+        reserved_allowed=True)
+
+    use = Field(
+        'use', 'string',
+        optional=True)
+
+    use = Field(
+        'use', 'code',
+        binding=codes.NAME_USE,
+        optional=True)
+
+    zip = Field(
+        'zip', 'string',
+        optional=True)
+
+
 @resource_type('Patient')
 class Patient(interfaces.IIdentifiedFHIRResource):
 
     active = Field(
         'active', 'boolean',
+        optional=True)
+
+    address = Field(
+        'address', 'object',
+        binding=Address,
         optional=True)
 
     age = Field(
@@ -685,17 +744,6 @@ class MessageHeader(interfaces.IFHIRResource):
         optional=True)
 
 
-class Period(zope.interface.Interface):
-
-    start = Field(
-        'start', 'datetime',
-        optional=True)
-
-    end = Field(
-        'end', 'datetime',
-        optional=True)
-
-
 @resource_type('CareTeam')
 class CareTeam(interfaces.IIdentifiedFHIRResource):
 
@@ -733,15 +781,3 @@ class CareTeam(interfaces.IIdentifiedFHIRResource):
         extension='CareTeam#ManagingOrganization',
         multiple=ALL_ITEMS,
         optional=True)
-
-
-# class Address(zope.interface.Interface):
-#
-#     use
-#     text
-#     line
-#     city
-#     state
-#     zip
-#     country
-#     period

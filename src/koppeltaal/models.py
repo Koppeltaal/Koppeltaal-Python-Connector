@@ -166,6 +166,7 @@ class Patient(FHIRResource):
     def __init__(
             self,
             active=None,
+            address=None,
             age=None,
             birth_date=None,
             care_providers=None,
@@ -175,6 +176,7 @@ class Patient(FHIRResource):
             name=None,
             managing_organization=None):
         self.active = active
+        self.address = address
         self.age = age
         self.birth_date = birth_date
         self.care_providers = care_providers

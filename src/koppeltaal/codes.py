@@ -70,6 +70,14 @@ ACTIVITY_PERFORMER = Code(
      'Patient': 'Patient',
      })
 
+ADDRESS_USE = Code(
+    'http://hl7.org/fhir/address-use',
+    {'home': 'home',
+     'old': 'old',
+     'temp': 'temp',
+     'work': 'work',
+     })
+
 CAREPLAN_ACTIVITY_CATEGORY = Code(
     'http://hl7.org/fhir/care-plan-activity-category',
     {'diet': 'diet',
