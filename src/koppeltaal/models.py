@@ -145,6 +145,7 @@ class Organization(FHIRResource):
     def __init__(
             self,
             active=None,
+            address=None,
             category=None,
             contacts=None,
             contact_persons=None,
@@ -152,6 +153,7 @@ class Organization(FHIRResource):
             name=None,
             part_of=None):
         self.active = active
+        self.address = address
         self.category = category
         self.contacts = contacts
         self.contact_persons = contact_persons
@@ -400,3 +402,26 @@ class CareTeam(FHIRResource):
         self.subject = subject
         self.period = period
         self.managing_organization = managing_organization
+
+
+@zope.interface.implementer(definitions.Address)
+class Address(object):
+
+    def __init__(
+            self,
+            city=None,
+            country=None,
+            line=None,
+            period=None,
+            state=None,
+            text=None,
+            use=None,
+            zip=None):
+        self.city = city
+        self.country = country
+        self.line = line
+        self.period = period
+        self.state = state
+        self.text = text
+        self.use = use
+        self.zip = zip

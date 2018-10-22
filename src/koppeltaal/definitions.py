@@ -313,7 +313,6 @@ class Address(zope.interface.Interface):
     period = Field(
         'period', 'object',
         binding=Period,
-        extension='CareTeam#Period',
         optional=True)
 
     state = Field(
@@ -326,12 +325,8 @@ class Address(zope.interface.Interface):
         reserved_allowed=True)
 
     use = Field(
-        'use', 'string',
-        optional=True)
-
-    use = Field(
         'use', 'code',
-        binding=codes.NAME_USE,
+        binding=codes.ADDRESS_USE,
         optional=True)
 
     zip = Field(
