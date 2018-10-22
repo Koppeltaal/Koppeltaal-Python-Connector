@@ -49,24 +49,26 @@ class Code(dict):
 
 ACTIVITY_KIND = Code(
     'ActivityKind',
-    {'Game': 'Game',
-     'ELearning': 'ELearning',
-     'Questionnaire': 'Questionnaire',
+    {'ELearning': 'E-Learning',
+     'Game': 'Game',
      'Meeting': 'Meeting',
-     'MultipleActivityTemplate': 'MultipleActivityTemplate'})
-
-ACTIVITY_PERFORMER = Code(
-    'ActivityPerformer',
-    {'Patient': 'Patient',
-     'Practitioner': 'Practitioner',
-     'RelatedPerson': 'RelatedPerson'})
+     'MultipleActivityTemplate': 'Multiple activity template',
+     'Questionnaire': 'Questionnaire',
+     })
 
 ACTIVITY_LAUNCH_TYPE = Code(
     'ActivityDefinitionLaunchType',
-    {'Web': 'Web',
-     'Mobile': 'Mobile',
-     'Node': 'Node'})
+    {'Mobile': 'Mobile',
+     'None': 'None',
+     'Web': 'Web',
+     })
 
+ACTIVITY_PERFORMER = Code(
+    'ActivityPerformer',
+    {'Practitioner': 'Practitioner',
+     'RelatedPerson': 'RelatedPerson',
+     'Patient': 'Patient',
+     })
 
 CAREPLAN_ACTIVITY_CATEGORY = Code(
     'http://hl7.org/fhir/care-plan-activity-category',
@@ -74,66 +76,82 @@ CAREPLAN_ACTIVITY_CATEGORY = Code(
      'drug': 'drug',
      'encounter': 'encounter',
      'observation': 'observation',
+     'other': 'other',
      'procedure': 'procedure',
      'supply': 'supply',
-     'other': 'other'})
-
-
-CAREPLAN_ACTIVITY_STATUS = Code(
-    'CarePlanActivityStatus',
-    {'Waiting': 'Waiting',
-     'Available': 'Available',
-     'InProgress': 'InProgress',
-     'Completed': 'Completed',
-     'Cancelled': 'Cancelled',
-     'Expired': 'Expired',
-     'SkippedByUser': 'SkippedByUser'})
+     })
 
 CAREPLAN_PARTICIPANT_ROLE = Code(
     'CarePlanParticipantRole',
-    {'Requester': 'Requester',
-     'Supervisor': 'Supervisor',
-     'Thirdparty': 'Thirdparty',
+    {'Analyst': 'Analyst',
      'Caregiver': 'Caregiver',
      'Secretary': 'Secretary',
-     'Analyst': 'Analyst'})
+     'Supervisor': 'Supervisor',
+     'Thirdparty': 'Thirdparty',
+     'Requester': 'Requester',
+     })
 
-CAREPLAN_STATUS = Code(
-    'http://hl7.org/fhir/care-plan-status',
-    {'planned': 'planned',
-     'active': 'active',
-     'completed': 'completed'})
+CAREPLAN_ACTIVITY_STATUS = Code(
+    'CarePlanActivityStatus',
+    {'Available': 'Available',
+     'Cancelled': 'Cancelled',
+     'Completed': 'Completed',
+     'Expired': 'Expired',
+     'InProgress': 'InProgress',
+     'SkippedByUser': 'SkippedByUser',
+     'Waiting': 'Waiting',
+     })
 
 CAREPLAN_GOAL_STATUS = Code(
     'http://hl7.org/fhir/care-plan-goal-status',
-    {'in progress': 'in progress',
-     'achieved': 'achieved',
+    {'achieved': 'achieved',
+     'cancelled': 'cancelled',
+     'in progress': 'in progress',
      'sustaining': 'sustaining',
-     'cancelled': 'cancelled'})
+     })
+
+CAREPLAN_STATUS = Code(
+    'http://hl7.org/fhir/care-plan-status',
+    {'active': 'active',
+     'completed': 'completed',
+     'planned': 'planned',
+     })
 
 CONTACT_SYSTEM = Code(
     'http://hl7.org/fhir/contact-system',
-    {'phone': 'phone',
+    {'email': 'email',
      'fax': 'fax',
+     'phone': 'phone',
      'url': 'url',
-     'email': 'email'})
+     })
+
+CARE_TEAM_STATUS = Code(
+    'CareTeamStatus',
+    {'active': 'Active',
+     'entered-in-error': 'Entered in error',
+     'inactive': 'Inactive',
+     'proposed': 'Proposed',
+     'suspended': 'Suspended',
+     })
+
+CONTACT_ENTITY_TYPE = Code(
+    'http://hl7.org/fhir/contactentity-type',
+    {'ADMIN': 'ADMIN',
+     'BILL': 'BILL',
+     'HR': 'HR',
+     'PATINF': 'PATINF',
+     'PAYOR': 'PAYOR',
+     'PRESS': 'PRESS',
+     })
 
 CONTACT_USE = Code(
     'http://hl7.org/fhir/contact-use',
     {'home': 'home',
-     'work': 'work',
-     'temp': 'temp',
+     'mobile': 'mobile',
      'old': 'old',
-     'mobile': 'mobile'})
-
-CONTACT_ENTITY_TYPE = Code(
-    'http://hl7.org/fhir/contactentity-type',
-    {'BILL': 'BILL',
-     'ADMIN': 'ADMIN',
-     'HR': 'HR',
-     'PAYOR': 'PAYOR',
-     'PATINF': 'PATINF',
-     'PRESS': 'PRESS'})
+     'temp': 'temp',
+     'work': 'work',
+     })
 
 DEVICE_KIND = Code(
     'DeviceKind',
@@ -141,21 +159,25 @@ DEVICE_KIND = Code(
 
 GENDER = Code(
     'http://hl7.org/fhir/v3/AdministrativeGender',
-    {'F': 'Female', 'M': 'Male', 'UN': 'Undifferentiated'})
+    {'F': 'Female',
+     'M': 'Male',
+     'UN': 'Undifferentiated',
+     })
 
 IDENTIFIER_USE = Code(
     'http://hl7.org/fhir/identifier-use',
-    {'usual': 'usual',
-     'official': 'official',
+    {'official': 'official',
+     'secondary': 'secondary',
      'temp': 'temp',
-     'secondary': 'secondary'})
-
+     'usual': 'usual',
+     })
 
 MESSAGE_HEADER_RESPONSE_CODE = Code(
     'http://hl7.org/fhir/response-code',
     {'fatal-error': 'fatal-error',
      'ok': 'ok',
-     'transient-error': 'transient-error'})
+     'transient-error': 'transient-error',
+     })
 
 MESSAGE_HEADER_EVENTS = Code(
     'MessageEvents',
@@ -172,43 +194,37 @@ MESSAGE_HEADER_EVENTS = Code(
 
 MESSAGE_KIND = Code(
     'UserMessageKind',
-    {'Alert': 'Alert',
-     'Advice': 'Advice',
-     'Question': 'Question',
+    {'Advice': 'Advice',
+     'Alert': 'Alert',
      'Answer': 'Answer',
-     'Notification': 'Notification',
      'Message': 'Message',
-     'Request': 'Request'})
+     'Notification': 'Notification',
+     'Question': 'Question',
+     'Request': 'Request',
+     })
 
 NAME_USE = Code(
     'http://hl7.org/fhir/name-use',
-    {'usual': 'usual',
-     'official': 'official',
-     'temp': 'temp',
+    {'anonymous': 'anonymous',
+     'maiden': 'maiden',
      'nickname': 'nickname',
-     'anonymous': 'anonymous',
+     'official': 'official',
      'old': 'old',
-     'maiden': 'maiden'})
+     'temp': 'temp',
+     'usual': 'usual',
+     })
 
 ORGANIZATION_TYPE = Code(
     'http://hl7.org/fhir/organization-type',
     {'dept': 'dept',
-     'icu': 'icu',
-     'team': 'team',
-     'fed': 'fed',
-     'ins': 'ins',
      'edu': 'edu',
+     'fed': 'fed',
+     'icu': 'icu',
+     'ins': 'ins',
+     'pharm': 'pharm',
      'reli': 'reli',
-     'pharm': 'pharm'})
-
-PROCESSING_STATUS = Code(
-    'ProcessingStatus',
-    {'Claimed': 'Claimed',
-     'Failed': 'Failed',
-     'MaximumRetriesExceeded': 'MaximumRetriesExceeded',
-     'New': 'New',
-     'ReplacedByNewVersion': 'ReplacedByNewVersion',
-     'Success': 'Success'})
+     'team': 'team',
+     })
 
 # BlackBoxState is not valid, but the javascript connector generate
 # some of those.
@@ -219,12 +235,16 @@ OTHER_RESOURCE_USAGE = Code(
      'CarePlanActivityStatus': 'CarePlanActivityStatus',
      'CareTeam': 'CareTeam',
      'StorageItem': 'StorageItem',
-     'UserMessage': 'UserMessage'})
+     'UserMessage': 'UserMessage',
+     })
 
-CARE_TEAM_STATUS = Code(
-    'CareTeamStatus',
-    {'proposed': 'Proposed',
-     'active': 'Active',
-     'suspended': 'Suspended',
-     'inactive': 'Inactive',
-     'entered-in-error': 'Entered in error'})
+
+PROCESSING_STATUS = Code(
+    'ProcessingStatus',
+    {'Claimed': 'Claimed',
+     'Failed': 'Failed',
+     'MaximumRetriesExceeded': 'MaximumRetriesExceeded',
+     'New': 'New',
+     'ReplacedByNewVersion': 'ReplacedByNewVersion',
+     'Success': 'Success',
+     })
