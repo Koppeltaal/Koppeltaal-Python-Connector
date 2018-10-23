@@ -730,7 +730,7 @@ class MessageHeader(interfaces.IFHIRResource):
 
     data = Field(
         'data', 'reference',
-        multiple=FIRST_ITEM,
+        multiple=ALL_ITEMS,
         optional=True)
 
     patient = Field(

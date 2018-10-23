@@ -477,9 +477,10 @@ def test_unpack_message_header(packer, namespace):
 
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.MessageHeader, message1)
+    assert len(message1.data) == 1
     assert zope.interface.verify.verifyObject(
-        koppeltaal.interfaces.IReferredFHIRResource, message1.data)
-    assert message1.data.fhir_link == 'https://example.com/data'
+        koppeltaal.interfaces.IReferredFHIRResource, message1.data[0])
+    assert message1.data[0].fhir_link == 'https://example.com/data'
     assert message1.event == 'CreateOrUpdatePatient'
     assert message1.identifier == '42-42-42'
     assert zope.interface.verify.verifyObject(

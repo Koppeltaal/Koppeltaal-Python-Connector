@@ -32,7 +32,7 @@ def test_search_message_id_from_fixture(connector, transport):
         koppeltaal.definitions.MessageHeader, message)
     assert message.event == 'CreateOrUpdateCarePlan'
     assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.CarePlan, message.data)
+        koppeltaal.definitions.CarePlan, message.data[0])
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Patient, message.patient)
 
@@ -43,13 +43,14 @@ def test_send_careplan_success_from_fixture(
         'POST',
         '/FHIR/Koppeltaal/Mailbox',
         respond_with='fixtures/bundle_post_careplan_ok.json')
-    message = connector.send(
+    response_data = connector.send(
         'CreateOrUpdateCarePlan',
         careplan_from_fixture,
         careplan_from_fixture.patient)
+    assert len(response_data) == 3
     assert zope.interface.verify.verifyObject(
-        koppeltaal.interfaces.IReferredFHIRResource, message)
-    assert message.fhir_link == (
+        koppeltaal.interfaces.IReferredFHIRResource, response_data[0])
+    assert response_data[0].fhir_link == (
         'https://example.com/fhir/Koppeltaal/CarePlan/1/'
         '_history/1970-01-01T01:01:01:01.1')
 

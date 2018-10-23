@@ -108,12 +108,12 @@ def test_createorupdate_activitydefinition(connector, transport):
         performer='Patient',
         subactivities=[])
 
-    message = connector.send(
+    response_data = connector.send(
         'CreateOrUpdateActivityDefinition', ad)
-
+    assert len(response_data) == 1
     assert zope.interface.verify.verifyObject(
-        koppeltaal.interfaces.IReferredFHIRResource, message)
-    assert message.fhir_link == (
+        koppeltaal.interfaces.IReferredFHIRResource, response_data[0])
+    assert response_data[0].fhir_link == (
         'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
         '_history/1970-01-01T01:01:01:01.1')
 

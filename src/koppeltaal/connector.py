@@ -54,7 +54,8 @@ class Update(object):
     def __init__(self, message, resources, ack_function):
         self.message = message
         self.resources = resources
-        self.data = message.data
+        assert len(message.data) == 1, 'Multiple focal resources found'
+        self.data = message.data[0]
         self.patient = message.patient
         self._ack_function = ack_function
 
@@ -298,7 +299,7 @@ class Connector(object):
             timestamp=utils.now(),
             event=event,
             identifier=identifier,
-            data=data,
+            data=[data],
             source=source,
             patient=patient)
         send_bundle = bundle.Bundle(self.domain, self.integration)
