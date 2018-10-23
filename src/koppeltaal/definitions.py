@@ -65,6 +65,15 @@ class Field(zope.interface.Attribute):
             self.url = interfaces.NAMESPACE + extension
 
 
+def extension_data_type(name):
+
+    def data_type_iface(cls):
+        cls.setTaggedValue('extension data type', 'value{}'.format(name))
+        return cls
+
+    return data_type_iface
+
+
 def resource_type(name, standard=True):
 
     def resource_iface(cls):
@@ -198,6 +207,7 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
         extension='CarePlanActivityStatus#PercentageCompleted')
 
 
+@extension_data_type('HumanName')
 class Name(zope.interface.Interface):
 
     # http://hl7.org/fhir/DSTU1/datatypes.html#HumanName
@@ -228,6 +238,7 @@ class Name(zope.interface.Interface):
         optional=True)
 
 
+@extension_data_type('Contact')
 class Contact(zope.interface.Interface):
 
     system = Field(
@@ -245,6 +256,7 @@ class Contact(zope.interface.Interface):
         optional=True)
 
 
+@extension_data_type('Identifier')
 class Identifier(zope.interface.Interface):
 
     system = Field(
@@ -285,6 +297,7 @@ class OrganizationContactPerson(zope.interface.Interface):
         optional=True)
 
 
+@extension_data_type('Period')
 class Period(zope.interface.Interface):
 
     start = Field(
@@ -296,6 +309,7 @@ class Period(zope.interface.Interface):
         optional=True)
 
 
+@extension_data_type('Address')
 class Address(zope.interface.Interface):
 
     city = Field(
