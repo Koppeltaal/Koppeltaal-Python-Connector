@@ -219,7 +219,7 @@ class Extension(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        if value is None:
+        if value is None or (isinstance(value, list) and len(value) == 0):
             if not field.optional:
                 raise interfaces.InvalidValue(field, value)
             return
@@ -399,14 +399,14 @@ class Native(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        if value is None:
+        if value is None or (isinstance(value, list) and len(value) == 0):
             if not field.optional:
                 raise interfaces.InvalidValue(field, value)
             return
         if field.multiple is definitions.ALL_ITEMS:
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
-            item = [self._pack_item(field, v) for v in value]
+            item = [self._pack_item(field, v) for v in value if value]
         elif field.multiple is definitions.FIRST_ITEM:
             item = [self._pack_item(field, value)]
         else:

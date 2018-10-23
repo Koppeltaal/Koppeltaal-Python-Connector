@@ -167,6 +167,32 @@ def test_pack_name(packer):
         'suffix': [u'tot', u'Daarhelemaalië'],
         'use': 'official'}
 
+    # Verify an empty array value for (in this case) "given" does not leave an
+    # empty array as that would trip up the Koppeltaal server's JSON parser.
+    name4 = packer.pack(
+        koppeltaal.models.Name(
+            given=[],
+            family=[u'der', u'Fantasten'],
+            suffix=[u'tot', u'Daarhelemaalië']),
+        koppeltaal.definitions.Name)
+
+    assert name4 == {
+        'family': [u'der', u'Fantasten'],
+        'id': mock.ANY,
+        'suffix': [u'tot', u'Daarhelemaalië'],
+        'use': 'official'}
+
+    # Verify a None value for (in this case) "given" does not leave an array
+    # with null value(s) as that would trip up the Koppeltaal server's JSON
+    # parser.
+    with pytest.raises(koppeltaal.interfaces.InvalidValue):
+        packer.pack(
+            koppeltaal.models.Name(
+                given=[None],
+                family=[u'der', u'Fantasten'],
+                suffix=[u'tot', u'Daarhelemaalië']),
+            koppeltaal.definitions.Name)
+
     with pytest.raises(koppeltaal.interfaces.InvalidResource):
         packer.pack(
             'Napoleon',
