@@ -796,3 +796,43 @@ def test_unpack_organization(packer, namespace):
         koppeltaal.definitions.Period, period2)
     assert period2.start == datetime.datetime(2010, 6, 1, 12, 34)
     assert period2.end == datetime.datetime(2013, 6, 1, 12, 33)
+
+
+def test_pack_organization(packer):
+    org1 = packer.pack(
+        koppeltaal.models.Organization(
+            active=True,
+            address=[koppeltaal.models.Address(
+                city='Rotterdam',
+                country='The Netherlands',
+                line='Coolsingel 1',
+                period=koppeltaal.models.Period(
+                    start=datetime.datetime(2010, 6, 1, 12, 34),
+                    end=None),
+                state='Zuid-Holland',
+                text='Ken je dat nie horen dan?',
+                use='work',
+                zip='3030AB')],
+            category='team',
+            contacts=[],
+            contact_persons=[],
+            identifiers=[],
+            name='Example',
+            part_of=None),
+        koppeltaal.definitions.Organization)
+
+    assert org1 == {
+        'active': True,
+        'address': [{
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
+            'id': 'ref002',
+            'line': 'Coolsingel 1',
+            'period': {'id': 'ref001', 'start': '2010-06-01T12:34:00'},
+            'state': 'Zuid-Holland',
+            'text': 'Ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3030AB'}],
+        'id': 'ref003',
+        'name': 'Example',
+        'type': 'team'}
