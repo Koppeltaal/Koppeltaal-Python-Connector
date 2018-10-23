@@ -29,8 +29,6 @@ class BrokenResource(object):
     payload = None
 
     def __init__(self, error, payload):
-        print(error, payload)
-
         self.error = error
         self.payload = payload
 
@@ -434,7 +432,7 @@ class Native(object):
         if field.multiple is definitions.ALL_ITEMS:
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
-            item = [self._pack_item(field, v) for v in value if value]
+            item = [self._pack_item(field, v) for v in value]
         elif field.multiple is definitions.FIRST_ITEM:
             item = [self._pack_item(field, value)]
         else:
