@@ -296,7 +296,7 @@ class Connector(object):
             endpoint=unicode(self.integration.url),
             software=unicode(interfaces.SOFTWARE),
             version=unicode(interfaces.VERSION))
-        message_request = models.MessageHeader(
+        request_message = models.MessageHeader(
             timestamp=utils.now(),
             event=event,
             identifier=identifier,
@@ -304,7 +304,7 @@ class Connector(object):
             source=source,
             patient=patient)
         request_bundle = bundle.Bundle(self.domain, self.integration)
-        request_bundle.add_model(message_request)
+        request_bundle.add_model(request_message)
         request_payload = request_bundle.get_payload()
 
         try:
@@ -320,14 +320,14 @@ class Connector(object):
 
         response_bundle = bundle.Bundle(self.domain, self.integration)
         response_bundle.add_payload(response.json)
-        message_response = response_bundle.unpack_model(
+        response_message = response_bundle.unpack_model(
             definitions.MessageHeader)
-        if (message_response is None or
-                message_response.response is None or
-                message_response.response.identifier != identifier or
-                message_response.response.code != "ok"):
-            raise interfaces.MessageResponseError(message_response)
-        return message_response.data
+        if (response_message is None or
+                response_message.response is None or
+                response_message.response.identifier != identifier or
+                response_message.response.code != "ok"):
+            raise interfaces.MessageResponseError(response_message)
+        return response_message.data
 
     def close(self):
         self.transport.close()
