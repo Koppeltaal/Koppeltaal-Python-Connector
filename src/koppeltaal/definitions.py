@@ -759,7 +759,7 @@ class MessageHeader(interfaces.IFHIRResource):
         optional=True)
 
 
-@resource_type('CareTeam')
+@resource_type('CareTeam', standard=False)
 class CareTeam(interfaces.IIdentifiedFHIRResource):
 
     identifier = Field(
