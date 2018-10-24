@@ -10,6 +10,7 @@ import zope.interface
 from koppeltaal.fhir import bundle, resource
 from koppeltaal import (
     interfaces,
+    definitions,
     logger,
     models,
     transport,
@@ -140,7 +141,7 @@ class Connector(object):
         else:
             response = self.transport.create(interfaces.OTHER_URL, payload)
         if response.location is None:
-            raise interfaces.InvalidResponse(response)
+            raise interfaces.ResponseError(response)
         activity.fhir_link = response.location
         return activity
 
@@ -232,12 +233,12 @@ class Connector(object):
         while True:
             try:
                 bundle = self._fetch_bundle(interfaces.MESSAGE_HEADER_URL, p)
-                message = bundle.unpack_message_header()
+                message = bundle.unpack_model(definitions.MessageHeader)
             except interfaces.InvalidBundle as error:
                 logger.error(
                     'Bundle error while reading message: {}'.format(error))
                 continue
-            except interfaces.InvalidResponse as error:
+            except interfaces.TransportError as error:
                 logger.error(
                     'Transport error while reading mailbox: {}'.format(error))
                 break
@@ -295,27 +296,38 @@ class Connector(object):
             endpoint=unicode(self.integration.url),
             software=unicode(interfaces.SOFTWARE),
             version=unicode(interfaces.VERSION))
-        message = models.MessageHeader(
+        message_request = models.MessageHeader(
             timestamp=utils.now(),
             event=event,
             identifier=identifier,
             data=[data],
             source=source,
             patient=patient)
-        send_bundle = bundle.Bundle(self.domain, self.integration)
-        send_bundle.add_model(message)
+        request_bundle = bundle.Bundle(self.domain, self.integration)
+        request_bundle.add_model(message_request)
+        request_payload = request_bundle.get_payload()
+
+        try:
+            response = self.transport.create(
+                interfaces.MAILBOX_URL, request_payload)
+        except interfaces.ResponseError as error:
+            response_resource = resource.Resource(
+                self.domain, self.integration)
+            response_resource.add_payload(error.response.json)
+            outcome = response_resource.unpack_model(
+                definitions.OperationOutcome)
+            raise interfaces.OperationOutcomeError(outcome)
+
         response_bundle = bundle.Bundle(self.domain, self.integration)
-        response_bundle.add_payload(
-            self.transport.create(
-                interfaces.MAILBOX_URL,
-                send_bundle.get_payload()).json)
-        response = response_bundle.unpack_message_header()
-        if (response is None or
-                response.response is None or
-                response.response.identifier != identifier or
-                response.response.code != "ok"):
-            raise interfaces.InvalidResponse(response)
-        return response.data
+        response_bundle.add_payload(response.json)
+        message_response = response_bundle.unpack_model(
+            definitions.MessageHeader)
+        if (message_response is None or
+                message_response.response is None or
+                message_response.response.identifier != identifier or
+                message_response.response.code != "ok"):
+            raise interfaces.MessageResponseError(message_response)
+        return message_response.data
 
     def close(self):
         self.transport.close()

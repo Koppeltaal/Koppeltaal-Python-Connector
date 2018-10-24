@@ -13,7 +13,8 @@ import pdb
 import sys
 import dateutil
 
-from koppeltaal import (connector, codes, interfaces, models, logger, utils)
+from koppeltaal import connector, codes, definitions, interfaces
+from koppeltaal import models, logger, utils
 from koppeltaal.fhir import xml, bundle
 
 
@@ -118,7 +119,7 @@ def download(connection, directory, msgid=None, msg=None):
         interfaces.MESSAGE_HEADER_URL, {'_id': msgid}).json
     packaging = bundle.Bundle(connection.domain, connection.integration)
     packaging.add_payload(response)
-    msg = packaging.unpack_message_header()
+    msg = packaging.unpack_model(definitions.MessageHeader)
     ts = msg.timestamp.isoformat()
     directory = os.path.join(directory, connection.domain)
     if not os.path.exists(directory):

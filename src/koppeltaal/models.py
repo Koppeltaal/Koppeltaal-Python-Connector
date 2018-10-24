@@ -425,3 +425,29 @@ class Address(object):
         self.text = text
         self.use = use
         self.zip = zip
+
+
+@zope.interface.implementer(definitions.Issue)
+class Issue(object):
+
+    def __init__(
+            self,
+            severity=None,
+            type=None,
+            resource=None,
+            details=None,
+            location=None):
+        self.severity = severity
+        self.type = type
+        self.resource = resource
+        self.details = details
+        self.location = location
+
+
+@zope.interface.implementer(definitions.OperationOutcome)
+class OperationOutcome(FHIRResource):
+
+    def __init__(
+            self,
+            issue=None):
+        self.issue = issue

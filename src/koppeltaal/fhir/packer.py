@@ -142,18 +142,18 @@ class Extension(object):
     def unpack(self, field):
         if field.url not in self._index:
             if field.optional:
-                if field.multiple is definitions.ALL_ITEMS:
+                if field.multiple:
                     return []
                 return field.default
             raise interfaces.RequiredMissing(field)
         extensions = self._index[field.url]
-        if field.multiple is definitions.ALL_ITEMS:
+        if field.multiple:
             values = []
             for extension in extensions:
                 values.append(self._unpack_item(field, extension))
             return values
 
-        if not field.multiple and len(extensions) != 1:
+        if len(extensions) != 1:
             raise interfaces.InvalidValue(field)
         return self._unpack_item(field, extensions[0])
 
@@ -237,11 +237,11 @@ class Extension(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        if value is None or (isinstance(value, list) and len(value) == 0):
+        if field.is_empty(value):
             if not field.optional:
                 raise interfaces.InvalidValue(field, value)
             return
-        if field.multiple is definitions.ALL_ITEMS:
+        if field.multiple:
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
         else:
@@ -342,7 +342,7 @@ class Native(object):
     def unpack(self, field):
         if field.name not in self._content:
             if field.optional:
-                if field.multiple is definitions.ALL_ITEMS:
+                if field.multiple:
                     return []
                 return field.default
             raise interfaces.RequiredMissing(field)
@@ -355,7 +355,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             if not len(value):
                 raise interfaces.RequiredMissing(field)
-            if field.multiple is definitions.ALL_ITEMS:
+            if field.multiple:
                 return [self._unpack_item(field, v) for v in value]
             value = value[0]
         return self._unpack_item(field, value)
@@ -425,16 +425,14 @@ class Native(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        if value is None or (isinstance(value, list) and len(value) == 0):
+        if field.is_empty(value):
             if not field.optional:
                 raise interfaces.InvalidValue(field, value)
             return
-        if field.multiple is definitions.ALL_ITEMS:
+        if field.multiple:
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
             item = [self._pack_item(field, v) for v in value]
-        elif field.multiple is definitions.FIRST_ITEM:
-            item = [self._pack_item(field, value)]
         else:
             assert field.multiple is False
             item = self._pack_item(field, value)

@@ -73,6 +73,9 @@ class Entry(object):
             return self._fhir_link
         assert self._model is not MARKER, 'Need a model.'
 
+        if self._model is None:
+            return None
+
         if self._model.fhir_link is not None:
             self._fhir_link = self._model.fhir_link
             return self._fhir_link
@@ -171,3 +174,13 @@ class Resource(object):
     def unpack(self):
         for item in self.items:
             yield item.unpack()
+
+    def unpack_model(self, definition):
+        expected_model = None
+        for model in self.unpack():
+            if definition.providedBy(model):
+                if expected_model is not None:
+                    # We allow only one expected_model header in the bundle.
+                    raise interfaces.InvalidBundle(self)
+                expected_model = model
+        return expected_model

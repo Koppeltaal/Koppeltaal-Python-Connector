@@ -26,9 +26,11 @@ class Code(dict):
     def pack_coding(self, value):
         if value not in self:
             raise koppeltaal.interfaces.InvalidCode(self, value)
-        return {"code": value,
-                "display": self[value],
-                "system": self.system}
+        display = self[value]
+        coding = {"code": value, "system": self.system}
+        if display is not None:
+            coding["display"] = display
+        return coding
 
     def unpack_code(self, code):
         if code not in self:
@@ -255,4 +257,44 @@ PROCESSING_STATUS = Code(
      'New': 'New',
      'ReplacedByNewVersion': 'ReplacedByNewVersion',
      'Success': 'Success',
+     })
+
+
+ISSUE_TYPE = Code(
+    'http://hl7.org/fhir/issue-type',
+    {'invalid': None,
+     'structure': None,
+     'required': None,
+     'value': None,
+     'invariant': None,
+     'security': None,
+     'login': None,
+     'unknown': None,
+     'expired': None,
+     'forbidden': None,
+     'processing': None,
+     'not-supported': None,
+     'duplicate': None,
+     'not-found': None,
+     'too-long': None,
+     'code-unknown': None,
+     'extension': None,
+     'too-costly': None,
+     'business-rule': None,
+     'conflict': None,
+     'transient': None,
+     'lock-error': None,
+     'no-store': None,
+     'exception': None,
+     'timeout': None,
+     'throttled': None,
+     })
+
+
+ISSUE_SEVERITY = Code(
+    'http://hl7.org/fhir/issue-severity',
+    {'fatal': None,
+     'error': None,
+     'warning': None,
+     'information': None,
      })

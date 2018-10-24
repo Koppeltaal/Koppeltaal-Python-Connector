@@ -29,9 +29,41 @@ class KoppeltaalError(ValueError):
     """
 
 
-class InvalidResponse(KoppeltaalError):
-    """Invalid response from transport to the koppeltaal server.
+class TransportError(KoppeltaalError):
+    """There was an error related to the transport.
     """
+
+
+class ConnectionError(TransportError):
+    """There was a connection error from the transport.
+    """
+
+
+class ResponseError(TransportError):
+    """The transport got a response but it was an error.
+    """
+
+    def __init__(self, response):
+        super(ResponseError, self).__init__(response)
+        self.response = response
+
+
+class OperationOutcomeError(KoppeltaalError):
+    """A non 200 status with an operation outcome was returned by the server.
+    """
+
+    def __init__(self, outcome):
+        super(OperationOutcomeError, self).__init__(outcome)
+        self.outcome = outcome
+
+
+class MessageResponseError(KoppeltaalError):
+    """The response in the message header reported an error.
+    """
+
+    def __init__(self, message):
+        super(MessageResponseError, self).__init__(message)
+        self.message = message
 
 
 class DummyError(KoppeltaalError):

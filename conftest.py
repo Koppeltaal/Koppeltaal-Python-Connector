@@ -114,7 +114,7 @@ def careplan_from_fixture(request, transport):
         'GET',
         '/FHIR/Koppeltaal/Other/_search?code=ActivityDefinition',
         respond_with='fixtures/activities_game.json')
-    return request.getfuncargvalue('careplan')
+    return request.getfixturevalue('careplan')
 
 
 @pytest.fixture

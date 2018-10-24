@@ -29,8 +29,6 @@ RESERVED_NAMES = {
     'resourceType',
     'text',
 }
-ALL_ITEMS = object()
-FIRST_ITEM = object()
 
 
 class Field(zope.interface.Attribute):
@@ -63,6 +61,13 @@ class Field(zope.interface.Attribute):
         self.url = None
         if extension:
             self.url = interfaces.NAMESPACE + extension
+
+    def is_empty(self, value):
+        if value is None:
+            return True
+        if self.multiple and isinstance(value, list) and len(value) == 0:
+            return True
+        return False
 
 
 def extension_data_type(name):
@@ -137,7 +142,7 @@ class ActivityDefinition(interfaces.IIdentifiedFHIRResource):
         'subActivity', 'object',
         binding=SubActivityDefinition,
         extension='ActivityDefinition#SubActivity',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     performer = Field(
@@ -199,7 +204,7 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
         'subactivity', 'object',
         binding=CarePlanSubActivityStatus,
         extension='CarePlanActivityStatus#SubActivity',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     percentage = Field(
@@ -214,22 +219,22 @@ class Name(zope.interface.Interface):
 
     given = Field(
         'given', 'string',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     family = Field(
         'family', 'string',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     prefix = Field(
         'prefix', 'string',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     suffix = Field(
         'suffix', 'string',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     use = Field(
@@ -278,7 +283,7 @@ class OrganizationContactPerson(zope.interface.Interface):
     contacts = Field(
         'telecom', 'object',
         binding=Contact,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     gender = Field(
@@ -358,7 +363,7 @@ class Organization(interfaces.IIdentifiedFHIRResource):
     address = Field(
         'address', 'object',
         binding=Address,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     category = Field(
@@ -369,19 +374,19 @@ class Organization(interfaces.IIdentifiedFHIRResource):
     contacts = Field(
         'telecom', 'object',
         binding=Contact,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     contact_persons = Field(
         'contact', 'object',
         binding=OrganizationContactPerson,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     identifiers = Field(
         'identifier', 'object',
         binding=Identifier,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     name = Field(
@@ -416,19 +421,19 @@ class Patient(interfaces.IIdentifiedFHIRResource):
 
     care_providers = Field(
         'careProvider', 'reference',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     contacts = Field(
         'telecom', 'object',
         binding=Contact,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     identifiers = Field(
         'identifier', 'object',
         binding=Identifier,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     gender = Field(
@@ -439,7 +444,7 @@ class Patient(interfaces.IIdentifiedFHIRResource):
     name = Field(
         'name', 'object',
         binding=Name,
-        multiple=ALL_ITEMS)
+        multiple=True)
 
     managing_organization = Field(
         'managingOrganization', 'reference',
@@ -456,13 +461,13 @@ class Practitioner(interfaces.IIdentifiedFHIRResource):
     contacts = Field(
         'telecom', 'object',
         binding=Contact,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     identifiers = Field(
         'identifier', 'object',
         binding=Identifier,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     name = Field(
@@ -493,7 +498,7 @@ class Participant(zope.interface.Interface):
     careteam = Field(
         'careteam', 'reference',
         extension='CarePlan#ParticipantCareTeam',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
 
@@ -542,7 +547,7 @@ class ActivityParticipant(zope.interface.Interface):
     careteam = Field(
         'careteam', 'reference',
         extension='CarePlan#ParticipantCareTeam',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
 
@@ -554,7 +559,7 @@ class ActivityDetails(zope.interface.Interface):
 
     performers = Field(
         'performer', 'reference',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
 
@@ -608,7 +613,7 @@ class Activity(zope.interface.Interface):
         'participant', 'object',
         binding=ActivityParticipant,
         extension='CarePlan#Participant',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     planned = Field(
@@ -633,7 +638,7 @@ class Activity(zope.interface.Interface):
         'subactivity', 'object',
         binding=SubActivity,
         extension='CarePlan#SubActivity',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     details = Field(
@@ -653,19 +658,19 @@ class CarePlan(interfaces.IIdentifiedFHIRResource):
     activities = Field(
         'activity', 'object',
         binding=Activity,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     goals = Field(
         'goal', 'object',
         binding=Goal,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     participants = Field(
         'participant', 'object',
         binding=Participant,
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     patient = Field(
@@ -730,7 +735,7 @@ class MessageHeader(interfaces.IFHIRResource):
 
     data = Field(
         'data', 'reference',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     patient = Field(
@@ -766,7 +771,7 @@ class CareTeam(interfaces.IIdentifiedFHIRResource):
         'careTeamIdentifier', 'object',
         binding=Identifier,
         extension='CareTeam#CareTeamIdentifier',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
 
     status = Field(
@@ -794,5 +799,40 @@ class CareTeam(interfaces.IIdentifiedFHIRResource):
     managing_organization = Field(
         'managingOrganization', 'reference',
         extension='CareTeam#ManagingOrganization',
-        multiple=ALL_ITEMS,
+        multiple=True,
         optional=True)
+
+
+class Issue(zope.interface.Interface):
+
+    severity = Field(
+        'severity', 'code',
+        binding=codes.ISSUE_SEVERITY)
+
+    type = Field(
+        'type', 'coding',
+        binding=codes.ISSUE_TYPE,
+        optional=True)
+
+    resource = Field(
+        'resource', 'reference',
+        extension='OperationOutcome#IssueResource',
+        optional=True)
+
+    details = Field(
+        'details', 'string',
+        optional=True)
+
+    location = Field(
+        'location', 'string',
+        optional=True,
+        multiple=True)
+
+
+@resource_type('OperationOutcome')
+class OperationOutcome(interfaces.IIdentifiedFHIRResource):
+
+    issue = Field(
+        'issue', 'object',
+        binding=Issue,
+        multiple=True)
