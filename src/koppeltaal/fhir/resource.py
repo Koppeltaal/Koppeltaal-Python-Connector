@@ -8,9 +8,10 @@ import json
 
 from koppeltaal.fhir import packer
 from koppeltaal import (
-    fhir,
     codes,
-    interfaces)
+    fhir,
+    interfaces,
+    utils)
 
 
 MARKER = object()
@@ -23,6 +24,7 @@ class Entry(object):
     _resource_type = MARKER
     _standard_type = MARKER
     _fhir_link = MARKER
+    _history_less_fhir_link = MARKER
 
     def __init__(self, packer, content=None, model=None):
         self._packer = packer
@@ -85,6 +87,18 @@ class Entry(object):
                 self._model, self.resource_type)
             self._model.fhir_link = self._fhir_link
             return self._fhir_link
+
+        return None
+
+    @property
+    def history_less_fhir_link(self):
+        if self._history_less_fhir_link is not MARKER:
+            return self._history_less_fhir_link
+
+        link = self.fhir_link
+        if link is not None:
+            self._history_less_fhir_link = utils.strip_history_from_link(link)
+            return self._history_less_fhir_link
 
         return None
 

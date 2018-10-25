@@ -5,7 +5,7 @@
 """
 
 from koppeltaal.fhir import resource
-from koppeltaal import (definitions, interfaces, utils)
+from koppeltaal import (interfaces, utils)
 
 
 MARKER = object()
@@ -28,11 +28,10 @@ class Entry(resource.Entry):
         if self._atom_id is not MARKER:
             return self._atom_id
 
-        if self.fhir_link is not None:
-            self._atom_id = utils.strip_history_from_link(self.fhir_link)
-        else:
-            self._atom_id = self._packer.fhir_link(
-                self._model, self.resource_type)
+        link = self.fhir_link
+        if link is None:
+            link = self._packer.fhir_link(self._model, self.resource_type)
+        self._atom_id = utils.strip_history_from_link(link)
         return self._atom_id
 
     def pack(self):
@@ -45,7 +44,9 @@ class Entry(resource.Entry):
 
     def __eq__(self, other):
         if isinstance(other, dict) and 'reference' in other:
-            return other['reference'] in (self.fhir_link, self.atom_id)
+            return other['reference'] in filter(
+                None,
+                (self.history_less_fhir_link, self.fhir_link, self.atom_id))
         return super(Entry, self).__eq__(other)
 
 

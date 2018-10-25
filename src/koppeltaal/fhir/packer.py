@@ -488,7 +488,7 @@ class Packer(object):
             else:
                 extension.pack(field, value)
         # We do not have to add an idref because we do not refer back to
-        # any object. However due to a bug the javascript connector
+        # any object. However due to a bug the Javascript connector
         # requires it in some cases.
         payload = {'id': self.idref()}
         payload.update(extension.payload)
@@ -516,4 +516,4 @@ class Packer(object):
                 raise interfaces.InvalidReference(value)
             return reference
         entry = self.resource.add_model(value)
-        return {'reference': entry.fhir_link}
+        return {'reference': utils.strip_history_from_link(entry.fhir_link)}
