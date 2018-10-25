@@ -32,7 +32,7 @@ def test_search_message_id_from_fixture(connector, transport):
         koppeltaal.definitions.MessageHeader, message)
     assert message.event == 'CreateOrUpdateCarePlan'
     assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.CarePlan, message.data)
+        koppeltaal.definitions.CarePlan, message.data[0])
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Patient, message.patient)
 
@@ -43,13 +43,14 @@ def test_send_careplan_success_from_fixture(
         'POST',
         '/FHIR/Koppeltaal/Mailbox',
         respond_with='fixtures/bundle_post_careplan_ok.json')
-    message = connector.send(
+    response_data = connector.send(
         'CreateOrUpdateCarePlan',
         careplan_from_fixture,
         careplan_from_fixture.patient)
+    assert len(response_data) == 3
     assert zope.interface.verify.verifyObject(
-        koppeltaal.interfaces.IReferredFHIRResource, message)
-    assert message.fhir_link == (
+        koppeltaal.interfaces.IReferredFHIRResource, response_data[0])
+    assert response_data[0].fhir_link == (
         'https://example.com/fhir/Koppeltaal/CarePlan/1/'
         '_history/1970-01-01T01:01:01:01.1')
 
@@ -57,13 +58,13 @@ def test_send_careplan_success_from_fixture(
     assert response is not None
 
 
-def test_send_careplan_fail_from_fixture(
+def test_send_careplan_fail_message_response_error_fixture(
         connector, transport, careplan_from_fixture):
     transport.expect(
         'POST',
         '/FHIR/Koppeltaal/Mailbox',
         respond_with='fixtures/bundle_post_careplan_failed.json')
-    with pytest.raises(koppeltaal.interfaces.InvalidResponse):
+    with pytest.raises(koppeltaal.interfaces.MessageResponseError) as cm:
         connector.send(
             'CreateOrUpdateCarePlan',
             careplan_from_fixture,
@@ -71,6 +72,52 @@ def test_send_careplan_fail_from_fixture(
 
     response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
     assert response is not None
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.MessageHeader,
+        cm.value.message)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.MessageHeaderResponse,
+        cm.value.message.response)
+
+
+def test_send_careplan_operation_outcome_error_from_fixture(
+        connector, transport, careplan_from_fixture):
+    transport.expect(
+        'POST',
+        '/FHIR/Koppeltaal/Mailbox',
+        respond_error='fixtures/operation_outcome.json')
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as cm:
+        connector.send(
+            'CreateOrUpdateCarePlan',
+            careplan_from_fixture,
+            careplan_from_fixture.patient)
+
+    response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
+    assert response is not None
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.OperationOutcome,
+        cm.value.outcome)
+    assert len(cm.value.outcome.issue) == 2
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Issue,
+        cm.value.outcome.issue[0])
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IReferredFHIRResource,
+        cm.value.outcome.issue[0].resource)
+    assert cm.value.outcome.issue[0].resource.fhir_link == \
+        'https://example.com/fhir/Koppeltaal/Patient/1'
+    assert cm.value.outcome.issue[0].details == \
+        'The specified resource version is not correct.'
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Issue,
+        cm.value.outcome.issue[1])
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IReferredFHIRResource,
+        cm.value.outcome.issue[1].resource)
+    assert cm.value.outcome.issue[1].resource.fhir_link == \
+        'https://example.com/fhir/Koppeltaal/Practitioner/1'
+    assert cm.value.outcome.issue[1].details == \
+        'The specified resource version is not correct.'
 
 
 def test_updates_implicit_success_from_fixture(connector, transport):

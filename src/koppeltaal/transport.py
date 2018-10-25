@@ -39,81 +39,77 @@ class Transport(object):
         parts = list(map(unicode, urlparse(url)[2:]))
         return urlunparse([unicode(self.scheme), unicode(self.netloc)] + parts)
 
+    def _read_http_response(self, http_response):
+        if not http_response.headers['content-type'].startswith(
+                'application/json'):
+            raise interfaces.ConnectionError(http_response)
+        response = Response(
+            json=http_response.json() if http_response.text else None,
+            location=http_response.headers.get('content-location'))
+        if 400 <= http_response.status_code < 600:
+            raise interfaces.ResponseError(response)
+        return response
+
     def query(self, url, params=None, username=None, password=None):
         """Query a url.
         """
         try:
-            response = self.session.get(
+            http_response = self.session.get(
                 self.absolute_url(url),
                 params=params,
                 auth=(username or self.username, password or self.password),
                 headers={'Accept': 'application/json'},
                 timeout=interfaces.TIMEOUT,
                 allow_redirects=False)
-            response.raise_for_status()
         except requests.RequestException as error:
-            raise interfaces.InvalidResponse(error)
-        if not response.headers['content-type'].startswith('application/json'):
-            raise interfaces.InvalidResponse(response)
-        json = response.json()
-        logger.debug_json('Query on {url}:\n {json}', json=json, url=url)
-        return Response(json=json)
+            raise interfaces.ConnectionError(error)
+        return self._read_http_response(http_response)
 
     def query_redirect(self, url, params=None):
         """Query a url for a redirect.
         """
         try:
-            response = self.session.get(
+            http_response = self.session.get(
                 self.absolute_url(url),
                 params=params,
                 auth=(self.username, self.password),
                 timeout=interfaces.TIMEOUT,
                 allow_redirects=False)
         except requests.RequestException as error:
-            raise interfaces.InvalidResponse(error)
-        if not response.is_redirect:
-            raise interfaces.InvalidResponse(response)
-        return Response(location=response.headers.get('location'))
+            raise interfaces.ConnectionError(error)
+        if not http_response.is_redirect:
+            raise interfaces.ConnectionError(http_response)
+        return Response(location=http_response.headers.get('location'))
 
     def create(self, url, data):
         """Create a new resource at the given url with JSON data.
         """
         try:
-            response = self.session.post(
+            http_response = self.session.post(
                 self.absolute_url(url),
                 auth=(self.username, self.password),
                 json=data,
                 headers={'Accept': 'application/json'},
                 timeout=interfaces.TIMEOUT,
                 allow_redirects=False)
-            response.raise_for_status()
         except requests.RequestException as error:
-            raise interfaces.InvalidResponse(error)
-        if not response.headers['content-type'].startswith('application/json'):
-            raise interfaces.InvalidResponse(response)
-        return Response(
-            json=response.json() if response.text else None,
-            location=response.headers.get('content-location'))
+            raise interfaces.ConnectionError(error)
+        return self._read_http_response(http_response)
 
     def update(self, url, data):
         """Update an existing resource at the given url with JSON data.
         """
         try:
-            response = self.session.put(
+            http_response = self.session.put(
                 self.absolute_url(url),
                 auth=(self.username, self.password),
                 json=data,
                 headers={'Accept': 'application/json'},
                 timeout=interfaces.TIMEOUT,
                 allow_redirects=False)
-            response.raise_for_status()
         except requests.RequestException as error:
-            raise interfaces.InvalidResponse(error)
-        if not response.headers['content-type'].startswith('application/json'):
-            raise interfaces.InvalidResponse(response)
-        return Response(
-            json=response.json() if response.text else None,
-            location=response.headers.get('content-location'))
+            raise interfaces.ConnectionError(error)
+        return self._read_http_response(http_response)
 
     def close(self):
         self.session.close()

@@ -148,6 +148,8 @@
           "reference": "https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515"
         },
         "status": "active",
+
+
         "participant": [
           {
             "id": "ref009",
@@ -162,8 +164,23 @@
             },
             "member": {
               "reference": "https://app.minddistrict.com/fhir/Koppeltaal/Practitioner/1394433065"
-            }
+            },
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlan#ParticipantCareTeam",
+                "valueResource": {
+                  "reference": "https://demo.koppeltaal.nl/CareTeam/1"
+                }
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlan#ParticipantCareTeam",
+                "valueResource": {
+                  "reference": "https://demo.koppeltaal.nl/CareTeam/2"
+                }
+              }
+            ]
           },
+
           {
             "id": "ref010",
             "role": {
@@ -177,8 +194,23 @@
             },
             "member": {
               "reference": "https://app.minddistrict.com/fhir/Koppeltaal/Practitioner/1394433032"
-            }
+            },
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlan#ParticipantCareTeam",
+                "valueResource": {
+                  "reference": "https://demo.koppeltaal.nl/CareTeam/1"
+                }
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlan#ParticipantCareTeam",
+                "valueResource": {
+                  "reference": "https://demo.koppeltaal.nl/CareTeam/2"
+                }
+              }
+            ]
           },
+
           {
             "id": "ref011",
             "role": {
@@ -192,9 +224,25 @@
             },
             "member": {
               "reference": "https://app.minddistrict.com/fhir/Koppeltaal/Practitioner/1394432922"
-            }
+            },
+            "extension": [
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlan#ParticipantCareTeam",
+                "valueResource": {
+                  "reference": "https://demo.koppeltaal.nl/CareTeam/1"
+                }
+              },
+              {
+                "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CarePlan#ParticipantCareTeam",
+                "valueResource": {
+                  "reference": "https://demo.koppeltaal.nl/CareTeam/2"
+                }
+              }
+            ]
           }
         ],
+
+
         "activity": [
           {
             "id": "ref008",
@@ -322,6 +370,118 @@
             "system": "email",
             "value": "jkolman@minddistrict.com",
             "use": "work"
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "https://demo.koppeltaal.nl/CareTeam/1",
+      "link": [
+        {
+          "rel": "self",
+          "href": "https://demo.koppeltaal.nl/CareTeam/1"
+        }
+      ],
+      "content": {
+        "resourceType": "Other",
+        "id": "ref100",
+        "code": {
+          "coding": [
+            {
+              "code": "CareTeam",
+              "display": "CareTeam",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage"
+            }
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#CareTeamIdentifier",
+            "valueIdentifier": {
+              "value": "careteam1"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Status",
+            "valueCoding": {
+              "code": "active",
+              "display": "Active",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeamStatus"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Name",
+            "valueString": "The Therapists Team"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Subject",
+            "valueResource": {
+              "reference": "https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Period",
+            "valuePeriod": {
+              "start": "2018-05-23",
+              "end": "2019-05-27"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "https://demo.koppeltaal.nl/CareTeam/2",
+      "link": [
+        {
+          "rel": "self",
+          "href": "https://demo.koppeltaal.nl/CareTeam/2"
+        }
+      ],
+      "content": {
+        "resourceType": "Other",
+        "id": "ref101",
+        "code": {
+          "coding": [
+            {
+              "code": "CareTeam",
+              "display": "CareTeam",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OtherResourceUsage"
+            }
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#CareTeamIdentifier",
+            "valueIdentifier": {
+              "value": "careteam2"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Status",
+            "valueCoding": {
+              "code": "active",
+              "display": "Active",
+              "system": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeamStatus"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Name",
+            "valueString": "The Supervisors Team"
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Subject",
+            "valueResource": {
+              "reference": "https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515"
+            }
+          },
+          {
+            "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/CareTeam#Period",
+            "valuePeriod": {
+              "start": "2018-05-23",
+              "end": "2019-05-27"
+            }
           }
         ]
       }

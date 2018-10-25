@@ -117,9 +117,11 @@ class Participant(object):
     def __init__(
             self,
             member=None,
-            role=None):
+            role=None,
+            careteam=None):
         self.member = member
         self.role = role
+        self.careteam = careteam
 
 
 @zope.interface.implementer(definitions.OrganizationContactPerson)
@@ -143,6 +145,7 @@ class Organization(FHIRResource):
     def __init__(
             self,
             active=None,
+            address=None,
             category=None,
             contacts=None,
             contact_persons=None,
@@ -150,6 +153,7 @@ class Organization(FHIRResource):
             name=None,
             part_of=None):
         self.active = active
+        self.address = address
         self.category = category
         self.contacts = contacts
         self.contact_persons = contact_persons
@@ -164,6 +168,7 @@ class Patient(FHIRResource):
     def __init__(
             self,
             active=None,
+            address=None,
             age=None,
             birth_date=None,
             care_providers=None,
@@ -173,6 +178,7 @@ class Patient(FHIRResource):
             name=None,
             managing_organization=None):
         self.active = active
+        self.address = address
         self.age = age
         self.birth_date = birth_date
         self.care_providers = care_providers
@@ -333,11 +339,12 @@ class MessageHeaderResponse(object):
 @zope.interface.implementer(definitions.MessageHeaderSource)
 class MessageHeaderSource(object):
 
-    def __init__(self,
-                 endpoint=None,
-                 name=None,
-                 software=None,
-                 version=None):
+    def __init__(
+            self,
+            endpoint=None,
+            name=None,
+            software=None,
+            version=None):
         self.endpoint = endpoint
         self.name = name
         self.software = software
@@ -365,3 +372,82 @@ class MessageHeader(FHIRResource):
         self.source = source
         self.status = status
         self.timestamp = timestamp
+
+
+@zope.interface.implementer(definitions.Period)
+class Period(object):
+
+    def __init__(
+            self,
+            start=None,
+            end=None):
+        self.start = start
+        self.end = end
+
+
+@zope.interface.implementer(definitions.CareTeam)
+class CareTeam(FHIRResource):
+
+    def __init__(
+            self,
+            identifier=None,
+            status=None,
+            name=None,
+            subject=None,
+            period=None,
+            managing_organization=None):
+        self.identifier = identifier
+        self.status = status
+        self.name = name
+        self.subject = subject
+        self.period = period
+        self.managing_organization = managing_organization
+
+
+@zope.interface.implementer(definitions.Address)
+class Address(object):
+
+    def __init__(
+            self,
+            city=None,
+            country=None,
+            line=None,
+            period=None,
+            state=None,
+            text=None,
+            use=None,
+            zip=None):
+        self.city = city
+        self.country = country
+        self.line = line
+        self.period = period
+        self.state = state
+        self.text = text
+        self.use = use
+        self.zip = zip
+
+
+@zope.interface.implementer(definitions.Issue)
+class Issue(object):
+
+    def __init__(
+            self,
+            severity=None,
+            type=None,
+            resource=None,
+            details=None,
+            location=None):
+        self.severity = severity
+        self.type = type
+        self.resource = resource
+        self.details = details
+        self.location = location
+
+
+@zope.interface.implementer(definitions.OperationOutcome)
+class OperationOutcome(FHIRResource):
+
+    def __init__(
+            self,
+            issue=None):
+        self.issue = issue

@@ -11,7 +11,7 @@ import pkg_resources
 import six
 
 from hamcrest.core.base_matcher import BaseMatcher
-from koppeltaal import transport
+from koppeltaal import interfaces, transport
 from six.moves.urllib.parse import urlparse, urlunparse, urlencode
 
 
@@ -32,18 +32,25 @@ class MockTransport(object):
         self._module_name = module_name
         self.clear()
 
+    def _load(self, fixture):
+        if fixture is None:
+            return None
+        filename = pkg_resources.resource_filename(self._module_name, fixture)
+        with open(filename) as fp:
+            return json.load(fp)
+
     def _expect(self, method, fixture, url):
-        response_json = None
-        if 'respond_with' in fixture:
-            filename = pkg_resources.resource_filename(
-                self._module_name, fixture['respond_with'])
-            with open(filename) as fp:
-                response_json = json.load(fp)
-        response_location = fixture.get('redirect_to')
+        location = fixture.get('redirect_to')
+        if 'respond_error' in fixture:
+            raise interfaces.ResponseError(
+                Response(
+                    request_method=method,
+                    json=self._load(fixture['respond_error']),
+                    location=location))
         return Response(
             request_method=method,
-            json=response_json,
-            location=response_location)
+            json=self._load(fixture.get('respond_with')),
+            location=location)
 
     def clear(self):
         self.expected = {}

@@ -44,10 +44,10 @@ def test_coding(packer, namespace):
 
     vertebrates = koppeltaal.codes.Code(
         'Vertebrate',
-        ['amphibians',
-         'birds',
-         'mammals',
-         'reptiles'])
+        {'amphibians': 'Amphibians',
+         'birds': 'Birds',
+         'mammals': 'Mammals',
+         'reptiles': 'Reptiles'})
 
     packed = vertebrates.pack_code('amphibians')
     assert packed == 'amphibians'
@@ -58,7 +58,7 @@ def test_coding(packer, namespace):
     coding = vertebrates.pack_coding('amphibians')
     assert coding == {
         'code': 'amphibians',
-        'display': 'amphibians',
+        'display': 'Amphibians',
         'system': namespace + 'Vertebrate'}
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
@@ -72,7 +72,7 @@ def test_coding(packer, namespace):
 
     unpacked_coding = vertebrates.unpack_coding({
         'code': 'amphibians',
-        'display': 'amphibians',
+        'display': 'Amphibians',
         'system': namespace + 'Vertebrate'})
 
     assert 'amphibians' == unpacked_coding
@@ -80,12 +80,12 @@ def test_coding(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_coding({
             'code': 'sponges',
-            'display': 'sponges',
+            'display': 'Sponges',
             'system': namespace + 'Vertebrate'})
 
     unknown_value = vertebrates.unpack_coding({
         'code': 'UNK',
-        'display': 'Unkown',
+        'display': 'Unknown',
         'system': koppeltaal.codes.NULL_SYSTEM})
 
     assert unknown_value is None
@@ -93,13 +93,13 @@ def test_coding(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_coding({
             'code': 'UNKNOW',
-            'display': 'Unkown',
+            'display': 'Unknown',
             'system': koppeltaal.codes.NULL_SYSTEM})
 
     with pytest.raises(koppeltaal.interfaces.InvalidSystem):
         vertebrates.unpack_coding({
             'code': 'reptiles',
-            'display': 'reptiles',
+            'display': 'Reptiles',
             'system': 'foobarbaz'})
 
 
@@ -167,6 +167,32 @@ def test_pack_name(packer):
         'suffix': [u'tot', u'Daarhelemaalië'],
         'use': 'official'}
 
+    # Verify an empty array value for (in this case) "given" does not leave an
+    # empty array as that would trip up the Koppeltaal server's JSON parser.
+    name4 = packer.pack(
+        koppeltaal.models.Name(
+            given=[],
+            family=[u'der', u'Fantasten'],
+            suffix=[u'tot', u'Daarhelemaalië']),
+        koppeltaal.definitions.Name)
+
+    assert name4 == {
+        'family': [u'der', u'Fantasten'],
+        'id': mock.ANY,
+        'suffix': [u'tot', u'Daarhelemaalië'],
+        'use': 'official'}
+
+    # Verify a None value for (in this case) "given" does not leave an array
+    # with null value(s) as that would trip up the Koppeltaal server's JSON
+    # parser.
+    with pytest.raises(koppeltaal.interfaces.InvalidValue):
+        packer.pack(
+            koppeltaal.models.Name(
+                given=[None],
+                family=[u'der', u'Fantasten'],
+                suffix=[u'tot', u'Daarhelemaalië']),
+            koppeltaal.definitions.Name)
+
     with pytest.raises(koppeltaal.interfaces.InvalidResource):
         packer.pack(
             'Napoleon',
@@ -194,7 +220,18 @@ def test_unpack_patient(packer, namespace):
          'name': [
              {'given': [u'Paul'],
               'family': [u'Roger'],
-              'use': u'official'}]},
+              'use': u'official'}],
+         'address': {
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
+            'period': {
+                'start': '2013-06-01T12:34:00',
+                },
+            'state': 'Zuid-Holland',
+            'text': 'Rotterdam, ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3033CH'
+          }},
         koppeltaal.definitions.Patient)
 
     assert zope.interface.verify.verifyObject(
@@ -211,6 +248,22 @@ def test_unpack_patient(packer, namespace):
     assert patient1.active is True
     assert patient1.birth_date is None
     assert patient1.gender == 'M'
+
+    address = patient1.address
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Address, address)
+    assert address.city == 'Rotterdam'
+    assert address.country == 'The Netherlands'
+    assert address.state == 'Zuid-Holland'
+    assert address.text == 'Rotterdam, ken je dat nie horen dan?'
+    assert address.use == 'work'
+    assert address.zip == '3033CH'
+
+    period = address.period
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Period, period)
+    assert period.start == datetime.datetime(2013, 6, 1, 12, 34)
+    assert period.end is None
 
     patient2 = packer.unpack(
         {'gender': {'coding': [
@@ -259,7 +312,7 @@ def test_pack_patient(packer):
         'id': mock.ANY,
         'gender': {'coding': [
             {'code': 'M',
-             'display': 'M',
+             'display': 'Male',
              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
         'name': [
             {'id': mock.ANY,
@@ -291,7 +344,7 @@ def test_pack_patient(packer):
         'birthDate': '1976-06-01T12:34:00',
         'gender': {'coding': [
             {'code': 'F',
-             'display': 'F',
+             'display': 'Female',
              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
         'id': mock.ANY,
         'identifier': [
@@ -424,9 +477,10 @@ def test_unpack_message_header(packer, namespace):
 
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.MessageHeader, message1)
+    assert len(message1.data) == 1
     assert zope.interface.verify.verifyObject(
-        koppeltaal.interfaces.IReferredFHIRResource, message1.data)
-    assert message1.data.fhir_link == 'https://example.com/data'
+        koppeltaal.interfaces.IReferredFHIRResource, message1.data[0])
+    assert message1.data[0].fhir_link == 'https://example.com/data'
     assert message1.event == 'CreateOrUpdatePatient'
     assert message1.identifier == '42-42-42'
     assert zope.interface.verify.verifyObject(
@@ -685,3 +739,101 @@ def test_unpack_allow_broken(packer):
         koppeltaal.interfaces.IBrokenFHIRResource, broken)
     assert str(broken.error) == \
         "InvalidCode: 'cool name' not in 'http://hl7.org/fhir/name-use'."
+
+
+def test_unpack_organization(packer, namespace):
+    org1 = packer.unpack(
+        {'active': True,
+         'address': [{
+             'city': 'Rotterdam',
+             'country': 'The Netherlands',
+             'period': {
+                 'start': '2013-06-01T12:34:00',
+                 },
+             'state': 'Zuid-Holland',
+             'text': 'Rotterdam, ken je dat nie horen dan?',
+             'use': 'work',
+             'zip': '3033CH'
+             }, {
+             'city': 'Den Haag',
+             'country': 'The Netherlands',
+             'period': {
+                 'start': '2010-06-01T12:34:00',
+                 'end': '2013-06-01T12:33:00',
+                 },
+             'state': 'Zuid-Holland',
+             'text': 'Achter de duinuh',
+             'use': 'work',
+             'zip': '2564TT'}]},
+        koppeltaal.definitions.Organization)
+
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Organization, org1)
+
+    addresses = org1.address
+    assert 2 == len(addresses)
+
+    address1 = addresses[0]
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Address, address1)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Address, address1)
+    assert address1.city == 'Rotterdam'
+    assert address1.country == 'The Netherlands'
+    assert address1.state == 'Zuid-Holland'
+    assert address1.text == 'Rotterdam, ken je dat nie horen dan?'
+    assert address1.use == 'work'
+    assert address1.zip == '3033CH'
+
+    period1 = address1.period
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Period, period1)
+    assert period1.start == datetime.datetime(2013, 6, 1, 12, 34)
+    assert period1.end is None
+
+    address2 = addresses[1]
+    period2 = address2.period
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Period, period2)
+    assert period2.start == datetime.datetime(2010, 6, 1, 12, 34)
+    assert period2.end == datetime.datetime(2013, 6, 1, 12, 33)
+
+
+def test_pack_organization(packer):
+    org1 = packer.pack(
+        koppeltaal.models.Organization(
+            active=True,
+            address=[koppeltaal.models.Address(
+                city='Rotterdam',
+                country='The Netherlands',
+                line='Coolsingel 1',
+                period=koppeltaal.models.Period(
+                    start=datetime.datetime(2010, 6, 1, 12, 34),
+                    end=None),
+                state='Zuid-Holland',
+                text='Ken je dat nie horen dan?',
+                use='work',
+                zip='3030AB')],
+            category='team',
+            contacts=[],
+            contact_persons=[],
+            identifiers=[],
+            name='Example',
+            part_of=None),
+        koppeltaal.definitions.Organization)
+
+    assert org1 == {
+        'active': True,
+        'address': [{
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
+            'id': 'ref002',
+            'line': 'Coolsingel 1',
+            'period': {'id': 'ref001', 'start': '2010-06-01T12:34:00'},
+            'state': 'Zuid-Holland',
+            'text': 'Ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3030AB'}],
+        'id': 'ref003',
+        'name': 'Example',
+        'type': 'team'}

@@ -52,6 +52,8 @@ class Extension(object):
             return value
 
         if field.field_type == 'codeable':
+            # Note how 'codeable' is actually an extension data type but we
+            # treat it specially here.
             value = extension.get('valueCodeableConcept')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, extension)
@@ -70,6 +72,8 @@ class Extension(object):
             return field.binding.unpack_code(value)
 
         if field.field_type == 'coding':
+            # Note how 'coding' is actually an extension data type but we
+            # treat it specially here.
             value = extension.get('valueCoding')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, extension)
@@ -109,10 +113,17 @@ class Extension(object):
             return value
 
         if field.field_type == 'object':
-            value = extension.get('extension')
-            if not isinstance(value, list):
+            key = field.binding.queryTaggedValue('extension data type')
+            if key is None:
+                value = extension.get('extension')
+                if not isinstance(value, list):
+                    raise interfaces.InvalidValue(field, extension)
+                return self._packer.unpack(extension, field.binding)
+
+            value = extension.get(key)
+            if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, extension)
-            return self._packer.unpack(extension, field.binding)
+            return self._packer.unpack(value, field.binding)
 
         if field.field_type == 'reference':
             value = extension.get('valueResource')
@@ -131,18 +142,18 @@ class Extension(object):
     def unpack(self, field):
         if field.url not in self._index:
             if field.optional:
-                if field.multiple is definitions.ALL_ITEMS:
+                if field.multiple:
                     return []
                 return field.default
             raise interfaces.RequiredMissing(field)
         extensions = self._index[field.url]
-        if field.multiple is definitions.ALL_ITEMS:
+        if field.multiple:
             values = []
             for extension in extensions:
                 values.append(self._unpack_item(field, extension))
             return values
 
-        if not field.multiple and len(extensions) != 1:
+        if len(extensions) != 1:
             raise interfaces.InvalidValue(field)
         return self._unpack_item(field, extensions[0])
 
@@ -167,12 +178,16 @@ class Extension(object):
             return {'valueCode': field.binding.pack_code(value)}
 
         if field.field_type == 'codeable':
+            # Note how 'codeable' is actually an extension data type but we
+            # treat it specially here.
             if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return {"valueCodeableConcept":
                     {"coding": [field.binding.pack_coding(value)]}}
 
         if field.field_type == 'coding':
+            # Note how 'coding' is actually an extension data type but we
+            # treat it specially here.
             if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return {'valueCoding': field.binding.pack_coding(value)}
@@ -204,7 +219,10 @@ class Extension(object):
         if field.field_type == 'object':
             if not isinstance(value, object):
                 raise interfaces.InvalidValue(field, value)
-            return self._packer.pack(value, field.binding)
+            key = field.binding.queryTaggedValue('extension data type')
+            if key is None:
+                return self._packer.pack(value, field.binding)
+            return {key: self._packer.pack(value, field.binding)}
 
         if field.field_type == 'reference':
             if not isinstance(value, object):
@@ -219,11 +237,11 @@ class Extension(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        if value is None:
+        if field.is_empty(value):
             if not field.optional:
                 raise interfaces.InvalidValue(field, value)
             return
-        if field.multiple is definitions.ALL_ITEMS:
+        if field.multiple:
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
         else:
@@ -251,6 +269,8 @@ class Native(object):
             return value
 
         if field.field_type == 'codeable':
+            # Note how 'codeable' is actually an extension data type but we
+            # treat it specially here.
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
             if 'coding' not in value:
@@ -267,6 +287,8 @@ class Native(object):
             return field.binding.unpack_code(value)
 
         if field.field_type == 'coding':
+            # Note how 'coding' is actually an extension data type but we
+            # treat it specially here.
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
             return field.binding.unpack_coding(value)
@@ -320,7 +342,7 @@ class Native(object):
     def unpack(self, field):
         if field.name not in self._content:
             if field.optional:
-                if field.multiple is definitions.ALL_ITEMS:
+                if field.multiple:
                     return []
                 return field.default
             raise interfaces.RequiredMissing(field)
@@ -333,7 +355,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             if not len(value):
                 raise interfaces.RequiredMissing(field)
-            if field.multiple is definitions.ALL_ITEMS:
+            if field.multiple:
                 return [self._unpack_item(field, v) for v in value]
             value = value[0]
         return self._unpack_item(field, value)
@@ -345,6 +367,8 @@ class Native(object):
             return value
 
         if field.field_type == 'codeable':
+            # Note how 'codeable' is actually an extension data type but we
+            # treat it specially here.
             if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return {"coding": [field.binding.pack_coding(value)]}
@@ -355,6 +379,8 @@ class Native(object):
             return field.binding.pack_code(value)
 
         if field.field_type == 'coding':
+            # Note how 'coding' is actually an extension data type but we
+            # treat it specially here.
             if not isinstance(value, basestring):
                 raise interfaces.InvalidValue(field, value)
             return field.binding.pack_coding(value)
@@ -399,16 +425,14 @@ class Native(object):
         raise NotImplementedError()
 
     def pack(self, field, value):
-        if value is None:
+        if field.is_empty(value):
             if not field.optional:
                 raise interfaces.InvalidValue(field, value)
             return
-        if field.multiple is definitions.ALL_ITEMS:
+        if field.multiple:
             if not isinstance(value, list):
                 raise interfaces.InvalidValue(field, value)
             item = [self._pack_item(field, v) for v in value]
-        elif field.multiple is definitions.FIRST_ITEM:
-            item = [self._pack_item(field, value)]
         else:
             assert field.multiple is False
             item = self._pack_item(field, value)

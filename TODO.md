@@ -11,8 +11,8 @@
 * `CarePlanActivityResult.*`
 * `CarePlanActivityStatus.blackBoxState` [1]
 * `Observation.*`
-* `Organization.adress`
 * `Patient.address`
+* `Practitioner.address`
 * `Questionnaire.*`
 * `RelatedPerson.*`
 * `StorageItem.*`

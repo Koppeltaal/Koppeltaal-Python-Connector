@@ -82,13 +82,3 @@ class Bundle(resource.Resource):
             if interfaces.IBrokenFHIRResource.providedBy(model):
                 errors.append(model)
         return errors
-
-    def unpack_message_header(self):
-        message = None
-        for model in self.unpack():
-            if definitions.MessageHeader.providedBy(model):
-                if message is not None:
-                    # We allow only one message header in the bundle.
-                    raise interfaces.InvalidBundle(self)
-                message = model
-        return message
