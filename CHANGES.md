@@ -1,11 +1,27 @@
 Changes
 =======
 
-1.3.2.5 (unreleased)
---------------------
+1.3.5 (unreleased)
+------------------
 
-- Nothing changed yet.
+- Koppeltaal 1.3.5:
 
+  - Added support for the Care Team extension.
+
+  - Verified the requirement on adding versioned resources to message bundle
+    works. This requires application integration code to keep track of the version of the referenced resources.
+
+  - There's not "first item only" option anymore for fields that are a
+    sequence of items. The application integration code needs the handle the
+    sequences. This applies to MessageHeaderResponse.data.
+
+  - The data in the response from the Koppeltaal server now contains the new
+    versions of all resources that were sent. The application integration code
+    needs to keep track of those versions.
+
+  - Added Organization.Address.
+
+  - Fixed several dispay values for codings.
 
 1.3.2.4 (2018-03-12)
 --------------------
