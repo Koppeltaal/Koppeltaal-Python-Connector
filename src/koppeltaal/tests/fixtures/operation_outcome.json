@@ -1,18 +1,37 @@
-{"resourceType": "OperationOutcome",
- "issue":[
-     {"severity": "error",
-      "type": {"system": "http://hl7.org/fhir/issue-type", "code": "conflict"},
+{
+  "issue": [
+    {
+      "details": "The specified resource version is not correct.",
       "extension": [
-          {"url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OperationOutcome#IssueResource",
-           "valueResource": {"reference": "https://example.com/fhir/Koppeltaal/Patient/1"}}
+        {
+          "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OperationOutcome#IssueResource",
+          "valueResource": {
+            "reference": "https://example.com/fhir/Koppeltaal/Patient/1"
+          }
+        }
       ],
-      "details": "The specified resource version is not correct."},
-     {"severity": "error",
-      "type": {"system": "http://hl7.org/fhir/issue-type", "code": "conflict"},
+      "severity": "error",
+      "type": {
+        "code": "conflict",
+        "system": "http://hl7.org/fhir/issue-type"
+      }
+    },
+    {
+      "details": "The specified resource version is not correct.",
       "extension": [
-          {"url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OperationOutcome#IssueResource",
-           "valueResource": {"reference": "https://example.com/fhir/Koppeltaal/Practitioner/1"}}
+        {
+          "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OperationOutcome#IssueResource",
+          "valueResource": {
+            "reference": "https://example.com/fhir/Koppeltaal/Practitioner/1"
+          }
+        }
       ],
-      "details": "The specified resource version is not correct."}
- ]
+      "severity": "error",
+      "type": {
+        "code": "conflict",
+        "system": "http://hl7.org/fhir/issue-type"
+      }
+    }
+  ],
+  "resourceType": "OperationOutcome"
 }
