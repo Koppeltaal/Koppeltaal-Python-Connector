@@ -53,6 +53,12 @@ def test_send_careplan_success_from_fixture(
     assert response_data[0].fhir_link == (
         'https://example.com/fhir/Koppeltaal/CarePlan/1/'
         '_history/1970-01-01T01:01:01:01.1')
+    assert response_data[1].fhir_link == (
+        'https://example.com/fhir/Koppeltaal/Practitioner/1/'
+        '_history/1970-01-01T01:01:01:01.1')
+    assert response_data[2].fhir_link == (
+        'https://example.com/fhir/Koppeltaal/Patient/1/'
+        '_history/1970-01-01T01:01:01:01.1')
 
     response = transport.called.get('/FHIR/Koppeltaal/Mailbox')
     assert response is not None

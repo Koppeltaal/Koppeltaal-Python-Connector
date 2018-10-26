@@ -99,7 +99,7 @@ def test_createorupdate_activitydefinition(connector, transport):
         '/FHIR/Koppeltaal/Mailbox',
         respond_with='fixtures/bundle_post_activitydefinition_ok.json')
 
-    ad = koppeltaal.models.ActivityDefinition(
+    definition = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
         description=u'A First Activity Definition',
         identifier=u'foobar',
@@ -109,7 +109,7 @@ def test_createorupdate_activitydefinition(connector, transport):
         subactivities=[])
 
     response_data = connector.send(
-        'CreateOrUpdateActivityDefinition', ad)
+        'CreateOrUpdateActivityDefinition', definition)
     assert len(response_data) == 1
     assert zope.interface.verify.verifyObject(
         koppeltaal.interfaces.IReferredFHIRResource, response_data[0])
@@ -129,7 +129,7 @@ def test_create_activitydefinition(connector, transport):
             'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
             '_history/1970-01-01T01:01:01:01.1'))
 
-    ad = koppeltaal.models.ActivityDefinition(
+    definition = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
         description=u'A First Activity Definition',
         identifier=u'foobar',
@@ -138,8 +138,8 @@ def test_create_activitydefinition(connector, transport):
         performer='Patient',
         subactivities=[])
 
-    ad = connector.send_activity(ad)
-    assert ad.fhir_link == (
+    definition = connector.send_activity(definition)
+    assert definition.fhir_link == (
         'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
         '_history/1970-01-01T01:01:01:01.1')
 
@@ -153,7 +153,7 @@ def test_update_activitydefinition(connector, transport):
             'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
             '_history/1970-02-02T02:02:02:02.2'))
 
-    ad = koppeltaal.models.ActivityDefinition(
+    definition = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
         description=u'A First Activity Definition',
         identifier=u'foobar',
@@ -161,11 +161,11 @@ def test_update_activitydefinition(connector, transport):
         name=u'AD-1',
         performer='Patient',
         subactivities=[])
-    ad.fhir_link = (
+    definition.fhir_link = (
         'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
         '_history/1970-01-01T01:01:01:01.1')
 
-    ad = connector.send_activity(ad)
-    assert ad.fhir_link == (
+    definition = connector.send_activity(definition)
+    assert definition.fhir_link == (
         'https://example.com/fhir/Koppeltaal/ActivityDefinition/1/'
         '_history/1970-02-02T02:02:02:02.2')
