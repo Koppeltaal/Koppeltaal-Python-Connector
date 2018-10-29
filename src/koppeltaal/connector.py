@@ -323,6 +323,7 @@ class Connector(object):
         response_message = response_bundle.unpack_model(
             definitions.MessageHeader)
         if (response_message is None or
+                response_message.event != event or
                 response_message.response is None or
                 response_message.response.identifier != identifier or
                 response_message.response.code != "ok"):

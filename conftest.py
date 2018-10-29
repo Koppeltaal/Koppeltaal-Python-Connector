@@ -119,8 +119,7 @@ def careplan_from_fixture(request, transport):
 
 @pytest.fixture
 def careplan_response(connector, careplan):
-    return connector.send(
-        'CreateOrUpdateCarePlan', careplan, careplan.patient)
+    return connector.send('CreateOrUpdateCarePlan', careplan, careplan.patient)
 
 
 @pytest.fixture(scope='session')

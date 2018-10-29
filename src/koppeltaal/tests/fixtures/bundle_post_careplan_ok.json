@@ -18,7 +18,7 @@
             "reference": "https://example.com/fhir/Koppeltaal/CarePlan/1/_history/1970-01-01T01:01:01:01.1"
           },
           {
-            "reference": "https://example.com/fhir/Koppeltaal/Practioner/1/_history/1970-01-01T01:01:01:01.1"
+            "reference": "https://example.com/fhir/Koppeltaal/Practitioner/1/_history/1970-01-01T01:01:01:01.1"
           },
           {
             "reference": "https://example.com/fhir/Koppeltaal/Patient/1/_history/1970-01-01T01:01:01:01.1"

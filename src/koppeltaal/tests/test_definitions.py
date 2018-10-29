@@ -47,10 +47,14 @@ def test_coding(packer, namespace):
         {'amphibians': 'Amphibians',
          'birds': 'Birds',
          'mammals': 'Mammals',
+         'human': None,
          'reptiles': 'Reptiles'})
 
     packed = vertebrates.pack_code('amphibians')
     assert packed == 'amphibians'
+
+    packed = vertebrates.pack_code('human')
+    assert packed == 'human'
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.pack_code('sponges')
@@ -61,11 +65,19 @@ def test_coding(packer, namespace):
         'display': 'Amphibians',
         'system': namespace + 'Vertebrate'}
 
+    coding = vertebrates.pack_coding('human')
+    assert coding == {
+        'code': 'human',
+        'system': namespace + 'Vertebrate'}
+
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.pack_coding('sponges')
 
     unpacked = vertebrates.unpack_code('amphibians')
     assert unpacked == 'amphibians'
+
+    unpacked = vertebrates.unpack_code('human')
+    assert unpacked == 'human'
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_code('sponges')
@@ -74,8 +86,12 @@ def test_coding(packer, namespace):
         'code': 'amphibians',
         'display': 'Amphibians',
         'system': namespace + 'Vertebrate'})
-
     assert 'amphibians' == unpacked_coding
+
+    unpacked_coding = vertebrates.unpack_coding({
+        'code': 'human',
+        'system': namespace + 'Vertebrate'})
+    assert 'human' == unpacked_coding
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_coding({
@@ -87,7 +103,6 @@ def test_coding(packer, namespace):
         'code': 'UNK',
         'display': 'Unknown',
         'system': koppeltaal.codes.NULL_SYSTEM})
-
     assert unknown_value is None
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
