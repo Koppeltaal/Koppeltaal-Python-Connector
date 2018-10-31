@@ -237,15 +237,15 @@ def test_unpack_patient(packer, namespace):
               'family': [u'Roger'],
               'use': u'official'}],
          'address': {
-            'city': 'Rotterdam',
-            'country': 'The Netherlands',
+            'city': u'Rotterdam',
+            'country': u'The Netherlands',
             'period': {
-                'start': '2013-06-01T12:34:00',
+                'start': u'2013-06-01T12:34:00',
                 },
-            'state': 'Zuid-Holland',
-            'text': 'Rotterdam, ken je dat nie horen dan?',
-            'use': 'work',
-            'zip': '3033CH'
+            'state': u'Zuid-Holland',
+            'text': u'Rotterdam, ken je dat nie horen dan?',
+            'use': u'work',
+            'zip': u'3033CH'
           }},
         koppeltaal.definitions.Patient)
 
@@ -760,26 +760,26 @@ def test_unpack_organization(packer, namespace):
     org1 = packer.unpack(
         {'active': True,
          'address': [{
-             'city': 'Rotterdam',
-             'country': 'The Netherlands',
+             'city': u'Rotterdam',
+             'country': u'The Netherlands',
              'period': {
-                 'start': '2013-06-01T12:34:00',
+                 'start': u'2013-06-01T12:34:00',
                  },
-             'state': 'Zuid-Holland',
-             'text': 'Rotterdam, ken je dat nie horen dan?',
-             'use': 'work',
-             'zip': '3033CH'
+             'state': u'Zuid-Holland',
+             'text': u'Rotterdam, ken je dat nie horen dan?',
+             'use': u'work',
+             'zip': u'3033CH'
              }, {
-             'city': 'Den Haag',
-             'country': 'The Netherlands',
+             'city': u'Den Haag',
+             'country': u'The Netherlands',
              'period': {
-                 'start': '2010-06-01T12:34:00',
-                 'end': '2013-06-01T12:33:00',
+                 'start': u'2010-06-01T12:34:00',
+                 'end': u'2013-06-01T12:33:00',
                  },
-             'state': 'Zuid-Holland',
-             'text': 'Achter de duinuh',
-             'use': 'work',
-             'zip': '2564TT'}]},
+             'state': u'Zuid-Holland',
+             'text': u'Achter de duinuh',
+             'use': u'work',
+             'zip': u'2564TT'}]},
         koppeltaal.definitions.Organization)
 
     assert zope.interface.verify.verifyObject(
@@ -819,21 +819,21 @@ def test_pack_organization(packer):
         koppeltaal.models.Organization(
             active=True,
             address=[koppeltaal.models.Address(
-                city='Rotterdam',
-                country='The Netherlands',
-                line='Coolsingel 1',
+                city=u'Rotterdam',
+                country=u'The Netherlands',
+                line=u'Coolsingel 1',
                 period=koppeltaal.models.Period(
                     start=datetime.datetime(2010, 6, 1, 12, 34),
                     end=None),
-                state='Zuid-Holland',
-                text='Ken je dat nie horen dan?',
-                use='work',
-                zip='3030AB')],
-            category='team',
+                state=u'Zuid-Holland',
+                text=u'Ken je dat nie horen dan?',
+                use=u'work',
+                zip=u'3030AB')],
+            category=u'team',
             contacts=[],
             contact_persons=[],
             identifiers=[],
-            name='Example',
+            name=u'Example',
             part_of=None),
         koppeltaal.definitions.Organization)
 
