@@ -94,7 +94,7 @@ class DummyResource(object):
     def __new__(cls, fhir_link):
         if fhir_link is None:
             return None
-        return object.__new__(cls, fhir_link)
+        return object.__new__(cls)
 
     def __init__(self, fhir_link):
         self.fhir_link = fhir_link
@@ -125,7 +125,7 @@ def download(connection, directory, msgid=None, msg=None):
     if not os.path.exists(directory):
         os.mkdir(directory)
     filename = os.path.join(directory, '{}-{}.json'.format(ts, msgid))
-    with open(filename, 'wb') as output:
+    with open(filename, 'w') as output:
         json.dump(
             response,
             output,

@@ -4,8 +4,7 @@ Changes
 1.3.5.1 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Corrected `Patient.address` to accept zero or more items.
 
 1.3.5 (2018-10-29)
 ------------------
