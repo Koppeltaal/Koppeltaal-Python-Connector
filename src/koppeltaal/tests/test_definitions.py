@@ -236,7 +236,7 @@ def test_unpack_patient(packer, namespace):
              {'given': [u'Paul'],
               'family': [u'Roger'],
               'use': u'official'}],
-         'address': {
+         'address': [{
             'city': u'Rotterdam',
             'country': u'The Netherlands',
             'period': {
@@ -246,7 +246,7 @@ def test_unpack_patient(packer, namespace):
             'text': u'Rotterdam, ken je dat nie horen dan?',
             'use': u'work',
             'zip': u'3033CH'
-          }},
+          }]},
         koppeltaal.definitions.Patient)
 
     assert zope.interface.verify.verifyObject(
@@ -264,7 +264,7 @@ def test_unpack_patient(packer, namespace):
     assert patient1.birth_date is None
     assert patient1.gender == 'M'
 
-    address = patient1.address
+    address = patient1.address[0]
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Address, address)
     assert address.city == 'Rotterdam'
