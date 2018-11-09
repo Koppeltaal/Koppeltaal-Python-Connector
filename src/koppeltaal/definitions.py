@@ -327,6 +327,7 @@ class Address(zope.interface.Interface):
 
     line = Field(
         'line', 'string',
+        multiple=True,
         optional=True)
 
     period = Field(

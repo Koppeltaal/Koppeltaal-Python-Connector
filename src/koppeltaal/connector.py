@@ -249,15 +249,18 @@ class Connector(object):
 
             update = Update(message, bundle.unpack, send_back_on_transaction)
             errors = bundle.errors()
-
             if errors:
-                logger.error('Error while reading message: {}'.format(errors))
+                reason = u', '.join([str(error) for error in errors])
+                logger.error(
+                    "Error while reading message '{}': {}".format(
+                        message.fhir_link, reason))
                 with update:
-                    update.fail(u', '.join([u"Resource '{}': {}".format(
-                        e.fhir_link, e.error) for e in errors]))
+                    update.fail(reason)
             elif (expected_events is not None
                   and message.event not in expected_events):
-                logger.warning('Event "{}" not expected'.format(message.event))
+                logger.warning(
+                    "Event '{}' not expected in message '{}'".format(
+                        message.event, message.fhir_link))
                 with update:
                     update.fail('Event not expected')
             elif (message.source is not None and
