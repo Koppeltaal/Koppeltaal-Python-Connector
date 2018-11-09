@@ -821,7 +821,7 @@ def test_pack_organization(packer):
             address=[koppeltaal.models.Address(
                 city=u'Rotterdam',
                 country=u'The Netherlands',
-                line=u'Coolsingel 1',
+                line=[u'Coolsingel 1'],
                 period=koppeltaal.models.Period(
                     start=datetime.datetime(2010, 6, 1, 12, 34),
                     end=None),
@@ -843,7 +843,7 @@ def test_pack_organization(packer):
             'city': 'Rotterdam',
             'country': 'The Netherlands',
             'id': 'ref002',
-            'line': 'Coolsingel 1',
+            'line': ['Coolsingel 1'],
             'period': {'id': 'ref001', 'start': '2010-06-01T12:34:00'},
             'state': 'Zuid-Holland',
             'text': 'Ken je dat nie horen dan?',
