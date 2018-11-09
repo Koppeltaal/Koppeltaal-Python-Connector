@@ -48,11 +48,11 @@ CAREPLAN_OUTPUT = """CarePlan:
 - fhir link: {model.fhir_link}
 """
 
-PATIENT_OUTPUT = """Patient: {model.name.family} {model.name.given}
+PATIENT_OUTPUT = """Patient: {model.name}
 - fhir link: {model.fhir_link}
 """
 
-PRACTITIONER_OUTPUT = """Practitioner: {model.name.family} {model.name.given}
+PRACTITIONER_OUTPUT = """Practitioner: {model.name}
 - fhir link: {model.fhir_link}
 """
 
@@ -182,7 +182,6 @@ def _updates(args, connection):
     until = None
     if args.until is not None:
         until = dateutil.parser.parse(args.until, tzinfos=utils.UTC)
-
     for index, update in enumerate(connection.updates()):
         with update:
             if until is None:
