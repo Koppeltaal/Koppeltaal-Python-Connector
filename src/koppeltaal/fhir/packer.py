@@ -32,6 +32,9 @@ class BrokenResource(object):
         self.error = error
         self.payload = payload
 
+    def __str__(self):
+        return u"Broken resource '{}': {}".format(self.fhir_link, self.error)
+
 
 class Extension(object):
 

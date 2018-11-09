@@ -4,8 +4,9 @@ Changes
 1.3.5.2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Corrected `Address.line` to accept zero or more items.
 
+- Display errors in command line tool by default (error log level "error").
 
 1.3.5.1 (2018-11-06)
 --------------------

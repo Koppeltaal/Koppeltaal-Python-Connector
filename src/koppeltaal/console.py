@@ -282,8 +282,8 @@ def console():
         root.setLevel(logging.DEBUG)
         logger.set_log_level(logging.DEBUG)
     else:
-        root.setLevel(logging.CRITICAL)
-        logger.set_log_level(logging.CRITICAL)
+        root.setLevel(logging.ERROR)
+        logger.set_log_level(logging.ERROR)
 
     credentials = get_credentials(args)
     integration = connector.Integration(name='Python command line')
