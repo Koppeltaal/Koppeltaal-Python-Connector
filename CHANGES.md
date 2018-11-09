@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.2 (unreleased)
+1.3.5.2 (2018-11-09)
 --------------------
 
 - Corrected `Address.line` to accept zero or more items.
