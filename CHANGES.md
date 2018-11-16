@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.3 (unreleased)
+1.3.5.3 (2018-11-16)
 --------------------
 
 - Corrected `CarePlanActivityStatus.PercentageCompleted` to accept zero or
