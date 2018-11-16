@@ -209,7 +209,8 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
 
     percentage = Field(
         'percentageCompleted', 'integer',
-        extension='CarePlanActivityStatus#PercentageCompleted')
+        extension='CarePlanActivityStatus#PercentageCompleted',
+        optional=True)
 
 
 @extension_data_type('HumanName')

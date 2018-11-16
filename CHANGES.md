@@ -4,8 +4,8 @@ Changes
 1.3.5.3 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Corrected `CarePlanActivityStatus.PercentageCompleted` to accept zero or
+  one item.
 
 1.3.5.2 (2018-11-09)
 --------------------
