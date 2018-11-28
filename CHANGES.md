@@ -4,8 +4,7 @@ Changes
 1.3.5.4 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Have the `InvalidValue` exception report a tiny bit more information.
 
 1.3.5.3 (2018-11-16)
 --------------------

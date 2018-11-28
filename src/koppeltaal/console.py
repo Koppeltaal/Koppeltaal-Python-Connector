@@ -38,7 +38,6 @@ ACTIVITY_STATUS_OUTPUT = """Activity Status: {model.identifier}
 MESSAGE_OUTPUT = """Message: {model.identifier}
 - fhir link: {model.fhir_link}
 - event: {model.event}
-- status: {model.status.status} ({model.status.exception})
 - time stamp: {model.timestamp}
 - software: {model.source.software} ({model.source.version})
 - endpoint: {model.source.endpoint}
@@ -70,6 +69,8 @@ def print_model(model):
     output = OUTPUT.get(model.__class__)
     if output:
         print(output.format(model=model))
+    else:
+        print(model)
 
 
 def print_json(data):
@@ -147,7 +148,6 @@ def _validate(args, connection):
     if payload is None:
         print("Please provide an XML or JSON file.")
         return
-    print_json(payload)
     resource_bundle = bundle.Bundle('validation', connection.integration)
     resource_bundle.add_payload(payload)
     for model in resource_bundle.unpack():
