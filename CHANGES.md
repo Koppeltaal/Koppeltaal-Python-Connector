@@ -4,8 +4,7 @@ Changes
 1.3.5.4 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Improvements for messages subcommand.
 
 1.3.5.3 (2018-11-16)
 --------------------
