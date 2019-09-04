@@ -47,6 +47,9 @@ class ResponseError(TransportError):
         super(ResponseError, self).__init__(response)
         self.response = response
 
+    def __str__(self):
+        return "{}: {}.".format(self.__class__.__name__, str(self.response))
+
 
 class OperationOutcomeError(KoppeltaalError):
     """A non 200 status with an operation outcome was returned by the server.
@@ -56,6 +59,14 @@ class OperationOutcomeError(KoppeltaalError):
         super(OperationOutcomeError, self).__init__(outcome)
         self.outcome = outcome
 
+    def __str__(self):
+        issues = []
+        for issue in self.outcome.issue:
+            issues.append('type: {}, resource: {}, details: {}'.format(
+                issue.type, issue.resource.fhir_link, issue.details))
+        return "{}: outcome issue(s): {}.".format(
+            self.__class__.__name__, issues)
+
 
 class MessageResponseError(KoppeltaalError):
     """The response in the message header reported an error.
@@ -64,6 +75,9 @@ class MessageResponseError(KoppeltaalError):
     def __init__(self, message):
         super(MessageResponseError, self).__init__(message)
         self.message = message
+
+    def __str__(self):
+        return "{}: {}.".format(self.__class__.__name__, str(self.message))
 
 
 class DummyError(KoppeltaalError):
