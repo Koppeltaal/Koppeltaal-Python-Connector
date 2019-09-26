@@ -309,7 +309,6 @@ class Connector(object):
         request_bundle = bundle.Bundle(self.domain, self.integration)
         request_bundle.add_model(request_message)
         request_payload = request_bundle.get_payload()
-
         try:
             response = self.transport.create(
                 interfaces.MAILBOX_URL, request_payload)

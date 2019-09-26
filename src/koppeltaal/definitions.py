@@ -21,6 +21,7 @@ FIELD_TYPES = {
     'object',
     'reference',
     'string',
+    'versioned reference',
 }
 RESERVED_NAMES = {
     'extension',

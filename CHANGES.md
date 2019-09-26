@@ -4,8 +4,8 @@ Changes
 1.3.5.4 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- The resource reference from the `MessageHeader` to the so called focal
+  resource of the bundle needs to be versioned.
 
 1.3.5.3 (2018-11-16)
 --------------------

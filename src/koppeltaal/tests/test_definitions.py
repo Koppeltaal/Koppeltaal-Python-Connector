@@ -41,7 +41,6 @@ def namespace():
 
 
 def test_coding(packer, namespace):
-
     vertebrates = koppeltaal.codes.Code(
         'Vertebrate',
         {'amphibians': 'Amphibians',
