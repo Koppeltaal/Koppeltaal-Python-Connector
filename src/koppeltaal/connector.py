@@ -309,16 +309,26 @@ class Connector(object):
         request_bundle = bundle.Bundle(self.domain, self.integration)
         request_bundle.add_model(request_message)
         request_payload = request_bundle.get_payload()
+
+        # XXX temporary.
+        logger.info(request_payload)
+
         try:
             response = self.transport.create(
                 interfaces.MAILBOX_URL, request_payload)
         except interfaces.ResponseError as error:
+            # XXX temporary.
+            logger.error(error.response.json)
+
             response_resource = resource.Resource(
                 self.domain, self.integration)
             response_resource.add_payload(error.response.json)
             outcome = response_resource.unpack_model(
                 definitions.OperationOutcome)
             raise interfaces.OperationOutcomeError(outcome)
+
+        # XXX temporary.
+        logger.info(response.json)
 
         response_bundle = bundle.Bundle(self.domain, self.integration)
         response_bundle.add_payload(response.json)
