@@ -738,7 +738,7 @@ class MessageHeader(interfaces.IFHIRResource):
         'timestamp', 'instant')
 
     data = Field(
-        'data', 'reference',
+        'data', 'versioned reference',
         multiple=True,
         optional=True)
 
