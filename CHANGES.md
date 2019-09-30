@@ -1,8 +1,8 @@
 Changes
 =======
 
-1.3.5.4 (unreleased)
---------------------
+1.3.5.4+md.1 (2019-09-30)
+-------------------------
 
 - The resource reference from the `MessageHeader` to the so called focal
   resource of the bundle needs to be versioned.
