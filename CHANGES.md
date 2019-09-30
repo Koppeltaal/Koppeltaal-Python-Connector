@@ -7,6 +7,10 @@ Changes
 - The resource reference from the `MessageHeader` to the so called focal
   resource of the bundle needs to be versioned.
 
+- Have the `InvalidValue` exception report a tiny bit more information.
+
+- Improvements for messages subcommand.
+
 1.3.5.3 (2018-11-16)
 --------------------
 
