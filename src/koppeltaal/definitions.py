@@ -21,6 +21,7 @@ FIELD_TYPES = {
     'object',
     'reference',
     'string',
+    'versioned reference',
 }
 RESERVED_NAMES = {
     'extension',
@@ -737,7 +738,7 @@ class MessageHeader(interfaces.IFHIRResource):
         'timestamp', 'instant')
 
     data = Field(
-        'data', 'reference',
+        'data', 'versioned reference',
         multiple=True,
         optional=True)
 

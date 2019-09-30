@@ -3,8 +3,9 @@
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
 """
-
+import koppeltaal.interfaces
 import koppeltaal.utils
+import pytest
 import requests
 import selenium.webdriver.support.expected_conditions as EC
 import selenium.webdriver.support.wait
@@ -178,3 +179,92 @@ def test_send_activity(connector):
     assert connector.activity(u'uuid://{}'.format(uuid)) is None
 
     assert len(list(connector.activities())) == 1
+
+
+def test_send_versioned_focal_resource_careplan(connector, careplan):
+    response = connector.send(
+        'CreateOrUpdateCarePlan', careplan, careplan.patient)
+    first_version = response[0].fhir_link
+    assert careplan.fhir_link != first_version
+    assert careplan.fhir_link == \
+        koppeltaal.utils.strip_history_from_link(first_version)
+
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as info:
+        # Sending an update to the CarePlan without a version, now that the
+        # server gave it a version, fails.
+        connector.send(
+            'CreateOrUpdateCarePlan', careplan, careplan.patient)
+
+    assert info.value.outcome.issue[0].details == (
+        'No version specified for the focal resource, message is rejected.')
+
+    # When we properly update the CarePlan's version (FHIR link), we can send
+    # an update again. And we get the subsequent version for it.
+    careplan.fhir_link = first_version
+    response = connector.send(
+        'CreateOrUpdateCarePlan', careplan, careplan.patient)
+    second_version = response[0].fhir_link
+    assert first_version != second_version
+    assert koppeltaal.utils.strip_history_from_link(first_version) == \
+        koppeltaal.utils.strip_history_from_link(second_version)
+
+    # Reusing the earlier version results in an error.
+    careplan.fhir_link = first_version
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as info:
+        connector.send(
+            'CreateOrUpdateCarePlan', careplan, careplan.patient)
+
+    assert info.value.outcome.issue[0].details == (
+        'Message Version mismatch: Please retrieve the latest version of '
+        'this Message and apply changes before resubmit.')
+
+    careplan.fhir_link = second_version
+    response = connector.send(
+        'CreateOrUpdateCarePlan', careplan, careplan.patient)
+    third_version = response[0].fhir_link
+    assert first_version != second_version != third_version
+    assert koppeltaal.utils.strip_history_from_link(first_version) == \
+        koppeltaal.utils.strip_history_from_link(second_version) == \
+        koppeltaal.utils.strip_history_from_link(third_version)
+
+
+def test_send_versioned_focal_resource_patient(connector, patient):
+    response = connector.send('CreateOrUpdatePatient', patient)
+    first_version = response[0].fhir_link
+    assert patient.fhir_link != first_version
+    assert patient.fhir_link == \
+        koppeltaal.utils.strip_history_from_link(first_version)
+
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as info:
+        # Sending an update to the Patient without a version, now that the
+        # server gave it a version, fails.
+        connector.send('CreateOrUpdatePatient', patient)
+
+    assert info.value.outcome.issue[0].details == (
+        'No version specified for the focal resource, message is rejected.')
+
+    # When we properly update the Patient's version (FHIR link), we can send
+    # an update again. And we get the subsequent version for it.
+    patient.fhir_link = first_version
+    response = connector.send('CreateOrUpdatePatient', patient)
+    second_version = response[0].fhir_link
+    assert first_version != second_version
+    assert koppeltaal.utils.strip_history_from_link(first_version) == \
+        koppeltaal.utils.strip_history_from_link(second_version)
+
+    # Reusing the earlier version results in an error.
+    patient.fhir_link = first_version
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as info:
+        response = connector.send('CreateOrUpdatePatient', patient)
+
+    assert info.value.outcome.issue[0].details == (
+        'Message Version mismatch: Please retrieve the latest version of '
+        'this Message and apply changes before resubmit.')
+
+    patient.fhir_link = second_version
+    response = connector.send('CreateOrUpdatePatient', patient)
+    third_version = response[0].fhir_link
+    assert first_version != second_version != third_version
+    assert koppeltaal.utils.strip_history_from_link(first_version) == \
+        koppeltaal.utils.strip_history_from_link(second_version) == \
+        koppeltaal.utils.strip_history_from_link(third_version)
