@@ -4,6 +4,8 @@ Changes
 1.3.5.4 (unreleased)
 --------------------
 
+- Have the `InvalidValue` exception report a tiny bit more information.
+
 - Improvements for messages subcommand.
 
 1.3.5.3 (2018-11-16)
