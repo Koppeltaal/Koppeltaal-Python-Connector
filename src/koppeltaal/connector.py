@@ -105,7 +105,8 @@ class Connector(object):
         self.domain = self._credentials.domain
         self.integration = integration
 
-    def _fetch_bundle(self, url, params=None):
+    def _fetch_bundle(self, url, params=None, batch_count=None):
+        count = 0
         next_url = url
         next_params = params
         packaging = bundle.Bundle(self.domain, self.integration)
@@ -114,6 +115,9 @@ class Connector(object):
             packaging.add_payload(response.json)
             next_url = utils.json2links(response.json).get('next')
             next_params = None  # Parameters are already in the next link.
+            count += 1
+            if batch_count is not None and count >= batch_count:
+                break
         return packaging
 
     def metadata(self):
@@ -275,13 +279,14 @@ class Connector(object):
                 yield update
 
     def search(
-            self, message_id=None, event=None, status=None, patient=None):
+            self, message_id=None, event=None, status=None, patient=None,
+            batch_size=DEFAULT_COUNT, batch_count=None):
         params = {}
         if message_id:
             params['_id'] = message_id
         else:
             params['_summary'] = 'true'
-            params['_count'] = DEFAULT_COUNT
+            params['_count'] = batch_size
         if event:
             params['event'] = event
         if status:
@@ -289,8 +294,7 @@ class Connector(object):
         if patient:
             params['Patient'] = patient.fhir_link
         return self._fetch_bundle(
-            interfaces.MESSAGE_HEADER_URL,
-            params).unpack()
+            interfaces.MESSAGE_HEADER_URL, params, batch_count).unpack()
 
     def send(self, event, data, patient=None):
         identifier = utils.messageid()

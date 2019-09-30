@@ -1,3 +1,6 @@
+# DISCLAIMER:
+Official Releases worden vanuit Release Repository gedaan. Ontwikkelaars moeten zich ervan bewust zijn dat nieuwere versies niet gebruikt mogen worden in productie, want die zijn nog niet geaccepteerd door Sg Koppeltaal
+
 Koppeltaal Python connector
 ===========================
 
