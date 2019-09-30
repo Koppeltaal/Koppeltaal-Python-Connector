@@ -163,7 +163,9 @@ def _messages(args, connection):
     for message in connection.search(
             event=args.event,
             status=args.status,
-            patient=DummyResource(args.patient)):
+            patient=DummyResource(args.patient),
+            batch_size=args.batch_size,
+            batch_count=args.batch_count):
         if args.save_in_dir:
             download(connection, args.save_in_dir, msg=message)
         else:
@@ -246,12 +248,22 @@ def console():
         '--event', choices=codes.MESSAGE_HEADER_EVENTS,
         help='Event type')
     messages.add_argument(
+        '--batch-size',
+        type=int,
+        help='Number of message per bundle.')
+    messages.add_argument(
+        '--batch-count',
+        type=int,
+        help='Number of bundles.')
+    messages.add_argument(
         '--save-in-dir', type=directory,
         help='Save the source for each messsage listed in the query in '
              'the given directory')
 
     message = subparsers.add_parser('message')
-    message.add_argument('message_id')
+    message.add_argument(
+        'message_id',
+        help='internal MessageHeader id or MessageHeader URL.')
     message.add_argument(
         '--save-in-dir', type=directory,
         help='Save the source for the messsage in the given directory')
