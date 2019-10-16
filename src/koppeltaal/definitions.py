@@ -11,10 +11,15 @@ from koppeltaal import (interfaces, codes)
 
 NULL_SYSTEM = 'http://hl7.org/fhir/v3/NullFlavor'
 NULL_VALUE = 'UNK'
+
+IDENTIFIER_BSN = 'http://fhir.nl/fhir/NamingSystem/bsn'
+IDENTIFIER_AGB_Z = 'http://fhir.nl/fhir/NamingSystem/agb-z'
+
 NAMING_SYSTEM_OFFICIAL = {
-    'http://fhir.nl/fhir/NamingSystem/agb-z',
-    'http://fhir.nl/fhir/NamingSystem/bsn'
+    IDENTIFIER_AGB_Z,
+    IDENTIFIER_BSN,
 }
+
 FIELD_TYPES = {
     'boolean',
     'codeable',
