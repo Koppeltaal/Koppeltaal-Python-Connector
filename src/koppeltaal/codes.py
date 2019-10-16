@@ -5,7 +5,9 @@
 """
 
 import koppeltaal.interfaces
-import koppeltaal.definitions
+
+NULL_SYSTEM = 'http://hl7.org/fhir/v3/NullFlavor'
+NULL_VALUE = 'UNK'
 
 
 class Code(dict):
@@ -38,8 +40,7 @@ class Code(dict):
     def unpack_coding(self, coding):
         value = coding.get("code")
         system = coding.get("system")
-        if system == koppeltaal.definitions.NULL_SYSTEM \
-                and value == koppeltaal.definitions.NULL_VALUE:
+        if system == NULL_SYSTEM and value == NULL_VALUE:
             return None
         if system != self.system:
             raise koppeltaal.interfaces.InvalidSystem(self, system)
