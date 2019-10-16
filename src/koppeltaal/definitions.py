@@ -8,6 +8,12 @@ import zope.interface
 
 from koppeltaal import (interfaces, codes)
 
+NULL_SYSTEM = 'http://hl7.org/fhir/v3/NullFlavor'
+NULL_VALUE = 'UNK'
+
+NAMING_SYSTEM_OFFICIAL = {
+    'http://fhir.nl/fhir/NamingSystem/agb-z',
+    'http://fhir.nl/fhir/NamingSystem/bsn'}
 
 FIELD_TYPES = {
     'boolean',
@@ -21,15 +27,14 @@ FIELD_TYPES = {
     'object',
     'reference',
     'string',
-    'versioned reference',
-}
+    'versioned reference'}
+
 RESERVED_NAMES = {
     'extension',
     'id',
     'language',
     'resourceType',
-    'text',
-}
+    'text'}
 
 
 class Field(zope.interface.Attribute):
