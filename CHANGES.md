@@ -1,14 +1,8 @@
 Changes
 =======
 
-1.3.5.4.dev0 (unreleased)
--------------------------
-
-- Nothing changed yet.
-
-
-1.3.5.4+md.2 (2019-10-29)
--------------------------
+1.3.5.4 (unreleased)
+--------------------
 
 - Add the "official" NamingSystem definitions.
 
