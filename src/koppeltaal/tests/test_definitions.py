@@ -101,14 +101,14 @@ def test_coding(packer, namespace):
     unknown_value = vertebrates.unpack_coding({
         'code': 'UNK',
         'display': 'Unknown',
-        'system': koppeltaal.codes.NULL_SYSTEM})
+        'system': koppeltaal.definitions.NULL_SYSTEM})
     assert unknown_value is None
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode):
         vertebrates.unpack_coding({
             'code': 'UNKNOW',
             'display': 'Unknown',
-            'system': koppeltaal.codes.NULL_SYSTEM})
+            'system': koppeltaal.definitions.NULL_SYSTEM})
 
     with pytest.raises(koppeltaal.interfaces.InvalidSystem):
         vertebrates.unpack_coding({

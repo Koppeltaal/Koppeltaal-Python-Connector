@@ -9,6 +9,17 @@ import zope.interface
 from koppeltaal import (interfaces, codes)
 
 
+NULL_SYSTEM = 'http://hl7.org/fhir/v3/NullFlavor'
+NULL_VALUE = 'UNK'
+
+IDENTIFIER_AGB_Z = 'http://fhir.nl/fhir/NamingSystem/agb-z'
+IDENTIFIER_BSN = 'http://fhir.nl/fhir/NamingSystem/bsn'
+
+NAMING_SYSTEM_OFFICIAL = {
+    IDENTIFIER_AGB_Z,
+    IDENTIFIER_BSN,
+}
+
 FIELD_TYPES = {
     'boolean',
     'codeable',
