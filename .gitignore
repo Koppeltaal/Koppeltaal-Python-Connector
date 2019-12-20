@@ -10,8 +10,10 @@
 *.swo
 *.swp
 bin
+build
 dev
 develop-eggs
+dist
 eggs
 geckodriver.log
 htmlcov
