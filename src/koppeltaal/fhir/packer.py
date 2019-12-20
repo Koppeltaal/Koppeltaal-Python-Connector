@@ -128,7 +128,7 @@ class Extension(object):
                 raise interfaces.InvalidValue(field, extension)
             return self._packer.unpack(value, field.binding)
 
-        if field.field_type == 'reference':
+        if field.field_type in {'reference', 'versioned reference'}:
             value = extension.get('valueResource')
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, extension)
@@ -232,6 +232,12 @@ class Extension(object):
                 raise interfaces.InvalidValue(field, value)
             return {'valueResource': self._packer.pack_reference(value)}
 
+        if field.field_type == 'versioned reference':
+            if not isinstance(value, object):
+                raise interfaces.InvalidValue(field, value)
+            ref = self._packer.pack_reference(value, versioned=True)
+            return {'valueResource': ref}
+
         if field.field_type == 'string':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
@@ -330,7 +336,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return self._packer.unpack(value, field.binding)
 
-        if field.field_type == 'reference':
+        if field.field_type in {'reference', 'versioned reference'}:
             if not isinstance(value, dict):
                 raise interfaces.InvalidValue(field, value)
             return self._packer.unpack_reference(value)
@@ -420,6 +426,11 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
             return self._packer.pack_reference(value)
 
+        if field.field_type == 'versioned reference':
+            if not isinstance(value, object):
+                raise interfaces.InvalidValue(field, value)
+            return self._packer.pack_reference(value, versioned=True)
+
         if field.field_type == 'string':
             if not isinstance(value, unicode):
                 raise interfaces.InvalidValue(field, value)
@@ -508,7 +519,7 @@ class Packer(object):
             fhir_link=value.get('reference'),
             display=value.get('display'))
 
-    def pack_reference(self, value):
+    def pack_reference(self, value, versioned=False):
         if interfaces.IReferredFHIRResource.providedBy(value):
             reference = {}
             if value.fhir_link:
@@ -519,4 +530,7 @@ class Packer(object):
                 raise interfaces.InvalidReference(value)
             return reference
         entry = self.resource.add_model(value)
-        return {'reference': utils.strip_history_from_link(entry.fhir_link)}
+        ref = entry.fhir_link
+        if not versioned:
+            ref = utils.strip_history_from_link(ref)
+        return {'reference': ref}
