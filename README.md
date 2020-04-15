@@ -22,10 +22,15 @@ This Koppeltaal connector was initially developed by Minddistrict Development B.
 Setting up for development
 ---------------------------
 
-virtualenv
-pip
-tox
-python36, 37, 38
+Previously `buildout` was used for setting up the package for development. We now realy on using a *virtual env*, *pip* and a requirements file instead.
+
+Quick start:
+
+```sh
+# inside the Koppeltaal-Python-Connector checkout
+$ python3.8 -m venv .
+$ ./bin/pip install -r requirements -e .
+```
 
 Tests
 -----
@@ -55,6 +60,8 @@ Note how there're two webdriver/selenium tests. They require a Firefox "driver" 
 ```sh
 $ brew install geckodriver
 ```
+
+*Tox* is used for running the test suites for multiple Python versions.
 
 Command line interface
 ----------------------
