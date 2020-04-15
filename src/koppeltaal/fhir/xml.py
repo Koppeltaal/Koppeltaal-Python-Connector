@@ -1,16 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
 import lxml.etree
-import six
 
 from koppeltaal import fhir
-
-
-unicode = six.text_type
 
 
 TYPES = [
@@ -62,7 +57,7 @@ def fhir2json(node, repeatable_field_names):
             elif child_value_type == 'boolean':
                 child_value = child.attrib['value'] == 'true'
             else:
-                child_value = unicode(child.attrib['value'])
+                child_value = str(child.attrib['value'])
         if child_tag in repeatable_field_names:
             result.setdefault(child_tag, []).append(child_value)
         else:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
@@ -7,14 +6,10 @@
 import collections
 import datetime
 import os.path
-import six
 import uuid
 
+from urllib.parse import urlparse
 from configparser import ConfigParser
-from six.moves.urllib.parse import urlparse
-
-
-unicode = six.text_type
 
 
 class UTC(datetime.tzinfo):
@@ -46,7 +41,7 @@ def json2links(data):
 def uniqueid():
     """Generate a unique ID.
     """
-    return unicode(uuid.uuid4())
+    return str(uuid.uuid4())
 
 
 def messageid():
@@ -66,7 +61,7 @@ Credentials = collections.namedtuple(
 
 def get_credentials_from_file(name):
     # They're not passed in, so now look at ~/.koppeltaal.cfg.
-    config = unicode(os.path.expanduser('~/.koppeltaal.cfg'))
+    config = str(os.path.expanduser('~/.koppeltaal.cfg'))
     if not os.path.isfile(config):
         raise ValueError("Can't find ~/.koppeltaal.cfg")
     parser = ConfigParser()

@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
-import six
 import zope.interface
-
+from urllib.parse import urlencode
 from koppeltaal.fhir import bundle, resource
 from koppeltaal import (
     interfaces,
@@ -15,10 +13,6 @@ from koppeltaal import (
     models,
     transport,
     utils)
-from six.moves.urllib.parse import urlencode
-
-
-unicode = six.text_type
 
 
 DEFAULT_COUNT = 100
@@ -86,7 +80,7 @@ class Update(object):
         self.ack('Success')
 
     def fail(self, exception="FAILED"):
-        self.ack('Failed', unicode(exception))
+        self.ack('Failed', str(exception))
 
     def postpone(self):
         self.acked = None
@@ -254,7 +248,7 @@ class Connector(object):
             update = Update(message, bundle.unpack, send_back_on_transaction)
             errors = bundle.errors()
             if errors:
-                reason = u', '.join([str(error) for error in errors])
+                reason = ', '.join([str(error) for error in errors])
                 logger.error(
                     "Error while reading message '{}': {}".format(
                         message.fhir_link, reason))
@@ -299,10 +293,10 @@ class Connector(object):
     def send(self, event, data, patient=None):
         identifier = utils.messageid()
         source = models.MessageHeaderSource(
-            name=unicode(self.integration.name),
-            endpoint=unicode(self.integration.url),
-            software=unicode(interfaces.SOFTWARE),
-            version=unicode(interfaces.VERSION))
+            name=self.integration.name,
+            endpoint=self.integration.url,
+            software=interfaces.SOFTWARE,
+            version=interfaces.VERSION)
         request_message = models.MessageHeader(
             timestamp=utils.now(),
             event=event,

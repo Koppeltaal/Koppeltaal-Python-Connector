@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
@@ -6,7 +5,6 @@
 
 import datetime
 import dateutil.parser
-import six
 import zope.interface
 
 from koppeltaal import (
@@ -16,10 +14,6 @@ from koppeltaal import (
     interfaces,
     models,
     utils)
-
-
-basestring = six.string_types
-unicode = six.text_type
 
 
 @zope.interface.implementer(interfaces.IBrokenFHIRResource)
@@ -70,7 +64,7 @@ class Extension(object):
 
         if field.field_type == 'code':
             value = extension.get('valueCode')
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, extension)
             return field.binding.unpack_code(value)
 
@@ -84,7 +78,7 @@ class Extension(object):
 
         if field.field_type == 'date':
             value = extension.get('valueDate')
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, extension)
             try:
                 return dateutil.parser.parse(value).date()
@@ -93,7 +87,7 @@ class Extension(object):
 
         if field.field_type == 'datetime':
             value = extension.get('valueDateTime')
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, extension)
             try:
                 return dateutil.parser.parse(value)
@@ -102,7 +96,7 @@ class Extension(object):
 
         if field.field_type == 'instant':
             value = extension.get('valueInstant')
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, extension)
             try:
                 return dateutil.parser.parse(value)
@@ -136,7 +130,7 @@ class Extension(object):
 
         if field.field_type == 'string':
             value = extension.get('valueString')
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, extension)
             return value
 
@@ -176,14 +170,14 @@ class Extension(object):
             return {'valueBoolean': value}
 
         if field.field_type == 'code':
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return {'valueCode': field.binding.pack_code(value)}
 
         if field.field_type == 'codeable':
             # Note how 'codeable' is actually an extension data type but we
             # treat it specially here.
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return {"valueCodeableConcept":
                     {"coding": [field.binding.pack_coding(value)]}}
@@ -191,7 +185,7 @@ class Extension(object):
         if field.field_type == 'coding':
             # Note how 'coding' is actually an extension data type but we
             # treat it specially here.
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return {'valueCoding': field.binding.pack_coding(value)}
 
@@ -239,7 +233,7 @@ class Extension(object):
             return {'valueResource': ref}
 
         if field.field_type == 'string':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return {'valueString': value}
 
@@ -291,7 +285,7 @@ class Native(object):
             return field.binding.unpack_coding(value['coding'][0])
 
         if field.field_type == 'code':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return field.binding.unpack_code(value)
 
@@ -303,7 +297,7 @@ class Native(object):
             return field.binding.unpack_coding(value)
 
         if field.field_type == 'date':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             try:
                 return dateutil.parser.parse(value).date()
@@ -311,7 +305,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
 
         if field.field_type == 'datetime':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             try:
                 return dateutil.parser.parse(value)
@@ -319,7 +313,7 @@ class Native(object):
                 raise interfaces.InvalidValue(field, value)
 
         if field.field_type == 'instant':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             try:
                 return dateutil.parser.parse(value)
@@ -342,7 +336,7 @@ class Native(object):
             return self._packer.unpack_reference(value)
 
         if field.field_type == 'string':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return value
 
@@ -378,19 +372,19 @@ class Native(object):
         if field.field_type == 'codeable':
             # Note how 'codeable' is actually an extension data type but we
             # treat it specially here.
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return {"coding": [field.binding.pack_coding(value)]}
 
         if field.field_type == 'code':
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return field.binding.pack_code(value)
 
         if field.field_type == 'coding':
             # Note how 'coding' is actually an extension data type but we
             # treat it specially here.
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return field.binding.pack_coding(value)
 
@@ -432,7 +426,7 @@ class Native(object):
             return self._packer.pack_reference(value, versioned=True)
 
         if field.field_type == 'string':
-            if not isinstance(value, unicode):
+            if not isinstance(value, str):
                 raise interfaces.InvalidValue(field, value)
             return value
 

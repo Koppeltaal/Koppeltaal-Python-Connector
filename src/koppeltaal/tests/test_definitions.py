@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
@@ -15,15 +14,7 @@ import koppeltaal.interfaces
 import koppeltaal.models
 import koppeltaal.utils
 
-import sys
-if sys.version_info.major == 2:
-    import mock
-
-    def bytes(arg, encoding):
-        return str(arg)
-
-else:
-    from unittest import mock
+from unittest import mock
 
 
 @pytest.fixture

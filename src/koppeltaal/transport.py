@@ -1,17 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
 import requests
-import six
 
+from urllib.parse import urlparse, urlunparse
 from koppeltaal import (interfaces, logger)
-from six.moves.urllib.parse import urlparse, urlunparse
-
-
-unicode = six.text_type
 
 
 class Response(object):
@@ -36,8 +31,8 @@ class Transport(object):
 
     def absolute_url(self, url):
         # Make sure we talk to the proper server by updating the URL.
-        parts = list(map(unicode, urlparse(url)[2:]))
-        return urlunparse([unicode(self.scheme), unicode(self.netloc)] + parts)
+        parts = list(map(str, urlparse(url)[2:]))
+        return urlunparse([self.scheme, self.netloc] + parts)
 
     def _read_http_response(self, http_response):
         if not http_response.headers['content-type'].startswith(

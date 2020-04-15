@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
@@ -8,14 +7,10 @@ import functools
 import hamcrest
 import json
 import pkg_resources
-import six
 
+from urllib.parse import urlparse, urlunparse, urlencode
 from hamcrest.core.base_matcher import BaseMatcher
 from koppeltaal import interfaces, transport
-from six.moves.urllib.parse import urlparse, urlunparse, urlencode
-
-
-unicode = six.text_type
 
 
 class Response(transport.Response):
@@ -70,8 +65,8 @@ class MockTransport(object):
         self.expected.setdefault(url, []).append(expect)
 
     def relative_url(self, url, params=None):
-        parts = list(map(unicode, urlparse(url)[2:]))
-        url = urlunparse([unicode(''), unicode('')] + parts)
+        parts = list(map(str, urlparse(url)[2:]))
+        url = urlunparse(['', ''] + parts)
         if params:
             url += '?' + urlencode(params)
         return url

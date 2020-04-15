@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
@@ -10,7 +9,7 @@ import requests
 import selenium.webdriver.support.expected_conditions as EC
 import selenium.webdriver.support.wait
 
-from six.moves.urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
 
 def test_request_metadata(connector):
