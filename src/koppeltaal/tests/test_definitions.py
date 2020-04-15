@@ -110,35 +110,57 @@ def test_coding(packer, namespace):
 
 def test_unpack_name(packer):
     name = packer.unpack(
-        {'given': [u'Napoleon'],
-         'family': [u'Bonaparte'],
-         'use': u'official'},
+        {'given': ['Napoleon'],
+         'family': ['Bonaparte'],
+         'use': 'official'},
         koppeltaal.definitions.Name)
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, name)
-    assert name.given == [u'Napoleon']
-    assert name.family == [u'Bonaparte']
+    assert name.given == ['Napoleon']
+    assert name.family == ['Bonaparte']
     assert name.use == 'official'
 
     name = packer.unpack(
-        {'given': [u'Thea'],
-         'family': [u'van', u'de', u'Bovenburen'],
-         'suffix': [u'van', u'den', u'Overkant'],
-         'use': u'official'},
+        {'given': ['Thea'],
+         'family': ['van', 'de', 'Bovenburen'],
+         'suffix': ['van', 'den', 'Overkant'],
+         'use': 'official'},
         koppeltaal.definitions.Name)
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, name)
-    assert name.given == [u'Thea']
-    assert name.family == [u'van', u'de', u'Bovenburen']
-    assert name.suffix == [u'van', u'den', u'Overkant']
+    assert name.given == ['Thea']
+    assert name.family == ['van', 'de', 'Bovenburen']
+    assert name.suffix == ['van', 'den', 'Overkant']
+    assert name.use == 'official'
+
+    name = packer.unpack(
+        {'text': 'Thea van de Bovenburen'},
+        koppeltaal.definitions.Name)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Name, name)
+    assert name.text == 'Thea van de Bovenburen'
+
+    name = packer.unpack(
+        {'given': ['Thea'],
+         'family': ['van', 'de', 'Bovenburen'],
+         'suffix': ['van', 'den', 'Overkant'],
+         'text': 'Thea van de Bovenburen',
+         'use': 'official'},
+        koppeltaal.definitions.Name)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Name, name)
+    assert name.given == ['Thea']
+    assert name.family == ['van', 'de', 'Bovenburen']
+    assert name.suffix == ['van', 'den', 'Overkant']
+    assert name.text == 'Thea van de Bovenburen'
     assert name.use == 'official'
 
 
 def test_pack_name(packer):
     name1 = packer.pack(
         koppeltaal.models.Name(
-            given=[u'Napoleon'],
-            family=[u'Bonaparte'],
+            given=['Napoleon'],
+            family=['Bonaparte'],
             use='old'),
         koppeltaal.definitions.Name)
 
@@ -150,7 +172,7 @@ def test_pack_name(packer):
 
     name2 = packer.pack(
         koppeltaal.models.Name(
-            given=[u'Nathan']),
+            given=['Nathan']),
         koppeltaal.definitions.Name)
 
     assert name2 == {
@@ -160,16 +182,16 @@ def test_pack_name(packer):
 
     name3 = packer.pack(
         koppeltaal.models.Name(
-            given=[u'Nathan'],
-            family=[u'der', u'Fantasten'],
-            suffix=[u'tot', u'Daarhelemaalië']),
+            given=['Nathan'],
+            family=['der', 'Fantasten'],
+            suffix=['tot', 'Daarhelemaalië']),
         koppeltaal.definitions.Name)
 
     assert name3 == {
         'given': ['Nathan'],
-        'family': [u'der', u'Fantasten'],
+        'family': ['der', 'Fantasten'],
         'id': mock.ANY,
-        'suffix': [u'tot', u'Daarhelemaalië'],
+        'suffix': ['tot', 'Daarhelemaalië'],
         'use': 'official'}
 
     # Verify an empty array value for (in this case) "given" does not leave an
@@ -177,14 +199,14 @@ def test_pack_name(packer):
     name4 = packer.pack(
         koppeltaal.models.Name(
             given=[],
-            family=[u'der', u'Fantasten'],
-            suffix=[u'tot', u'Daarhelemaalië']),
+            family=['der', 'Fantasten'],
+            suffix=['tot', 'Daarhelemaalië']),
         koppeltaal.definitions.Name)
 
     assert name4 == {
-        'family': [u'der', u'Fantasten'],
+        'family': ['der', 'Fantasten'],
         'id': mock.ANY,
-        'suffix': [u'tot', u'Daarhelemaalië'],
+        'suffix': ['tot', 'Daarhelemaalië'],
         'use': 'official'}
 
     # Verify a None value for (in this case) "given" does not leave an array
@@ -194,8 +216,8 @@ def test_pack_name(packer):
         packer.pack(
             koppeltaal.models.Name(
                 given=[None],
-                family=[u'der', u'Fantasten'],
-                suffix=[u'tot', u'Daarhelemaalië']),
+                family=['der', 'Fantasten'],
+                suffix=['tot', 'Daarhelemaalië']),
             koppeltaal.definitions.Name)
 
     with pytest.raises(koppeltaal.interfaces.InvalidResource):
@@ -206,36 +228,53 @@ def test_pack_name(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue):
         packer.pack(
             koppeltaal.models.Name(
-                given=[u'Napoleon'],
-                family=[u'Bonaparte'],
+                given=['Napoleon'],
+                family=['Bonaparte'],
                 use='cool name'),
             koppeltaal.definitions.Name)
+
+    name5 = packer.pack(
+        koppeltaal.models.Name(
+            given=['Nathan'],
+            family=['der', 'Fantasten'],
+            suffix=['tot', 'Daarhelemaalië'],
+            text='Nathan de Fantasten tot Daarhelemaalië'),
+        koppeltaal.definitions.Name)
+
+    assert name5 == {
+        'given': ['Nathan'],
+        'family': ['der', 'Fantasten'],
+        'id': mock.ANY,
+        'suffix': ['tot', 'Daarhelemaalië'],
+        'text': 'Nathan de Fantasten tot Daarhelemaalië',
+        'use': 'official'}
 
 
 def test_unpack_patient(packer, namespace):
     patient1 = packer.unpack(
         {'active': True,
          'extension': [
-             {'url': namespace + u'Patient#Age',
+             {'url': namespace + 'Patient#Age',
               'valueInteger': 42}],
          'gender': {'coding': [
-             {'code': u'M',
-              'display': u'M',
-              'system': u'http://hl7.org/fhir/v3/AdministrativeGender'}]},
+             {'code': 'M',
+              'display': 'M',
+              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
          'name': [
-             {'given': [u'Paul'],
-              'family': [u'Roger'],
-              'use': u'official'}],
+             {'given': ['Paul'],
+              'family': ['Roger'],
+              'text': 'Paul Roger',
+              'use': 'official'}],
          'address': [{
-            'city': u'Rotterdam',
-            'country': u'The Netherlands',
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
             'period': {
-                'start': u'2013-06-01T12:34:00',
+                'start': '2013-06-01T12:34:00',
                 },
-            'state': u'Zuid-Holland',
-            'text': u'Rotterdam, ken je dat nie horen dan?',
-            'use': u'work',
-            'zip': u'3033CH'
+            'state': 'Zuid-Holland',
+            'text': 'Rotterdam, ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3033CH'
           }]},
         koppeltaal.definitions.Patient)
 
@@ -244,8 +283,9 @@ def test_unpack_patient(packer, namespace):
     name = patient1.name[0]
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, name)
-    assert name.given == [u'Paul']
-    assert name.family == [u'Roger']
+    assert name.given == ['Paul']
+    assert name.family == ['Roger']
+    assert name.text == 'Paul Roger'
     assert name.use == 'official'
     assert len(patient1.contacts) == 0
     assert len(patient1.identifiers) == 0
@@ -272,21 +312,21 @@ def test_unpack_patient(packer, namespace):
 
     patient2 = packer.unpack(
         {'gender': {'coding': [
-            {'code': u'UNK',
-             'display': u'UNK',
-             'system': u'http://hl7.org/fhir/v3/NullFlavor'}]},
+            {'code': 'UNK',
+             'display': 'UNK',
+             'system': 'http://hl7.org/fhir/v3/NullFlavor'}]},
          'name': [
-             {'given': [u'Paul'],
-              'family': [u'Roger'],
-              'use': u'official'}]},
+             {'given': ['Paul'],
+              'family': ['Roger'],
+              'use': 'official'}]},
         koppeltaal.definitions.Patient)
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Patient, patient2)
     name2 = patient2.name[0]
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, name2)
-    assert name2.given == [u'Paul']
-    assert name2.family == [u'Roger']
+    assert name2.given == ['Paul']
+    assert name2.family == ['Roger']
     assert name2.use == 'official'
     assert len(patient2.contacts) == 0
     assert len(patient2.identifiers) == 0
@@ -303,8 +343,8 @@ def test_pack_patient(packer):
             age=42,
             name=[
                 koppeltaal.models.Name(
-                    given=[u'Paul'],
-                    family=[u'Roger'],
+                    given=['Paul'],
+                    family=['Roger'],
                     use='official')],
             gender='M'),
         koppeltaal.definitions.Patient)
@@ -331,16 +371,16 @@ def test_pack_patient(packer):
             contacts=[
                 koppeltaal.models.Contact(
                     system='email',
-                    value=u'petra@example.com',
+                    value='petra@example.com',
                     use='home')],
             identifiers=[
                 koppeltaal.models.Identifier(
-                    system=u'http://fhir.nl/fhir/NamingSystem/bsn',
-                    value=u'640563569',
+                    system='http://fhir.nl/fhir/NamingSystem/bsn',
+                    value='640563569',
                     use='official')],
             name=[
                 koppeltaal.models.Name(
-                    given=[u'Petra'],
+                    given=['Petra'],
                     use='temp')],
             gender='F'),
         koppeltaal.definitions.Patient)
@@ -371,26 +411,28 @@ def test_pack_patient(packer):
 def test_unpack_practitioner(packer):
     practitioner1 = packer.unpack(
         {'telecom': [
-            {'system': u'email',
-             'value': u'paul@example.com',
-             'use': u'work'}],
-         'name':  {'given': [u'Paul'],
-                   'family': [u'Cézanne'],
-                   'use': u'official'}},
+            {'system': 'email',
+             'value': 'paul@example.com',
+             'use': 'work'}],
+         'name':  {'given': ['Paul'],
+                   'family': ['Cézanne'],
+                   'text': 'Paul Cézanne',
+                   'use': 'official'}},
         koppeltaal.definitions.Practitioner)
 
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Practitioner, practitioner1)
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Name, practitioner1.name)
-    assert practitioner1.name.given == [u'Paul']
-    assert practitioner1.name.family == [u'Cézanne']
+    assert practitioner1.name.given == ['Paul']
+    assert practitioner1.name.family == ['Cézanne']
+    assert practitioner1.name.text == 'Paul Cézanne'
     assert practitioner1.name.use == 'official'
     assert len(practitioner1.contacts) == 1
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Contact, practitioner1.contacts[0])
     assert practitioner1.contacts[0].system == 'email'
-    assert practitioner1.contacts[0].value == u'paul@example.com'
+    assert practitioner1.contacts[0].value == 'paul@example.com'
     assert practitioner1.contacts[0].use == 'work'
     assert len(practitioner1.identifiers) == 0
 
@@ -401,16 +443,16 @@ def test_pack_practitioner(packer):
             contacts=[
                 koppeltaal.models.Contact(
                     system='email',
-                    value=u'paul@example.com',
+                    value='paul@example.com',
                     use='work')],
             identifiers=[
                 koppeltaal.models.Identifier(
-                    system=u'http://fhir.nl/fhir/NamingSystem/bsn',
-                    value=u'154694496',
+                    system='http://fhir.nl/fhir/NamingSystem/bsn',
+                    value='154694496',
                     use='official')],
             name=koppeltaal.models.Name(
-                given=[u'Paul'],
-                family=[u'Cézanne'])),
+                given=['Paul'],
+                family=['Cézanne'])),
         koppeltaal.definitions.Practitioner)
 
     assert practitioner1 == {
@@ -422,7 +464,7 @@ def test_pack_practitioner(packer):
              'use': 'official'}],
         'name': {'id': mock.ANY,
                  'given': ['Paul'],
-                 'family': [u'Cézanne'],
+                 'family': ['Cézanne'],
                  'use': 'official'},
         'telecom': [
             {'id': mock.ANY,
@@ -435,19 +477,19 @@ def test_unpack_activity_definition(packer, namespace):
     definition1 = packer.unpack(
         {'extension': [
             {'url': (namespace +
-                     u'ActivityDefinition#ActivityDefinitionIdentifier'),
-             'valueString': u'myapp'},
-            {'url': namespace + u'ActivityDefinition#ActivityName',
-             'valueString': u'My APP'},
-            {'url': namespace + u'ActivityDefinition#ActivityKind',
+                     'ActivityDefinition#ActivityDefinitionIdentifier'),
+             'valueString': 'myapp'},
+            {'url': namespace + 'ActivityDefinition#ActivityName',
+             'valueString': 'My APP'},
+            {'url': namespace + 'ActivityDefinition#ActivityKind',
              'valueCoding': {
-                 'code': u'Game',
-                 'display': u'Game',
-                 'system': namespace + u'ActivityKind'}},
-            {'url': namespace + u'ActivityDefinition#Application',
+                 'code': 'Game',
+                 'display': 'Game',
+                 'system': namespace + 'ActivityKind'}},
+            {'url': namespace + 'ActivityDefinition#Application',
              'valueResource': {
                  'reference': 'https://example.com/refmyapp',
-                 'display': u'refmyapp'}}]},
+                 'display': 'refmyapp'}}]},
         koppeltaal.definitions.ActivityDefinition)
 
     assert zope.interface.verify.verifyObject(
@@ -469,15 +511,15 @@ def test_unpack_activity_definition(packer, namespace):
 def test_unpack_message_header(packer, namespace):
     message1 = packer.unpack(
         {'data': [{'reference': 'https://example.com/data'}],
-         'event': {'code': u'CreateOrUpdatePatient',
-                   'display': u'CreateOrUpdatePatient',
-                   'system': namespace + u'MessageEvents'},
-         'identifier': u'42-42-42',
-         'source': {'name': u'unpack message header',
-                    'version': u'about 1.0',
-                    'endpoint': u'https://example.com/here',
-                    'software': u'pytest'},
-         'timestamp': u'2015-10-09T12:16:00+00:00'},
+         'event': {'code': 'CreateOrUpdatePatient',
+                   'display': 'CreateOrUpdatePatient',
+                   'system': namespace + 'MessageEvents'},
+         'identifier': '42-42-42',
+         'source': {'name': 'unpack message header',
+                    'version': 'about 1.0',
+                    'endpoint': 'https://example.com/here',
+                    'software': 'pytest'},
+         'timestamp': '2015-10-09T12:16:00+00:00'},
         koppeltaal.definitions.MessageHeader)
 
     assert zope.interface.verify.verifyObject(
@@ -503,10 +545,10 @@ def test_pack_message_header(packer, namespace):
         koppeltaal.models.MessageHeader(
             timestamp=datetime.datetime(2015, 10, 9, 12, 4),
             event='CreateOrUpdatePatient',
-            identifier=u'42-42',
+            identifier='42-42',
             source=koppeltaal.models.MessageHeaderSource(
                 software=u"pytest",
-                endpoint=u'https://example.com/here')),
+                endpoint='https://example.com/here')),
         koppeltaal.definitions.MessageHeader)
 
     assert message1 == {
@@ -514,10 +556,10 @@ def test_pack_message_header(packer, namespace):
                   'display': 'CreateOrUpdatePatient',
                   'system': namespace + 'MessageEvents'},
         'id': mock.ANY,
-        'identifier': u'42-42',
-        'source': {'endpoint': u'https://example.com/here',
+        'identifier': '42-42',
+        'source': {'endpoint': 'https://example.com/here',
                    'id': mock.ANY,
-                   'software': u'pytest'},
+                   'software': 'pytest'},
         'timestamp': '2015-10-09T12:04:00+00:00'}
 
 
@@ -525,9 +567,9 @@ def test_unpack_extension_invalid_integer(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'extension': [
-                {'url': namespace + u'Patient#Age',
-                 'valueInteger': u'forty'}],
-             'name': [{'given': [u'Me']}]},
+                {'url': namespace + 'Patient#Age',
+                 'valueInteger': 'forty'}],
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value '{'url': " \
@@ -537,9 +579,9 @@ def test_unpack_extension_invalid_integer(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'extension': [
-                {'url': namespace + u'Patient#Age',
+                {'url': namespace + 'Patient#Age',
                  'value': 40}],
-             'name': [{'given': [u'Me']}]},
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value '{'url': " \
@@ -552,15 +594,15 @@ def test_unpack_extension_required_missing(packer, namespace):
         packer.unpack(
             {'extension': [
                 {'url': (namespace +
-                         u'ActivityDefinition#ActivityDefinitionIdentifier'),
-                 'valueString': u'myapp'},
-                {'url': namespace + u'ActivityDefinition#ActivityName',
-                 'valueString': u'My APP'},
-                {'url': namespace + u'ActivityDefinition#ActivityKind',
+                         'ActivityDefinition#ActivityDefinitionIdentifier'),
+                 'valueString': 'myapp'},
+                {'url': namespace + 'ActivityDefinition#ActivityName',
+                 'valueString': 'My APP'},
+                {'url': namespace + 'ActivityDefinition#ActivityKind',
                  'valueCoding': {
-                     'code': u'Game',
-                     'display': u'Game',
-                     'system': namespace + u'ActivityKind'}}]},
+                     'code': 'Game',
+                     'display': 'Game',
+                     'system': namespace + 'ActivityKind'}}]},
             koppeltaal.definitions.ActivityDefinition)
     assert str(error.value) == \
         "RequiredMissing: 'application' required but missing."
@@ -569,8 +611,8 @@ def test_unpack_extension_required_missing(packer, namespace):
 def test_unpack_native_invalid_boolean(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
-            {'active': u'yes!',
-             'name': [{'given': [u'Me']}]},
+            {'active': 'yes!',
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value 'yes!' for 'Patient.active'."
@@ -579,7 +621,7 @@ def test_unpack_native_invalid_boolean(packer):
 def test_unpack_native_invalid_code(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidCode) as error:
         packer.unpack(
-            {'use': u'cool name'},
+            {'use': 'cool name'},
             koppeltaal.definitions.Name)
     assert str(error.value) == \
         "InvalidCode: 'cool name' not in 'http://hl7.org/fhir/name-use'."
@@ -595,13 +637,13 @@ def test_unpack_native_invalid_code(packer):
 def test_unpack_native_invalid_coding(packer, namespace):
     with pytest.raises(koppeltaal.interfaces.InvalidCode) as error:
         packer.unpack(
-            {'event': {'code': u'CreateWorld',
-                       'display': u'CreateWorld',
-                       'system': namespace + u'MessageEvents'},
-             'identifier': u'42-42-42',
-             'source': {'endpoint': u'https://example.com/here',
-                        'software': u'pytest'},
-             'timestamp': u'2015-10-09T12:16:00+00:00'},
+            {'event': {'code': 'CreateWorld',
+                       'display': 'CreateWorld',
+                       'system': namespace + 'MessageEvents'},
+             'identifier': '42-42-42',
+             'source': {'endpoint': 'https://example.com/here',
+                        'software': 'pytest'},
+             'timestamp': '2015-10-09T12:16:00+00:00'},
             koppeltaal.definitions.MessageHeader)
     assert str(error.value) == \
         "InvalidCode: 'CreateWorld' not in " \
@@ -609,47 +651,47 @@ def test_unpack_native_invalid_coding(packer, namespace):
 
     with pytest.raises(koppeltaal.interfaces.InvalidCode) as error:
         packer.unpack(
-            {'event': {'coding': u'CreateOrUpdatePatient',
-                       'system': namespace + u'MessageEvents'},
-             'identifier': u'42-42-42',
-             'source': {'endpoint': u'https://example.com/here',
-                        'software': u'pytest'},
-             'timestamp': u'2015-10-09T12:16:00+00:00'},
+            {'event': {'coding': 'CreateOrUpdatePatient',
+                       'system': namespace + 'MessageEvents'},
+             'identifier': '42-42-42',
+             'source': {'endpoint': 'https://example.com/here',
+                        'software': 'pytest'},
+             'timestamp': '2015-10-09T12:16:00+00:00'},
             koppeltaal.definitions.MessageHeader)
     assert str(error.value) == \
         "InvalidCode: code is missing."
 
     with pytest.raises(koppeltaal.interfaces.InvalidSystem) as error:
         packer.unpack(
-            {'event': {'code': u'CreateWorld',
-                       'display': u'CreateWorld',
-                       'system': u'http://example.com/event'},
-             'identifier': u'42-42-42',
-             'source': {'endpoint': u'https://example.com/here',
-                        'software': u'pytest'},
-             'timestamp': u'2015-10-09T12:16:00+00:00'},
+            {'event': {'code': 'CreateWorld',
+                       'display': 'CreateWorld',
+                       'system': 'http://example.com/event'},
+             'identifier': '42-42-42',
+             'source': {'endpoint': 'https://example.com/here',
+                        'software': 'pytest'},
+             'timestamp': '2015-10-09T12:16:00+00:00'},
             koppeltaal.definitions.MessageHeader)
     assert str(error.value) == \
         "InvalidSystem: system 'http://example.com/event' is not supported."
 
     with pytest.raises(koppeltaal.interfaces.InvalidSystem) as error:
         packer.unpack(
-            {'event': {'code': u'CreateOrUpdatePatient'},
-             'identifier': u'42-42-42',
-             'source': {'endpoint': u'https://example.com/here',
-                        'software': u'pytest'},
-             'timestamp': u'2015-10-09T12:16:00+00:00'},
+            {'event': {'code': 'CreateOrUpdatePatient'},
+             'identifier': '42-42-42',
+             'source': {'endpoint': 'https://example.com/here',
+                        'software': 'pytest'},
+             'timestamp': '2015-10-09T12:16:00+00:00'},
             koppeltaal.definitions.MessageHeader)
     assert str(error.value) == \
         "InvalidSystem: system is missing."
 
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
-            {'event': u'CreateOrUpdatePatient',
-             'identifier': u'42-42-42',
-             'source': {'endpoint': u'https://example.com/here',
-                        'software': u'pytest'},
-             'timestamp': u'2015-10-09T12:16:00+00:00'},
+            {'event': 'CreateOrUpdatePatient',
+             'identifier': '42-42-42',
+             'source': {'endpoint': 'https://example.com/here',
+                        'software': 'pytest'},
+             'timestamp': '2015-10-09T12:16:00+00:00'},
             koppeltaal.definitions.MessageHeader)
     assert str(error.value) == \
         "InvalidValue: invalid value 'CreateOrUpdatePatient' " \
@@ -659,8 +701,8 @@ def test_unpack_native_invalid_coding(packer, namespace):
 def test_unpack_native_invalid_datetime(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
-            {'birthDate': u'yesterday',
-             'name': [{'given': [u'Me']}]},
+            {'birthDate': 'yesterday',
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value 'yesterday' for 'Patient.birth_date' " \
@@ -669,7 +711,7 @@ def test_unpack_native_invalid_datetime(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'birthDate': -1,
-             'name': [{'given': [u'Me']}]},
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value '-1' for 'Patient.birth_date' " \
@@ -678,7 +720,7 @@ def test_unpack_native_invalid_datetime(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'birthDate': False,
-             'name': [{'given': [u'Me']}]},
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value 'False' for 'Patient.birth_date' " \
@@ -688,7 +730,7 @@ def test_unpack_native_invalid_datetime(packer):
 def test_unpack_native_invalid_multiple(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
-            {'given': u'Napoleon'},
+            {'given': 'Napoleon'},
             koppeltaal.definitions.Name)
     assert str(error.value) == \
         "InvalidValue: invalid value 'Napoleon' for 'Name.given'."
@@ -711,8 +753,8 @@ def test_unpack_native_invalid_multiple(packer):
 def test_unpack_native_invalid_object(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
-            {'telecom': u'by fax',
-             'name': [{'given': [u'Me']}]},
+            {'telecom': 'by fax',
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value 'by fax' for 'Patient.contacts' " \
@@ -721,7 +763,7 @@ def test_unpack_native_invalid_object(packer):
     with pytest.raises(koppeltaal.interfaces.InvalidValue) as error:
         packer.unpack(
             {'telecom': False,
-             'name': [{'given': [u'Me']}]},
+             'name': [{'given': ['Me']}]},
             koppeltaal.definitions.Patient)
     assert str(error.value) == \
         "InvalidValue: invalid value 'False' for 'Patient.contacts' " \
@@ -746,7 +788,7 @@ def test_unpack_native_invalid_string(packer):
 
 def test_unpack_allow_broken(packer):
     broken = packer.unpack(
-        {'use': u'cool name'},
+        {'use': 'cool name'},
         koppeltaal.definitions.Name,
         allow_broken=True)
     assert not koppeltaal.definitions.Name.providedBy(broken)
@@ -760,26 +802,26 @@ def test_unpack_organization(packer, namespace):
     org1 = packer.unpack(
         {'active': True,
          'address': [{
-             'city': u'Rotterdam',
-             'country': u'The Netherlands',
+             'city': 'Rotterdam',
+             'country': 'The Netherlands',
              'period': {
-                 'start': u'2013-06-01T12:34:00',
+                 'start': '2013-06-01T12:34:00',
                  },
-             'state': u'Zuid-Holland',
-             'text': u'Rotterdam, ken je dat nie horen dan?',
-             'use': u'work',
-             'zip': u'3033CH'
+             'state': 'Zuid-Holland',
+             'text': 'Rotterdam, ken je dat nie horen dan?',
+             'use': 'work',
+             'zip': '3033CH'
              }, {
-             'city': u'Den Haag',
-             'country': u'The Netherlands',
+             'city': 'Den Haag',
+             'country': 'The Netherlands',
              'period': {
-                 'start': u'2010-06-01T12:34:00',
-                 'end': u'2013-06-01T12:33:00',
+                 'start': '2010-06-01T12:34:00',
+                 'end': '2013-06-01T12:33:00',
                  },
-             'state': u'Zuid-Holland',
-             'text': u'Achter de duinuh',
-             'use': u'work',
-             'zip': u'2564TT'}]},
+             'state': 'Zuid-Holland',
+             'text': 'Achter de duinuh',
+             'use': 'work',
+             'zip': '2564TT'}]},
         koppeltaal.definitions.Organization)
 
     assert zope.interface.verify.verifyObject(
@@ -819,21 +861,21 @@ def test_pack_organization(packer):
         koppeltaal.models.Organization(
             active=True,
             address=[koppeltaal.models.Address(
-                city=u'Rotterdam',
-                country=u'The Netherlands',
-                line=[u'Coolsingel 1'],
+                city='Rotterdam',
+                country='The Netherlands',
+                line=['Coolsingel 1'],
                 period=koppeltaal.models.Period(
                     start=datetime.datetime(2010, 6, 1, 12, 34),
                     end=None),
-                state=u'Zuid-Holland',
-                text=u'Ken je dat nie horen dan?',
-                use=u'work',
-                zip=u'3030AB')],
-            category=u'team',
+                state='Zuid-Holland',
+                text='Ken je dat nie horen dan?',
+                use='work',
+                zip='3030AB')],
+            category='team',
             contacts=[],
             contact_persons=[],
             identifiers=[],
-            name=u'Example',
+            name='Example',
             part_of=None),
         koppeltaal.definitions.Organization)
 

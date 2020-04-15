@@ -53,8 +53,8 @@ def test_activities_from_fixture(connector, transport):
     assert activity2.is_active is True
     assert activity2.is_archived is False
     assert activity2.is_domain_specific is True
-    assert activity2.launch_type == u'Web'
-    assert activity2.performer == u'Patient'
+    assert activity2.launch_type == 'Web'
+    assert activity2.performer == 'Patient'
     assert len(activity2.subactivities) == 12
     for subactivity in activity2.subactivities:
         assert zope.interface.verify.verifyObject(
@@ -66,8 +66,8 @@ def test_activities_from_fixture(connector, transport):
         "voor jou, want jij moet voor vijf uur handgeschreven notulen "
         "hebben uitgewerkt. Je collega's treffen ondertussen de "
         "voorbereidingen voor het vieren van de verjaardag van hun chef.")
-    assert subactivity.identifier == u'scenario_12'
-    assert subactivity.name == u'Verjaardag op het werk'
+    assert subactivity.identifier == 'scenario_12'
+    assert subactivity.name == 'Verjaardag op het werk'
 
 
 def test_activity_from_fixture(connector, transport):
@@ -100,10 +100,10 @@ def test_createorupdate_activitydefinition(connector, transport):
 
     definition = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
-        description=u'A First Activity Definition',
-        identifier=u'foobar',
+        description='A First Activity Definition',
+        identifier='foobar',
         kind='ELearning',
-        name=u'AD-1',
+        name='AD-1',
         performer='Patient',
         subactivities=[])
 
@@ -130,10 +130,10 @@ def test_create_activitydefinition(connector, transport):
 
     definition = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
-        description=u'A First Activity Definition',
-        identifier=u'foobar',
+        description='A First Activity Definition',
+        identifier='foobar',
         kind='ELearning',
-        name=u'AD-1',
+        name='AD-1',
         performer='Patient',
         subactivities=[])
 
@@ -154,10 +154,10 @@ def test_update_activitydefinition(connector, transport):
 
     definition = koppeltaal.models.ActivityDefinition(
         application=koppeltaal.models.ReferredResource(display='Foobar'),
-        description=u'A First Activity Definition',
-        identifier=u'foobar',
+        description='A First Activity Definition',
+        identifier='foobar',
         kind='ELearning',
-        name=u'AD-1',
+        name='AD-1',
         performer='Patient',
         subactivities=[])
     definition.fhir_link = (
