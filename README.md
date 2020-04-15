@@ -17,38 +17,38 @@ This connector acts as an intermediary or adapter between application and framew
 
 See https://python.org
 
-The initial development was done using Python 2.7. Python 3.6 compatibility
-work is being done.
-
 This Koppeltaal connector was initially developed by Minddistrict Development B.V. for Stichting Koppeltaal.
 
-Buildout
---------
+Setting up for development
+---------------------------
 
-The dependencies for the Koppeltaal Python connector is put together using [buildout].
-
-On Linux/OSX, run:
-
-```sh
-$ python2.7 bootstrap-buildout.py
-$ bin/buildout
-```
-
-On Windows, run (this works best in a git shell):
-
-```sh
-$ C:\Python27\Python.exe bootstrap-buildout.py
-$ bin\buildout.exe
-```
+virtualenv
+pip
+tox
+python36, 37, 38
 
 Tests
 -----
 
-We use the [pytest] framework. The tests are run against a Koppeltaal server and domain setup specifically for testing the connector code base. This domain is called `edge`:
+We use the [pytest] framework. The tests should be run against the Koppeltaal `edge` server, preferrably in a domain sepcifically setup for running the
+tests.
 
 ```sh
 $ bin/py.test --server=edge
 ```
+
+The `--server=edge` argument to the test command is the server to connect to when running tests. It is taken from `~/.koppeltaal.cfg`. The format of
+`~/.koppeltaal.cfg` looks like this:
+
+```
+[edge]
+url = https://edgekoppeltaal.vhscloud.nl
+username = PA@PythonAdapterTesting4Edge
+password = <secret here>
+domain = PythonAdapterTesting
+```
+
+The name of the configuration section in the `~/.koppeltaal.cfg` file is the name passed to the `--server` argument.
 
 Note how there're two webdriver/selenium tests. They require a Firefox "driver" to be available on your system. For MacOS using brew, this can be installed like so:
 
@@ -68,17 +68,7 @@ $ bin/koppeltaal --help
 Arguments:
 
 The first argument to the *koppeltaal* script is the server to connect to, for
-example *edge*. The username, password and
-domain can be passed in as arguments or taken from *~/.koppeltaal.cfg*. The
-format of ~/.koppeltaal.cfg looks like this:
-
-```
-[edge]
-url = https://edgekoppeltaal.vhscloud.nl
-username = PA@PythonAdapterTesting4Edge
-password = <secret here>
-domain = PythonAdapterTesting
-```
+example *edge*. The username, password and domain can be passed in as arguments or taken from `~/.koppeltaal.cfg`.
 
 Metadata / Conformance statement
 --------------------------------
@@ -127,12 +117,5 @@ Use the following API in your integration code to talk to a Koppeltaal server:
 
 T.B.D.
 
-Development
------------
-
-* Formally support Python 2.7 and Python 3.6
-* Use the [six] library for the compatibility layer
-
 [buildout]: http://www.buildout.org
 [pytest]: https://pytest.org
-[six]: http://six.readthedocs.io/

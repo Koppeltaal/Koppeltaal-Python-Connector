@@ -139,8 +139,9 @@ def test_send_careplan_operation_outcome_error_from_fixture(
         cm.value.outcome.issue[0].resource)
     assert cm.value.outcome.issue[0].resource.fhir_link == \
         'https://example.com/fhir/Koppeltaal/Patient/1'
-    assert cm.value.outcome.issue[0].details == \
-        'The specified resource version is not correct.'
+    assert cm.value.outcome.issue[0].details == (
+        'Message Version mismatch: Please retrieve the latest version of '
+        'this Message and apply changes before resubmit.')
     assert zope.interface.verify.verifyObject(
         koppeltaal.definitions.Issue,
         cm.value.outcome.issue[1])
@@ -149,8 +150,9 @@ def test_send_careplan_operation_outcome_error_from_fixture(
         cm.value.outcome.issue[1].resource)
     assert cm.value.outcome.issue[1].resource.fhir_link == \
         'https://example.com/fhir/Koppeltaal/Practitioner/1'
-    assert cm.value.outcome.issue[1].details == \
-        'The specified resource version is not correct.'
+    assert cm.value.outcome.issue[1].details == (
+        'Message Version mismatch: Please retrieve the latest version of '
+        'this Message and apply changes before resubmit.')
 
 
 def test_updates_implicit_success_from_fixture(connector, transport):
