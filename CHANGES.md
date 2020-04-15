@@ -7,6 +7,8 @@ CHANGES
 - Repository cleanups, remove buildout in favor of virtual env, pip and tox.
   Remove Python 2.x support.
 
+- Add `HumanName.text` field to the `Name` definition and model.
+
 1.3.5.4 (2019-12-20)
 --------------------
 

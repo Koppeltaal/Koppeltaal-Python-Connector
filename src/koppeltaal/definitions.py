@@ -254,6 +254,11 @@ class Name(zope.interface.Interface):
         binding=codes.NAME_USE,
         optional=True)
 
+    text = Field(
+        'text', 'string',
+        optional=True,
+        reserved_allowed=True)
+
 
 @extension_data_type('Contact')
 class Contact(zope.interface.Interface):
