@@ -11,7 +11,6 @@ with open('README.md') as file:
 
 
 install_requires = [
-    'six',
     'lxml',
     'python-dateutil',
     'requests',
@@ -24,11 +23,6 @@ tests_require = [
     'PyHamcrest >= 1.9',
     'selenium >= 3.8',
     ]
-
-
-if sys.version_info.major == 2:
-    install_requires.append('configparser')
-    tests_require.append('mock==1.0.1')
 
 
 setup(
@@ -51,9 +45,10 @@ setup(
         'Natural Language :: Dutch',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
