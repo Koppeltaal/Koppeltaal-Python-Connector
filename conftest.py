@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
@@ -8,14 +7,10 @@ import datetime
 import uuid
 import pytest
 import selenium.webdriver
-import six
 import koppeltaal.connector
 import koppeltaal.models
 import koppeltaal.testing
 import koppeltaal.utils
-
-
-unicode = six.text_type
 
 
 def pytest_addoption(parser):
@@ -97,7 +92,7 @@ def careplan(patient, practitioner, activity_definition):
         role='Caregiver')]
     return koppeltaal.models.CarePlan(
         activities=[koppeltaal.models.Activity(
-            identifier=unicode(uuid.uuid4()),
+            identifier=str(uuid.uuid4()),
             definition=activity_definition.identifier,
             kind=activity_definition.kind,
             participants=participants,
