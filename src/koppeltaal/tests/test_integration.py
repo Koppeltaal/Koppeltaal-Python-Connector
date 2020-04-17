@@ -215,8 +215,7 @@ def test_send_versioned_focal_resource_careplan(connector, careplan):
             'CreateOrUpdateCarePlan', careplan, careplan.patient)
 
     assert info.value.outcome.issue[0].details == (
-        'Message Version mismatch: Please retrieve the latest version of '
-        'this Message and apply changes before resubmit.')
+        'The specified resource version is not correct')
 
     careplan.fhir_link = second_version
     response = connector.send(
@@ -258,8 +257,7 @@ def test_send_versioned_focal_resource_patient(connector, patient):
         response = connector.send('CreateOrUpdatePatient', patient)
 
     assert info.value.outcome.issue[0].details == (
-        'Message Version mismatch: Please retrieve the latest version of '
-        'this Message and apply changes before resubmit.')
+        'The specified resource version is not correct')
 
     patient.fhir_link = second_version
     response = connector.send('CreateOrUpdatePatient', patient)
