@@ -142,6 +142,20 @@ def test_unpack_name(packer):
     assert name.suffix == [u'van', u'den', u'Overkant']
     assert name.use == 'official'
 
+    name = packer.unpack(
+        {'given': [u'Thea'],
+         'family': [u'van', u'de', u'Bovenburen'],
+         'suffix': [u'van', u'den', u'Overkant'],
+         'text': u'Thea van de Bovenburen',
+         'use': u'official'},
+        koppeltaal.definitions.Name)
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Name, name)
+    assert name.given == [u'Thea']
+    assert name.family == [u'van', u'de', u'Bovenburen']
+    assert name.suffix == [u'van', u'den', u'Overkant']
+    assert name.text == 'Thea van de Bovenburen'
+    assert name.use == 'official'
 
 def test_pack_name(packer):
     name1 = packer.pack(
@@ -220,6 +234,21 @@ def test_pack_name(packer):
                 use='cool name'),
             koppeltaal.definitions.Name)
 
+    name5 = packer.pack(
+        koppeltaal.models.Name(
+            given=[u'Nathan'],
+            family=[u'der', u'Fantasten'],
+            suffix=[u'tot', u'Daarhelemaalië'],
+            text=u'Nathan de Fantasten tot Daarhelemaalië'),
+        koppeltaal.definitions.Name)
+
+    assert name5 == {
+        'given': [u'Nathan'],
+        'family': [u'der', u'Fantasten'],
+        'id': mock.ANY,
+        'suffix': [u'tot', u'Daarhelemaalië'],
+        'text': u'Nathan de Fantasten tot Daarhelemaalië',
+        'use': u'official'}
 
 def test_unpack_patient(packer, namespace):
     patient1 = packer.unpack(
@@ -234,6 +263,7 @@ def test_unpack_patient(packer, namespace):
          'name': [
              {'given': [u'Paul'],
               'family': [u'Roger'],
+              'text': u'Paul Roger',
               'use': u'official'}],
          'address': [{
             'city': u'Rotterdam',
@@ -255,6 +285,7 @@ def test_unpack_patient(packer, namespace):
         koppeltaal.definitions.Name, name)
     assert name.given == [u'Paul']
     assert name.family == [u'Roger']
+    assert name.text == u'Paul Roger'
     assert name.use == 'official'
     assert len(patient1.contacts) == 0
     assert len(patient1.identifiers) == 0
@@ -385,6 +416,7 @@ def test_unpack_practitioner(packer):
              'use': u'work'}],
          'name':  {'given': [u'Paul'],
                    'family': [u'Cézanne'],
+                   'text': u'Paul Cézanne',
                    'use': u'official'}},
         koppeltaal.definitions.Practitioner)
 
@@ -394,6 +426,7 @@ def test_unpack_practitioner(packer):
         koppeltaal.definitions.Name, practitioner1.name)
     assert practitioner1.name.given == [u'Paul']
     assert practitioner1.name.family == [u'Cézanne']
+    assert practitioner1.name.text == u'Paul Cézanne'
     assert practitioner1.name.use == 'official'
     assert len(practitioner1.contacts) == 1
     assert zope.interface.verify.verifyObject(
