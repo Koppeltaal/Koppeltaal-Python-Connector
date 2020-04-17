@@ -4,8 +4,7 @@ Changes
 1.3.5.5 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Repository cleanups, remove buildout in favor of virtual env, pip and tox.
 
 1.3.5.4 (2019-12-20)
 --------------------
