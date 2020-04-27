@@ -67,7 +67,8 @@ def patient(request, connector):
         name=[
             koppeltaal.models.Name(
                 family=[u"Doe"],
-                given=[u"John"])],
+                given=[u"John"],
+                text=u'John Doe')],
         age=42,
         gender="M",
         active=True)
@@ -79,7 +80,8 @@ def practitioner():
     return koppeltaal.models.Practitioner(
         name=koppeltaal.models.Name(
             given=[u'John'],
-            family=[u'Q.', u'Practitioner']))
+            family=[u'Q.', u'Practitioner'],
+            text=u'John Q Practitioner'))
 
 
 @pytest.fixture

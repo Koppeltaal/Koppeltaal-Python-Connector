@@ -266,3 +266,12 @@ def test_send_versioned_focal_resource_patient(connector, patient):
     assert koppeltaal.utils.strip_history_from_link(first_version) == \
         koppeltaal.utils.strip_history_from_link(second_version) == \
         koppeltaal.utils.strip_history_from_link(third_version)
+
+
+def test_send_patient_resource_message(connector, patient):
+    connector.send('CreateOrUpdatePatient', patient)
+
+
+def test_send_practitioner_resource_message(connector, practitioner):
+    connector.send('CreateOrUpdatePractitioner', practitioner)
+
