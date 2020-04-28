@@ -19,6 +19,6 @@ geckodriver.log
 htmlcov
 lib
 parts
-pyenv.cfg
 pytestdebug.log
+pyvenv.cfg
 tmp_*xml
