@@ -17,6 +17,8 @@ dist
 eggs
 geckodriver.log
 htmlcov
+lib
 parts
 pytestdebug.log
+pyvenv.cfg
 tmp_*xml

@@ -4,8 +4,9 @@ Changes
 1.3.5.5 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Repository cleanups, remove buildout in favor of virtual env, pip and tox.
 
+- Add `HumanName.text` field to the `Name` definition and model.
 
 1.3.5.4 (2019-12-20)
 --------------------

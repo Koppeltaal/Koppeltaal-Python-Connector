@@ -1,7 +1,7 @@
 {
   "issue": [
     {
-      "details": "The specified resource version is not correct.",
+      "details": "Message Version mismatch: Please retrieve the latest version of this Message and apply changes before resubmit.",
       "extension": [
         {
           "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OperationOutcome#IssueResource",
@@ -17,7 +17,7 @@
       }
     },
     {
-      "details": "The specified resource version is not correct.",
+      "details": "Message Version mismatch: Please retrieve the latest version of this Message and apply changes before resubmit.",
       "extension": [
         {
           "url": "http://ggz.koppeltaal.nl/fhir/Koppeltaal/OperationOutcome#IssueResource",
