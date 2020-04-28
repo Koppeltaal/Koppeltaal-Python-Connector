@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.5 (unreleased)
+1.3.5.5 (2020-04-28)
 --------------------
 
 - Repository cleanups, remove buildout in favor of virtual env, pip and tox.
