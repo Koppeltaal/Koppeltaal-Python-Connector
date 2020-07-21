@@ -275,3 +275,15 @@ def test_send_patient_resource_message(connector, patient):
 def test_send_practitioner_resource_message(connector, practitioner):
     connector.send('CreateOrUpdatePractitioner', practitioner)
 
+# TODO enable and enrich after test_send_related_person_resource_message is fixed
+# def test_send_versioned_focal_resource_patient(connector, patient):
+#     response = connector.send('CreateOrUpdateRelatedPerson', related_person, related_person.patient)
+#     first_version = response[0].fhir_link
+#     assert careplan.fhir_link != first_version
+#     assert careplan.fhir_link == \
+#         koppeltaal.utils.strip_history_from_link(first_version)
+
+
+def test_send_related_person_resource_message(connector, related_person):
+    connector.send('CreateOrUpdateRelatedPerson', related_person, related_person.patient)
+

@@ -48,7 +48,7 @@ class ResponseError(TransportError):
         self.response = response
 
     def __str__(self):
-        return "{}: {}.".format(self.__class__.__name__, str(self.response))
+        return "{}: {}.".format(self.__class__.__name__, self.response.__dict__)
 
 
 class OperationOutcomeError(KoppeltaalError):
@@ -62,8 +62,9 @@ class OperationOutcomeError(KoppeltaalError):
     def __str__(self):
         issues = []
         for issue in self.outcome.issue:
+            fhir_link = issue.resource.fhir_link if issue.resource is not None else None
             issues.append('type: {}, resource: {}, details: {}'.format(
-                issue.type, issue.resource.fhir_link, issue.details))
+                issue.type, fhir_link, issue.details))
         return "{}: outcome issue(s): {}.".format(
             self.__class__.__name__, issues)
 

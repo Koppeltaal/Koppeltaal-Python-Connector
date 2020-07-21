@@ -472,6 +472,120 @@ def test_pack_practitioner(packer):
              'value': 'paul@example.com',
              'use': 'work'}]}
 
+# TODO transform from patient to related_person
+# def test_unpack_related_person(packer, namespace):
+
+
+def test_pack_related_person(packer):
+    related_person1 = packer.pack(
+        koppeltaal.models.RelatedPerson(
+            identifiers=[
+                koppeltaal.models.Identifier(
+                    system=u'http://fhir.nl/fhir/NamingSystem/bsn',
+                    value=u'154694496',
+                    use='official')],
+            patient=koppeltaal.models.Patient(
+                birth_date=datetime.datetime(1976, 6, 1, 12, 34),
+                contacts=[
+                    koppeltaal.models.Contact(
+                        system='email',
+                        value=u'petra@example.com',
+                        use='home')],
+                identifiers=[
+                    koppeltaal.models.Identifier(
+                        system=u'http://fhir.nl/fhir/NamingSystem/bsn',
+                        value=u'640563569',
+                        use='official')],
+                name=[
+                    koppeltaal.models.Name(
+                        given=[u'Petra'],
+                        use='temp')],
+                gender='F'),
+            relationship='PRN',
+            name=[
+                koppeltaal.models.Name(
+                    given=[u'Paul'],
+                    family=[u'Roger'],
+                    use='official')],
+            contacts=[
+                koppeltaal.models.Contact(
+                    system='email',
+                    value=u'paul@example.com',
+                    use='work')],
+            gender='M',
+            address=[koppeltaal.models.Address(
+                city=u'Rotterdam',
+                country=u'The Netherlands',
+                line=[u'Coolsingel 1'],
+                period=koppeltaal.models.Period(
+                    start=datetime.datetime(2010, 6, 1, 12, 34),
+                    end=None),
+                state=u'Zuid-Holland',
+                text=u'Ken je dat nie horen dan?',
+                use=u'work',
+                zip=u'3030AB')],
+            photo=None),
+        koppeltaal.definitions.RelatedPerson)
+
+    assert related_person1 == {
+        'id': mock.ANY,
+        'identifier': [
+            {'id': mock.ANY,
+             'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+             'value': '154694496',
+             'use': 'official'}],
+        'patient': {
+            'birthDate': '1976-06-01T12:34:00',
+            'gender': {'coding': [
+                {'code': 'F',
+                'display': 'Female',
+                'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
+            'id': mock.ANY,
+            'identifier': [
+                {'id': mock.ANY,
+                'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+                'value': '640563569',
+                'use': 'official'}],
+            'name': [
+                {'id': mock.ANY,
+                'given': ['Petra'],
+                'use': 'temp'}],
+            'telecom': [
+                {'id': mock.ANY,
+                'system': 'email',
+                'value': 'petra@example.com',
+                'use': 'home'}]
+        },
+        'relationship': {'coding': [{
+            'code': 'PRN', 
+            'display': 'parent', 
+            'system': 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/https://www.hl7.org/fhir/valueset-relatedperson-relationshiptype.html'}]},
+        'name': [
+            {'id': mock.ANY,
+             'given': ['Paul'],
+             'family': ['Roger'],
+             'use': 'official'}],
+        'telecom': [
+            {'id': mock.ANY,
+            'system': 'email',
+            'value': 'paul@example.com',
+            'use': 'work'}],
+        'gender': {'coding': [
+            {'code': 'M',
+             'display': 'Male',
+             'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
+        'address': [{
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
+            'id': mock.ANY,
+            'line': ['Coolsingel 1'],
+            'period': {'id': mock.ANY, 'start': '2010-06-01T12:34:00'},
+            'state': 'Zuid-Holland',
+            'text': 'Ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3030AB'}]   
+    }
+
 
 def test_unpack_activity_definition(packer, namespace):
     definition1 = packer.unpack(

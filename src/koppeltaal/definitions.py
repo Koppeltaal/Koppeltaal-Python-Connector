@@ -225,6 +225,23 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
         optional=True)
 
 
+# TODO check how to implement Attachment
+@extension_data_type('Attachment')
+class Attachment(zope.interface.Interface):
+    # TODO: https://www.hl7.org/fhir/datatypes.html#attachment
+    # ... contentType	Σ	0..1	code	Mime type of the content, with charset etc.
+    # MimeType (Required)
+    # ... language	Σ	0..1	code	Human language of the content (BCP-47)
+    # Common Languages (Preferred but limited to AllLanguages)
+    # ... data		0..1	base64Binary	Data inline, base64ed
+    # ... url	Σ	0..1	url	Uri where the data can be found
+    # ... size	Σ	0..1	unsignedInt	Number of bytes of content (if url provided)
+    # ... hash	Σ	0..1	base64Binary	Hash of the data (sha-1, base64ed)
+    # ... title	Σ	0..1	string	Label to display in place of the data
+    # ... creation	Σ	0..1	dateTime	Date attachment was first created
+    data = Field('data', 'string')
+
+
 @extension_data_type('HumanName')
 class Name(zope.interface.Interface):
 
@@ -502,6 +519,57 @@ class Practitioner(interfaces.IIdentifiedFHIRResource):
 
     organization = Field(
         'organization', 'reference',
+        optional=True)
+
+
+@resource_type('RelatedPerson')
+class RelatedPerson(interfaces.IIdentifiedFHIRResource):
+
+    identifiers = Field(
+        'identifier', 'object',
+        binding=Identifier,
+        multiple=True,
+        optional=True)
+
+    # TODO check which one is needed (reference or object)
+    patient = Field(
+        'patient', 'reference')
+    # patient = Field(
+        # 'patient', 'object',
+        # binding=Patient)
+
+    relationship = Field(
+        'relationship', 'codeable',
+        binding=codes.RELATED_PERSON_RELATIONSHIP_TYPE,
+        optional=True)
+
+    name = Field(
+        'name', 'object',
+        binding=Name,
+        multiple=True)
+
+    contacts = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=True,
+        optional=True)
+
+    gender = Field(
+        'gender', 'codeable',
+        binding=codes.GENDER,
+        optional=True)
+
+    address = Field(
+        'address', 'object',
+        binding=Address,
+        multiple=True,
+        optional=True)
+
+    # TODO check how to implement Attachment
+    photo = Field(
+        'photo', 'object',
+        binding=Attachment,
+        multiple=True,
         optional=True)
 
 
