@@ -225,23 +225,6 @@ class CarePlanActivityStatus(interfaces.IIdentifiedFHIRResource):
         optional=True)
 
 
-# TODO check how to implement Attachment
-@extension_data_type('Attachment')
-class Attachment(zope.interface.Interface):
-    # TODO: https://www.hl7.org/fhir/datatypes.html#attachment
-    # ... contentType	Σ	0..1	code	Mime type of the content, with charset etc.
-    # MimeType (Required)
-    # ... language	Σ	0..1	code	Human language of the content (BCP-47)
-    # Common Languages (Preferred but limited to AllLanguages)
-    # ... data		0..1	base64Binary	Data inline, base64ed
-    # ... url	Σ	0..1	url	Uri where the data can be found
-    # ... size	Σ	0..1	unsignedInt	Number of bytes of content (if url provided)
-    # ... hash	Σ	0..1	base64Binary	Hash of the data (sha-1, base64ed)
-    # ... title	Σ	0..1	string	Label to display in place of the data
-    # ... creation	Σ	0..1	dateTime	Date attachment was first created
-    data = Field('data', 'string')
-
-
 @extension_data_type('HumanName')
 class Name(zope.interface.Interface):
 
@@ -531,12 +514,8 @@ class RelatedPerson(interfaces.IIdentifiedFHIRResource):
         multiple=True,
         optional=True)
 
-    # TODO check which one is needed (reference or object)
     patient = Field(
         'patient', 'reference')
-    # patient = Field(
-        # 'patient', 'object',
-        # binding=Patient)
 
     relationship = Field(
         'relationship', 'codeable',
@@ -546,7 +525,7 @@ class RelatedPerson(interfaces.IIdentifiedFHIRResource):
     name = Field(
         'name', 'object',
         binding=Name,
-        multiple=True)
+        optional=True)
 
     contacts = Field(
         'telecom', 'object',
@@ -565,12 +544,11 @@ class RelatedPerson(interfaces.IIdentifiedFHIRResource):
         multiple=True,
         optional=True)
 
-    # TODO check how to implement Attachment
-    photo = Field(
-        'photo', 'object',
-        binding=Attachment,
-        multiple=True,
-        optional=True)
+    # photo = Field(
+    #     'photo', 'object',
+    #     binding=Attachment,
+    #     multiple=True,
+    #     optional=True)
 
 
 class Participant(zope.interface.Interface):
