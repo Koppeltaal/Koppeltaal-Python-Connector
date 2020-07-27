@@ -314,9 +314,6 @@ class Connector(object):
         request_bundle.add_model(request_message)
         request_payload = request_bundle.get_payload()
 
-        # TODO remove after test
-        print('send request_payload:', request_payload)
-
         try:
             response = self.transport.create(
                 interfaces.MAILBOX_URL, request_payload)
