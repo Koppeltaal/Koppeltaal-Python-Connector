@@ -21,7 +21,7 @@ from koppeltaal.fhir import xml, bundle
 ACTIVITY_DEFINITION_OUTPUT = """Activity: {model.identifier}
 - fhir link: {model.fhir_link}
 - active: {model.is_active}
-- application: {model.fhir_link}
+- application: {model.application.fhir_link}
 - archived: {model.is_archived}
 - description: {model.description}
 - domain specific: {model.is_domain_specific}
