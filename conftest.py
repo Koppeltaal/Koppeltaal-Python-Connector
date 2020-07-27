@@ -89,11 +89,10 @@ def related_person(patient):
     related_person = koppeltaal.models.RelatedPerson(
         patient=patient,
         relationship='PRN',
-        name=[
-            koppeltaal.models.Name(
+        name=koppeltaal.models.Name(
                 family=[u"Doe"],
                 given=[u"John"],
-                text=u'John Doe')],
+                text=u'John Doe'),
         gender="M")
     return related_person
 
