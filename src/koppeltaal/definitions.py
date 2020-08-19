@@ -544,12 +544,6 @@ class RelatedPerson(interfaces.IIdentifiedFHIRResource):
         multiple=True,
         optional=True)
 
-    # photo = Field(
-    #     'photo', 'object',
-    #     binding=Attachment,
-    #     multiple=True,
-    #     optional=True)
-
 
 class Participant(zope.interface.Interface):
 

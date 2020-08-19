@@ -29,7 +29,7 @@ virtualenv = "==20.0.17"
 wcwidth = "==0.1.9"
 PyHamcrest = "==2.0.2"
 "zope.interface" = "==5.1.0"
-koppeltaal = {editable = true,path = "."}
+koppeltaal = {editable = true, path = "."}
 
 [requires]
 python_version = "3.8"

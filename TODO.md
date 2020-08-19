@@ -13,7 +13,7 @@
 * `Observation.*`
 * `Practitioner.address`
 * `Questionnaire.*`
-* `RelatedPerson.*`
+* `RelatedPerson.photo`
 * `StorageItem.*`
 * `UserMessage.*`
 

@@ -484,7 +484,8 @@ def test_unpack_related_person(packer, namespace):
         'relationship': {'coding': [{
             'code': 'PRN', 
             'display': 'parent', 
-            'system': 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/https://www.hl7.org/fhir/valueset-relatedperson-relationshiptype.html'}]},
+            'system': 'https://www.hl7.org/fhir/\
+                valueset-relatedperson-relationshiptype.html'}]},
         'name': {'given': ['Paul'],
              'family': ['Roger'],
              'use': 'official'},
@@ -609,7 +610,8 @@ def test_pack_related_person(packer):
         'relationship': {'coding': [{
             'code': 'PRN', 
             'display': 'parent', 
-            'system': 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/https://www.hl7.org/fhir/valueset-relatedperson-relationshiptype.html'}]},
+            'system': 'https://www.hl7.org/fhir/\
+                valueset-relatedperson-relationshiptype.html'}]},
         'name': {'id': 'ref002',
             'given': ['Paul'],
             'family': ['Roger'],
