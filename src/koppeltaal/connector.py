@@ -225,9 +225,9 @@ class Connector(object):
 
     def updates(
         self,
+        expected_events=None,
         patient=None,
-        event=None,
-        expected_events=None):
+        event=None):
 
         def send_back(message):
             packaging = resource.Resource(self.domain, self.integration)
