@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.6 (unreleased)
+1.3.5.6 (2020-09-15)
 --------------------
 
 - Allows the fetch updates call to optionally add query parametes for Patient
