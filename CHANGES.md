@@ -1,11 +1,18 @@
 Changes
 =======
 
-1.3.5.6 (unreleased)
+1.3.5.7 (unreleased)
 --------------------
 
 - Nothing changed yet.
 
+
+1.3.5.6 (2020-09-15)
+--------------------
+
+- Allows the fetch updates call to optionally add query parametes for Patient
+  and event type. See also https://vzvz.gitbook.io/koppeltaal-1-3-architectuur/technologie-architectuur#bericht-ophalen
+  for the possible query parameters.
 
 1.3.5.5 (2020-04-28)
 --------------------
@@ -52,7 +59,8 @@ Changes
   - Added support for the Care Team extension.
 
   - Verified the requirement on adding versioned resources to message bundle
-    works. This requires application integration code to keep track of the version of the referenced resources.
+    works. This requires application integration code to keep track of the
+    version of the referenced resources.
 
   - There's not "first item only" option anymore for fields that are a
     sequence of items. The application integration code needs the handle the

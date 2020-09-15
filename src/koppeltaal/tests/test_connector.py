@@ -516,6 +516,83 @@ def test_updates_unexpected_event(connector, transport):
             )))
 
 
+def test_updates_for_patient(connector, transport):
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim&'
+        'Patient=https%3A%2F%2Fapp.minddistrict.com%2Ffhir%2FKoppeltaal'
+        '%2FPatient%2F1394433515',
+        respond_with='fixtures/bundle_one_message.json')
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim&'
+        'Patient=https%3A%2F%2Fapp.minddistrict.com%2Ffhir%2FKoppeltaal'
+        '%2FPatient%2F1394433515',
+        respond_with='fixtures/bundle_zero_messages.json')
+    transport.expect(
+        'PUT',
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        respond_with='fixtures/resource_put_message.json')
+
+    updates = list(connector.updates(patient=(
+        'https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515')))
+    assert len(updates) == 1
+    for update in updates:
+        with update:
+            assert update.message.event == 'CreateOrUpdateCarePlan'
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'Success'))))
+
+
+def test_updates_for_event(connector, transport):
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim&event=CarePlan',
+        respond_with='fixtures/bundle_one_message.json')
+    transport.expect(
+        'GET',
+        '/FHIR/Koppeltaal/MessageHeader/_search?'
+        '_query=MessageHeader.GetNextNewAndClaim&event=CarePlan',
+        respond_with='fixtures/bundle_zero_messages.json')
+    transport.expect(
+        'PUT',
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839',
+        respond_with='fixtures/resource_put_message.json')
+
+    updates = list(connector.updates(event='CarePlan'))
+    assert len(updates) == 1
+    for update in updates:
+        with update:
+            assert update.message.event == 'CreateOrUpdateCarePlan'
+
+    response = transport.called.get(
+        '/FHIR/Koppeltaal/MessageHeader/45909'
+        '/_history/2016-07-15T11:50:24:494.7839')
+    assert response is not None
+    hamcrest.assert_that(
+        response,
+        koppeltaal.testing.has_extension(
+            '#ProcessingStatus',
+            koppeltaal.testing.has_extension(
+                '#ProcessingStatusStatus',
+                hamcrest.has_entry('valueCode', 'Success'))))
+
+
 def test_updates_unexpected_event_no_events_at_all(connector, transport):
     transport.expect(
         'GET',
