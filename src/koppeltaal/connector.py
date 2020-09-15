@@ -223,7 +223,11 @@ class Connector(object):
             username=username,
             password=password).json
 
-    def updates(self, expected_events=None):
+    def updates(
+        self,
+        expected_events=None,
+        patient=None,
+        event=None):
 
         def send_back(message):
             packaging = resource.Resource(self.domain, self.integration)
@@ -233,10 +237,16 @@ class Connector(object):
         def send_back_on_transaction(message):
             return self.integration.transaction_hook(send_back, message)
 
-        p = {'_query': 'MessageHeader.GetNextNewAndClaim'}
+        parameters = {'_query': 'MessageHeader.GetNextNewAndClaim'}
+        if patient is not None:
+            parameters['Patient'] = patient
+        if event is not None:
+            parameters['event'] = event
+
         while True:
             try:
-                bundle = self._fetch_bundle(interfaces.MESSAGE_HEADER_URL, p)
+                bundle = self._fetch_bundle(
+                    interfaces.MESSAGE_HEADER_URL, parameters)
                 message = bundle.unpack_model(definitions.MessageHeader)
             except interfaces.InvalidBundle as error:
                 logger.error(
