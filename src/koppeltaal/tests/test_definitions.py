@@ -482,10 +482,9 @@ def test_unpack_related_person(packer, namespace):
              'use': 'official'}],
         'patient': {'reference': 'https://example.com/refmypatient'},
         'relationship': {'coding': [{
-            'code': 'PRN', 
-            'display': 'parent', 
-            'system': 'https://www.hl7.org/fhir/\
-                valueset-relatedperson-relationshiptype.html'}]},
+            'code': 'PRN',
+            'display': 'parent',
+            'system': 'http://hl7.org/fhir/vs/relatedperson-relationshiptype'}]},
         'name': {'given': ['Paul'],
              'family': ['Roger'],
              'use': 'official'},
@@ -505,7 +504,7 @@ def test_unpack_related_person(packer, namespace):
             'state': 'Zuid-Holland',
             'text': 'Ken je dat nie horen dan?',
             'use': 'work',
-            'zip': '3030AB'}]   
+            'zip': '3030AB'}]
         },
         koppeltaal.definitions.RelatedPerson)
 
@@ -608,10 +607,9 @@ def test_pack_related_person(packer):
              'use': 'official'}],
         'patient': {'reference': mock.ANY},
         'relationship': {'coding': [{
-            'code': 'PRN', 
-            'display': 'parent', 
-            'system': 'https://www.hl7.org/fhir/\
-                valueset-relatedperson-relationshiptype.html'}]},
+            'code': 'PRN',
+            'display': 'parent',
+            'system': 'http://hl7.org/fhir/vs/relatedperson-relationshiptype'}]},
         'name': {'id': 'ref002',
             'given': ['Paul'],
             'family': ['Roger'],
@@ -634,7 +632,7 @@ def test_pack_related_person(packer):
              'state': 'Zuid-Holland',
              'text': 'Ken je dat nie horen dan?',
              'use': 'work',
-             'zip': '3030AB'}]   
+             'zip': '3030AB'}]
     }
 
 

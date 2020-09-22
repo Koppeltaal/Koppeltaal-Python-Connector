@@ -236,7 +236,7 @@ ORGANIZATION_TYPE = Code(
      })
 
 RELATED_PERSON_RELATIONSHIP_TYPE = Code(
-    'https://hl7.org/fhir/DSTU1/valueset-relatedperson-relationshiptype.html',
+    'http://hl7.org/fhir/vs/relatedperson-relationshiptype',
     {'emergency': 'Emergency',
      'family': 'Family',
      'guardian': 'Guardian',
