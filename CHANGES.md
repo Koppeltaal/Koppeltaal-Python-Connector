@@ -4,8 +4,8 @@ Changes
 1.3.5.7 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- INT-182 Do not fail reporting an OperationOutcomeError for None resources
+  (e.g. when sending CarePlanActivityStatus messages).
 
 1.3.5.6 (2020-09-15)
 --------------------
