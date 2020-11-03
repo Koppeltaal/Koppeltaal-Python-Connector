@@ -63,7 +63,9 @@ class OperationOutcomeError(KoppeltaalError):
         issues = []
         for issue in self.outcome.issue:
             issues.append('type: {}, resource: {}, details: {}'.format(
-                issue.type, issue.resource.fhir_link, issue.details))
+                issue.type,
+                issue.resource and issue.resource.fhir_link,
+                issue.details))
         return "{}: outcome issue(s): {}.".format(
             self.__class__.__name__, issues)
 
