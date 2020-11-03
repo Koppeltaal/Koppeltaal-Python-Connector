@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.7 (unreleased)
+1.3.5.7 (2020-11-03)
 --------------------
 
 - Do not fail reporting an OperationOutcomeError for None resources
