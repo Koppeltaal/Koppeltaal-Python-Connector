@@ -1,9 +1,11 @@
-include *.cfg
+exclude .github
+exclude .installed.cfg
+exclude .mr.developer.cfg
+exclude pyvenv.cfg
 include *.ini
-include *.lock
 include *.md
 include *.py
 include Pipfile
+include Pipfile.lock
 include requirements
-include VERSION
 recursive-include src/koppeltaal *.py *.json
