@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.8 (unreleased)
+1.3.5.8 (2020-11-09)
 --------------------
 
 - Add RelatedPerson resource definition and support.
