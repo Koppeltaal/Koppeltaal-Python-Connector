@@ -1,3 +1,4 @@
+exclude .github
 exclude .installed.cfg
 exclude .mr.developer.cfg
 exclude pyvenv.cfg
