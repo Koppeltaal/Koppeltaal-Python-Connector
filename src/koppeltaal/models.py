@@ -209,9 +209,10 @@ class Practitioner(FHIRResource):
         self.gender = gender
         self.organization = organization
 
+
 @zope.interface.implementer(definitions.RelatedPerson)
 class RelatedPerson(FHIRResource):
-    
+
     def __init__(
             self,
             identifiers=None,
