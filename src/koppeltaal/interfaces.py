@@ -62,10 +62,10 @@ class OperationOutcomeError(KoppeltaalError):
     def __str__(self):
         issues = []
         for issue in self.outcome.issue:
-            issue_resource_fhir_link = issue.resource.fhir_link if \
-                                       issue.resource is not None else None
             issues.append('type: {}, resource: {}, details: {}'.format(
-                issue.type, issue_resource_fhir_link, issue.details))
+                issue.type,
+                issue.resource and issue.resource.fhir_link,
+                issue.details))
         return "{}: outcome issue(s): {}.".format(
             self.__class__.__name__, issues)
 

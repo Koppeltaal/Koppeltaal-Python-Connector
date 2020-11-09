@@ -1,10 +1,16 @@
 Changes
 =======
 
-1.3.5.7 (unreleased)
+1.3.5.8 (unreleased)
 --------------------
 
 - Add RelatedPerson resource definition and support.
+
+1.3.5.7 (2020-11-03)
+--------------------
+
+- Do not fail reporting an OperationOutcomeError for None resources
+  (e.g. when sending CarePlanActivityStatus messages).
 
 1.3.5.6 (2020-09-15)
 --------------------
