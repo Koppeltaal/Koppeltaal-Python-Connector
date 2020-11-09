@@ -1,4 +1,3 @@
-exclude .github
 exclude .installed.cfg
 exclude .mr.developer.cfg
 exclude pyvenv.cfg
@@ -8,4 +7,5 @@ include *.py
 include Pipfile
 include Pipfile.lock
 include requirements
+recursive-exclude .github
 recursive-include src/koppeltaal *.py *.json
