@@ -505,6 +505,46 @@ class Practitioner(interfaces.IIdentifiedFHIRResource):
         optional=True)
 
 
+@resource_type('RelatedPerson')
+class RelatedPerson(interfaces.IIdentifiedFHIRResource):
+
+    identifiers = Field(
+        'identifier', 'object',
+        binding=Identifier,
+        multiple=True,
+        optional=True)
+
+    patient = Field(
+        'patient', 'reference')
+
+    relationship = Field(
+        'relationship', 'codeable',
+        binding=codes.RELATED_PERSON_RELATIONSHIP_TYPE,
+        optional=True)
+
+    name = Field(
+        'name', 'object',
+        binding=Name,
+        optional=True)
+
+    contacts = Field(
+        'telecom', 'object',
+        binding=Contact,
+        multiple=True,
+        optional=True)
+
+    gender = Field(
+        'gender', 'codeable',
+        binding=codes.GENDER,
+        optional=True)
+
+    address = Field(
+        'address', 'object',
+        binding=Address,
+        multiple=True,
+        optional=True)
+
+
 class Participant(zope.interface.Interface):
 
     member = Field(

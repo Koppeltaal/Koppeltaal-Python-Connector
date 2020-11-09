@@ -29,6 +29,12 @@ $ python3.8 -m venv .
 $ ./bin/pip install -r requirements -e .
 ```
 
+Or if you use [pipenv](https://github.com/pypa/pipenv):
+```sh
+# inside the Koppeltaal-Python-Connector checkout
+$ pipenv install -r requirements -e .
+```
+
 Tests
 -----
 

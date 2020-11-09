@@ -48,7 +48,7 @@ class ResponseError(TransportError):
         self.response = response
 
     def __str__(self):
-        return "{}: {}.".format(self.__class__.__name__, str(self.response))
+        return "{}: {}.".format(self.__class__.__name__, self.response.__dict__)
 
 
 class OperationOutcomeError(KoppeltaalError):

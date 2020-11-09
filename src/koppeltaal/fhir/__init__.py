@@ -34,6 +34,7 @@ REGISTRY = Registry({
     definitions.Period: models.Period,
     definitions.Practitioner: models.Practitioner,
     definitions.ProcessingStatus: models.ProcessingStatus,
+    definitions.RelatedPerson: models.RelatedPerson,
     definitions.SubActivity: models.SubActivity,
     definitions.SubActivityDefinition: models.SubActivityDefinition,
 })

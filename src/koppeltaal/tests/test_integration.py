@@ -3,8 +3,10 @@
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
 """
+import pdb
 import koppeltaal.interfaces
 import koppeltaal.utils
+import koppeltaal.models
 import pytest
 import requests
 import selenium.webdriver.support.expected_conditions as EC
@@ -275,3 +277,72 @@ def test_send_patient_resource_message(connector, patient):
 def test_send_practitioner_resource_message(connector, practitioner):
     connector.send('CreateOrUpdatePractitioner', practitioner)
 
+
+def test_send_versioned_focal_resource_related_person(connector,
+                                                      related_person):
+    response = connector.send('CreateOrUpdateRelatedPerson',
+        related_person, related_person.patient)
+    first_version = response[0].fhir_link
+    assert related_person.fhir_link != first_version
+    assert related_person.fhir_link == \
+        koppeltaal.utils.strip_history_from_link(first_version)
+
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as info:
+        # Sending an update to the RelatedPerson without a version, now that
+        # the server gave it a version, fails.
+        connector.send('CreateOrUpdateRelatedPerson',
+            related_person, related_person.patient)
+
+    assert info.value.outcome.issue[0].details == (
+        'No version specified for the focal resource, message is rejected.')
+
+    # When we properly update the RelatedPerson's version (FHIR link), we
+    # can send an update again. And we get the subsequent version for it.
+    related_person.fhir_link = first_version
+    response = connector.send('CreateOrUpdateRelatedPerson',
+        related_person, related_person.patient)
+    second_version = response[0].fhir_link
+    assert first_version != second_version
+    assert koppeltaal.utils.strip_history_from_link(first_version) == \
+        koppeltaal.utils.strip_history_from_link(second_version)
+
+    # Reusing the earlier version results in an error.
+    related_person.fhir_link = first_version
+    with pytest.raises(koppeltaal.interfaces.OperationOutcomeError) as info:
+        response = connector.send('CreateOrUpdateRelatedPerson',
+            related_person, related_person.patient)
+
+    assert info.value.outcome.issue[0].details == (
+        'The specified resource version is not correct')
+
+    related_person.fhir_link = second_version
+    response = connector.send('CreateOrUpdateRelatedPerson',
+        related_person, related_person.patient)
+    third_version = response[0].fhir_link
+    assert first_version != second_version != third_version
+    assert koppeltaal.utils.strip_history_from_link(first_version) == \
+        koppeltaal.utils.strip_history_from_link(second_version) == \
+        koppeltaal.utils.strip_history_from_link(third_version)
+
+
+def test_send_related_person_resource_message(connector, related_person):
+    connector.send('CreateOrUpdateRelatedPerson',
+        related_person, related_person.patient)
+
+
+def test_send_related_person_resource_in_careplan(
+        connector, careplan, related_person):
+    careplan.participants.append(
+        koppeltaal.models.Participant(
+            member=related_person,
+            role='Thirdparty'))
+    response = connector.send(
+        'CreateOrUpdateCarePlan', careplan, careplan.patient)
+
+    msghdr = [model for model in connector.search(patient=careplan.patient)][0]
+    bundle = connector.search(message_id=msghdr.fhir_link)
+    for m in bundle:
+        if koppeltaal.definitions.RelatedPerson.providedBy(m):
+            assert koppeltaal.utils.strip_history_from_link(m.fhir_link) == \
+                koppeltaal.utils.strip_history_from_link(
+                    related_person.fhir_link)

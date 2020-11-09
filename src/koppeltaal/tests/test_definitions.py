@@ -473,6 +473,169 @@ def test_pack_practitioner(packer):
              'use': 'work'}]}
 
 
+def test_unpack_related_person(packer, namespace):
+    related_person1 = packer.unpack(
+        {
+        'identifier': [
+            {'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+             'value': '154694496',
+             'use': 'official'}],
+        'patient': {'reference': 'https://example.com/refmypatient'},
+        'relationship': {'coding': [{
+            'code': 'PRN',
+            'display': 'parent',
+            'system': 'http://hl7.org/fhir/vs/relatedperson-relationshiptype'}]},
+        'name': {'given': ['Paul'],
+             'family': ['Roger'],
+             'use': 'official'},
+        'telecom': [
+            {'system': 'email',
+             'value': 'paul@example.com',
+             'use': 'work'}],
+        'gender': {'coding': [
+            {'code': 'M',
+             'display': 'Male',
+             'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
+        'address': [{
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
+            'line': ['Coolsingel 1'],
+            'period': {'id': 'ref004', 'start': '2010-06-01T12:34:00'},
+            'state': 'Zuid-Holland',
+            'text': 'Ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3030AB'}]
+        },
+        koppeltaal.definitions.RelatedPerson)
+
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.RelatedPerson, related_person1)
+    # Identifier
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Identifier, related_person1.identifiers[0])
+    assert related_person1.identifiers[0].system == 'http://fhir.nl/fhir/NamingSystem/bsn'
+    assert related_person1.identifiers[0].value == '154694496'
+    assert related_person1.identifiers[0].use == 'official'
+    assert len(related_person1.identifiers) == 1
+    # Patient
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.interfaces.IReferredFHIRResource, related_person1.patient)
+    assert related_person1.patient.fhir_link == 'https://example.com/refmypatient'
+    # Relationship
+    assert related_person1.relationship == 'PRN'
+    # Name
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Name, related_person1.name)
+    assert related_person1.name.given == ['Paul']
+    assert related_person1.name.family == ['Roger']
+    assert related_person1.name.use == 'official'
+    assert len(related_person1.contacts) == 1
+    # Telecom
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Contact, related_person1.contacts[0])
+    assert related_person1.contacts[0].system == 'email'
+    assert related_person1.contacts[0].value == 'paul@example.com'
+    assert related_person1.contacts[0].use == 'work'
+    # Gender
+    assert related_person1.gender == 'M'
+    # Contact
+    assert zope.interface.verify.verifyObject(
+        koppeltaal.definitions.Address, related_person1.address[0])
+    assert related_person1.address[0].city == 'Rotterdam'
+    assert related_person1.address[0].country == 'The Netherlands'
+    assert related_person1.address[0].state == 'Zuid-Holland'
+    assert related_person1.address[0].text == 'Ken je dat nie horen dan?'
+    assert related_person1.address[0].use == 'work'
+    assert related_person1.address[0].zip == '3030AB'
+
+
+def test_pack_related_person(packer):
+    related_person1 = packer.pack(
+        koppeltaal.models.RelatedPerson(
+            identifiers=[
+                koppeltaal.models.Identifier(
+                    system=u'http://fhir.nl/fhir/NamingSystem/bsn',
+                    value=u'154694496',
+                    use='official')],
+            patient=koppeltaal.models.Patient(
+                birth_date=datetime.datetime(1976, 6, 1, 12, 34),
+                contacts=[
+                    koppeltaal.models.Contact(
+                        system='email',
+                        value=u'petra@example.com',
+                        use='home')],
+                identifiers=[
+                    koppeltaal.models.Identifier(
+                        system=u'http://fhir.nl/fhir/NamingSystem/bsn',
+                        value=u'640563569',
+                        use='official')],
+                name=[koppeltaal.models.Name(
+                        given=[u'Petra'],
+                        use='temp')],
+                gender='F'),
+            relationship='PRN',
+            name=koppeltaal.models.Name(
+                    given=[u'Paul'],
+                    family=[u'Roger'],
+                    use='official'),
+            contacts=[
+                koppeltaal.models.Contact(
+                    system='email',
+                    value=u'paul@example.com',
+                    use='work')],
+            gender='M',
+            address=[koppeltaal.models.Address(
+                city=u'Rotterdam',
+                country=u'The Netherlands',
+                line=[u'Coolsingel 1'],
+                period=koppeltaal.models.Period(
+                    start=datetime.datetime(2010, 6, 1, 12, 34),
+                    end=None),
+                state=u'Zuid-Holland',
+                text=u'Ken je dat nie horen dan?',
+                use=u'work',
+                zip=u'3030AB')],
+            photo=None),
+        koppeltaal.definitions.RelatedPerson)
+
+    assert related_person1 == {
+        'id': 'ref006',
+        'identifier': [
+            {'id': 'ref001',
+             'system': 'http://fhir.nl/fhir/NamingSystem/bsn',
+             'value': '154694496',
+             'use': 'official'}],
+        'patient': {'reference': mock.ANY},
+        'relationship': {'coding': [{
+            'code': 'PRN',
+            'display': 'parent',
+            'system': 'http://hl7.org/fhir/vs/relatedperson-relationshiptype'}]},
+        'name': {'id': 'ref002',
+            'given': ['Paul'],
+            'family': ['Roger'],
+            'use': 'official'},
+        'telecom': [
+            {'id': 'ref003',
+             'system': 'email',
+             'value': 'paul@example.com',
+             'use': 'work'}],
+        'gender': {'coding': [
+            {'code': 'M',
+             'display': 'Male',
+             'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
+        'address': [
+            {'city': 'Rotterdam',
+             'country': 'The Netherlands',
+             'id': 'ref005',
+             'line': ['Coolsingel 1'],
+             'period': {'id': 'ref004', 'start': '2010-06-01T12:34:00'},
+             'state': 'Zuid-Holland',
+             'text': 'Ken je dat nie horen dan?',
+             'use': 'work',
+             'zip': '3030AB'}]
+    }
+
+
 def test_unpack_activity_definition(packer, namespace):
     definition1 = packer.unpack(
         {'extension': [
