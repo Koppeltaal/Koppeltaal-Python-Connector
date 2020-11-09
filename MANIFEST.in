@@ -7,5 +7,5 @@ include *.py
 include Pipfile
 include Pipfile.lock
 include requirements
-recursive-exclude .github
+recursive-exclude .github *
 recursive-include src/koppeltaal *.py *.json
