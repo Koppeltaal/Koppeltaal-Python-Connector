@@ -30,9 +30,13 @@ class Integration(object):
     def __init__(
             self,
             name='Generic python application',
-            url='https://example.com/fhir/Koppeltaal'):
+            url='https://example.com/fhir/Koppeltaal',
+            software=interfaces.SOFTWARE,
+            version=interfaces.VERSION):
         self.name = name
         self.url = url
+        self.software = software
+        self.version = version
 
     def transaction_hook(self, commit_function, message):
         return commit_function(message)
@@ -311,8 +315,8 @@ class Connector(object):
         source = models.MessageHeaderSource(
             name=unicode(self.integration.name),
             endpoint=unicode(self.integration.url),
-            software=unicode(interfaces.SOFTWARE),
-            version=unicode(interfaces.VERSION))
+            software=unicode(self.integration.software),
+            version=unicode(self.integration.version))
         request_message = models.MessageHeader(
             timestamp=utils.now(),
             event=event,
