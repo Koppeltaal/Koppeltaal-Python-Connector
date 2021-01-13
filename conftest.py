@@ -93,7 +93,8 @@ def related_person(patient):
                 family=[u"Doe"],
                 given=[u"John"],
                 text=u'John Doe'),
-        gender="M")
+        gender="M",
+        address=koppeltaal.models.Address(city='Rotterdam'))
     return related_person
 
 
