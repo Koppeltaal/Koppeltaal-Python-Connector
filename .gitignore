@@ -5,6 +5,7 @@
 .mr.developer.cfg
 .pytest_cache/*
 .tox
+.vscode
 *.egg-info
 *.pyc
 *.swo
