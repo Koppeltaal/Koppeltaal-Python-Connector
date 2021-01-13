@@ -1,6 +1,11 @@
 Changes
 =======
 
+1.3.5.9 (unreleased)
+--------------------
+
+- Fix #61 for `RelatedPerson.Address` cardinality.
+
 1.3.5.8 (2020-11-09)
 --------------------
 
