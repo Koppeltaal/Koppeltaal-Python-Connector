@@ -496,7 +496,7 @@ def test_unpack_related_person(packer, namespace):
             {'code': 'M',
              'display': 'Male',
              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
-        'address': [{
+        'address': {
             'city': 'Rotterdam',
             'country': 'The Netherlands',
             'line': ['Coolsingel 1'],
@@ -504,7 +504,7 @@ def test_unpack_related_person(packer, namespace):
             'state': 'Zuid-Holland',
             'text': 'Ken je dat nie horen dan?',
             'use': 'work',
-            'zip': '3030AB'}]
+            'zip': '3030AB'}
         },
         koppeltaal.definitions.RelatedPerson)
 
@@ -540,13 +540,13 @@ def test_unpack_related_person(packer, namespace):
     assert related_person1.gender == 'M'
     # Contact
     assert zope.interface.verify.verifyObject(
-        koppeltaal.definitions.Address, related_person1.address[0])
-    assert related_person1.address[0].city == 'Rotterdam'
-    assert related_person1.address[0].country == 'The Netherlands'
-    assert related_person1.address[0].state == 'Zuid-Holland'
-    assert related_person1.address[0].text == 'Ken je dat nie horen dan?'
-    assert related_person1.address[0].use == 'work'
-    assert related_person1.address[0].zip == '3030AB'
+        koppeltaal.definitions.Address, related_person1.address)
+    assert related_person1.address.city == 'Rotterdam'
+    assert related_person1.address.country == 'The Netherlands'
+    assert related_person1.address.state == 'Zuid-Holland'
+    assert related_person1.address.text == 'Ken je dat nie horen dan?'
+    assert related_person1.address.use == 'work'
+    assert related_person1.address.zip == '3030AB'
 
 
 def test_pack_related_person(packer):
@@ -584,7 +584,7 @@ def test_pack_related_person(packer):
                     value=u'paul@example.com',
                     use='work')],
             gender='M',
-            address=[koppeltaal.models.Address(
+            address=koppeltaal.models.Address(
                 city=u'Rotterdam',
                 country=u'The Netherlands',
                 line=[u'Coolsingel 1'],
@@ -594,7 +594,7 @@ def test_pack_related_person(packer):
                 state=u'Zuid-Holland',
                 text=u'Ken je dat nie horen dan?',
                 use=u'work',
-                zip=u'3030AB')],
+                zip=u'3030AB'),
             photo=None),
         koppeltaal.definitions.RelatedPerson)
 
@@ -623,16 +623,16 @@ def test_pack_related_person(packer):
             {'code': 'M',
              'display': 'Male',
              'system': 'http://hl7.org/fhir/v3/AdministrativeGender'}]},
-        'address': [
-            {'city': 'Rotterdam',
-             'country': 'The Netherlands',
-             'id': 'ref005',
-             'line': ['Coolsingel 1'],
-             'period': {'id': 'ref004', 'start': '2010-06-01T12:34:00'},
-             'state': 'Zuid-Holland',
-             'text': 'Ken je dat nie horen dan?',
-             'use': 'work',
-             'zip': '3030AB'}]
+        'address':{
+            'city': 'Rotterdam',
+            'country': 'The Netherlands',
+            'id': 'ref005',
+            'line': ['Coolsingel 1'],
+            'period': {'id': 'ref004', 'start': '2010-06-01T12:34:00'},
+            'state': 'Zuid-Holland',
+            'text': 'Ken je dat nie horen dan?',
+            'use': 'work',
+            'zip': '3030AB'}
     }
 
 

@@ -541,7 +541,6 @@ class RelatedPerson(interfaces.IIdentifiedFHIRResource):
     address = Field(
         'address', 'object',
         binding=Address,
-        multiple=True,
         optional=True)
 
 
