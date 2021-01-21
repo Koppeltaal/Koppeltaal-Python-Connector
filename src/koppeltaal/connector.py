@@ -177,7 +177,8 @@ class Connector(object):
             application_id,
             patient_link,
             user_link,
-            activity_identifier):
+            activity_identifier,
+            intent=None):
         assert application_id is not None, 'Invalid activity'
         assert patient_link is not None, 'Invalid patient'
         assert user_link is not None, 'Invalid user'
@@ -186,6 +187,8 @@ class Connector(object):
             'patient': patient_link,
             'user': user_link,
             'resource': activity_identifier}
+        if intent is not None:
+            params['intent'] = intent
         return self.transport.query_redirect(
             interfaces.OAUTH_LAUNCH_URL, params).location
 

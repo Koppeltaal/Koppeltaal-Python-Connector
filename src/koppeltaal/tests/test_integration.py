@@ -141,6 +141,51 @@ def test_sso(connector):
     assert 'user' in token and token['user'] == patient_link
 
 
+def test_sso_intent(connector):
+    connector.integration.client_id = 'MindDistrict'
+    connector.integration.client_secret = \
+        connector._credentials.options.get('oauth_secret')
+
+    patient_link = (
+        'https://app.minddistrict.com/fhir/Koppeltaal/Patient/1394433515')
+    step_1 = connector.launch_from_parameters(
+        'MindDistrict', patient_link, patient_link, 'KTSTESTGAME',
+        intent='Do Something Nice For Me')
+
+    parts = urlparse(step_1)
+    query = parse_qs(parts.query)
+
+    assert query['application_id'][0] == 'MindDistrict'
+    assert query['launch_id'][0] != ''
+
+    step_2 = connector.authorize_from_parameters(
+        query['application_id'][0],
+        query['launch_id'][0],
+        'https://example.com/koppeltaalauth')
+
+    step_6 = requests.get(
+        step_2, allow_redirects=False).headers.get('Location')
+
+    parts = urlparse(step_6)
+    query = parse_qs(parts.query)
+
+    token = connector.token_from_parameters(
+        query['code'][0],
+        'https://example.com/koppeltaalauth')
+
+    assert 'access_token' in token
+    assert 'refresh_token' in token
+
+    assert 'domain' in token and token['domain'] == connector.domain
+    assert 'expires_in' in token and token['expires_in'] == 3600
+    assert 'patient' in token and token['patient'] == patient_link
+    assert 'resource' in token and token['resource'] == 'KTSTESTGAME'
+    assert 'scope' in token and token['scope'] == 'patient/*.read'
+    assert 'token_type' in token and token['token_type'] == 'Bearer'
+    assert 'user' in token and token['user'] == patient_link
+    assert 'intent' in token and token['intent'] == 'Do Something Nice For Me'
+
+
 def test_send_activity(connector):
     uuid = koppeltaal.utils.uniqueid()
 
