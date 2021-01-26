@@ -1,8 +1,8 @@
 Changes
 =======
 
-1.3.5.10 (unreleased)
----------------------
+1.3.5.10+md.1 (2021-01-26)
+--------------------------
 
 - Allow for intent parameter to be passed to launch URL request.
 
