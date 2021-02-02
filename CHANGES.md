@@ -4,8 +4,8 @@ Changes
 1.3.5.10 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- Additional logging when unpacking the message header and it turns out to
+  be broken.
 
 1.3.5.9 (2021-01-21)
 --------------------

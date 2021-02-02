@@ -5,12 +5,14 @@
 """
 
 import json
+import koppeltaal
 
 from koppeltaal.fhir import packer
 from koppeltaal import (
     codes,
     fhir,
     interfaces,
+    logger,
     utils)
 
 
@@ -192,6 +194,10 @@ class Resource(object):
     def unpack_model(self, definition):
         expected_model = None
         for model in self.unpack():
+            if interfaces.IBrokenFHIRResource.providedBy(model):
+                logger.warning(
+                    f'Trying to unpack an expected resource, '
+                    f'but it is broken {model}')
             if definition.providedBy(model):
                 if expected_model is not None:
                     # We allow only one expected_model header in the bundle.
