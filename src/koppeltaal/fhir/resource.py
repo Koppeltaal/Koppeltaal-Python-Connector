@@ -195,9 +195,9 @@ class Resource(object):
         expected_model = None
         for model in self.unpack():
             if interfaces.IBrokenFHIRResource.providedBy(model):
-                logger.warning(
-                    f'Trying to unpack an expected resource, '
-                    f'but it is broken {model}')
+                logger.error(
+                    'Trying to unpack an expected resource, '
+                    'but it is broken: {}'.format(model))
             if definition.providedBy(model):
                 if expected_model is not None:
                     # We allow only one expected_model header in the bundle.
