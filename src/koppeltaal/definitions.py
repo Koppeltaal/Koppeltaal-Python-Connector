@@ -642,6 +642,7 @@ class Activity(zope.interface.Interface):
         extension='CarePlan#ActivityDefinition',
         optional=True)
 
+    # Note that this field has been deprecated.
     description = Field(
         'description', 'string',
         extension='CarePlan#ActivityDescription',
