@@ -642,6 +642,7 @@ class Activity(zope.interface.Interface):
         extension='CarePlan#ActivityDefinition',
         optional=True)
 
+    # Note that this field has been deprecated.
     description = Field(
         'description', 'string',
         extension='CarePlan#ActivityDescription',
@@ -658,11 +659,14 @@ class Activity(zope.interface.Interface):
         optional=True)
 
     # Note the `kind` should match the `kind` of the `ActivityDefinition`
-    # we're pointing to.
+    # we're pointing to. Also note that this field used to be required, but
+    # has been deprecated. The best way to stay backwards compatible seems
+    # to make this an optional field now in this implementation.
     kind = Field(
         'type', 'coding',
         binding=codes.ACTIVITY_KIND,
-        extension='CarePlan#ActivityKind')
+        extension='CarePlan#ActivityKind',
+        optional=True)
 
     notes = Field(
         'notes', 'string',

@@ -4,6 +4,12 @@ Changes
 1.3.5.10 (unreleased)
 ---------------------
 
+- Careplan.activity.type and careplan.activity.description have been declared
+  obsolete. This means we make careplan.activity.type optional now to remain
+  backwards compatible as much as possible.
+
+  see https://github.com/Koppeltaal/Koppeltaal-Documentation/issues/36
+
 - Additional logging when unpacking the message header and it turns out to
   be broken.
 
