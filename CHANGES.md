@@ -4,6 +4,8 @@ Changes
 1.3.5.10 (unreleased)
 ---------------------
 
+- Allow for intent parameter to be passed to launch URL request.
+
 - Careplan.activity.type and careplan.activity.description have been declared
   obsolete. This means we make careplan.activity.type optional now to remain
   backwards compatible as much as possible.
