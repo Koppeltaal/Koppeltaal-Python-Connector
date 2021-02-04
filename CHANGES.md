@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.11 (unreleased)
+1.3.5.11 (2021-02-04)
 ---------------------
 
 - Fix a version mismatch with the internal test release downstream.
