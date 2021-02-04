@@ -10,6 +10,9 @@ Changes
 
   see https://github.com/Koppeltaal/Koppeltaal-Documentation/issues/36
 
+- Additional logging when unpacking the message header and it turns out to
+  be broken.
+
 1.3.5.9 (2021-01-21)
 --------------------
 
