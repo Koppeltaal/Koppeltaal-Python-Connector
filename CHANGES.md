@@ -4,7 +4,8 @@ Changes
 1.3.5.12 (unreleased)
 ---------------------
 
-- Nothing changed yet.
+- Raise exception on invalid bundle error in unpack_model at resource.py, so
+  incorrect messages do not break similar to 'We are out of messages'.
 
 
 1.3.5.11 (2021-02-04)

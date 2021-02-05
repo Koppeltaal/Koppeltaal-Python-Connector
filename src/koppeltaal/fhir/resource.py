@@ -198,6 +198,7 @@ class Resource(object):
                 logger.error(
                     'Trying to unpack an expected resource, '
                     'but it is broken: {}'.format(model))
+                raise interfaces.InvalidBundle(self)
             if definition.providedBy(model):
                 if expected_model is not None:
                     # We allow only one expected_model header in the bundle.
