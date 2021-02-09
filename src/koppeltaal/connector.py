@@ -27,16 +27,18 @@ DEFAULT_COUNT = 100
 @zope.interface.implementer(interfaces.IIntegration)
 class Integration(object):
 
-    def __init__(
-            self,
-            name='Generic python application',
-            url='https://example.com/fhir/Koppeltaal',
-            software=interfaces.SOFTWARE,
-            version=interfaces.VERSION):
+    def __init__(self, name=None, url=None, software=None, version=None):
+        assert (
+            name is not None
+            and url is not None
+            and software is not None
+            and version is not None), (
+            'It is required to provide a name, base url, software name, '
+            'and version when sending Koppeltaal messages.')
         self.name = name
         self.url = url
-        self.software = software
-        self.version = version
+        self.software = '; '.join([interfaces.SOFTWARE, software])
+        self.version = '; '.join([interfaces.VERSION, version])
 
     def transaction_hook(self, commit_function, message):
         return commit_function(message)

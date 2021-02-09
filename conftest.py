@@ -9,6 +9,7 @@ import uuid
 import pytest
 import selenium.webdriver
 import six
+import koppeltaal.interfaces
 import koppeltaal.connector
 import koppeltaal.models
 import koppeltaal.testing
@@ -48,7 +49,10 @@ def connector(request):
         raise ValueError("No server name defined.")
     credentials = koppeltaal.utils.get_credentials_from_file(server)
     integration = koppeltaal.connector.Integration(
-        name='Python connector tests')
+        'Koppeltaal Python Adapter Tests',
+        'https://example.com/fhir/Koppeltaal',
+        software='Koppeltaal Python Adapter Tests Runner',
+        version=koppeltaal.interfaces.VERSION)
     return koppeltaal.connector.Connector(credentials, integration)
 
 
