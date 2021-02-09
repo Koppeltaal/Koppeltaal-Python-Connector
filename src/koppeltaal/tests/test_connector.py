@@ -684,17 +684,17 @@ def test_software_name_and_version(
     sent = transport.called.get('/FHIR/Koppeltaal/Mailbox')
     assert sent is not None
     hamcrest.assert_that(
-         sent, hamcrest.has_entry(
-             'entry',
-             hamcrest.has_item(
+         sent,
+         hamcrest.has_entry(
+             'entry', hamcrest.has_item(
                  hamcrest.has_entry(
-                     'content',
-                     hamcrest.has_entry('source', hamcrest.has_entries(
-                        'endpoint', 'https://example.com/fhir/Koppeltaal',
-                        'name', 'Koppeltaal Python Adapter Tests',
-                        'software', (
-                            'Koppeltaal Python Adapter; '
-                            'Koppeltaal Python Adapter Tests Runner'),
-                        'version', hamcrest.all_of(
-                            hamcrest.starts_with('1.3.5.'),
-                            hamcrest.contains_string('; 1.3.5.'))))))))
+                     'content', hamcrest.has_entry(
+                        'source', hamcrest.has_entries(
+                            'endpoint', 'https://example.com/fhir/Koppeltaal',
+                            'name', 'Koppeltaal Python Adapter Tests',
+                            'software', (
+                                'Koppeltaal Python Adapter; '
+                                'Koppeltaal Python Adapter Tests Runner'),
+                            'version', hamcrest.all_of(
+                                hamcrest.starts_with('1.3.5.'),
+                                hamcrest.contains_string('; 1.3.5.'))))))))
