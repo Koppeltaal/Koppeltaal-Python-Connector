@@ -46,15 +46,15 @@ domain = PythonAdapterTesting
 
 @pytest.fixture(scope='session')
 def connector(request):
-    server = request.config.option.server
-    if server:
-        credentials = koppeltaal.utils.get_credentials_from_file(server)
-    else:
-        credentials = koppeltaal.utils.Credentials(
-            request.config.option.baseurl,
-            request.config.option.username,
-            request.config.option.password,
-            request.config.option.domain)
+    # server = request.config.option.server
+    # if server:
+    #     credentials = koppeltaal.utils.get_credentials_from_file(server)
+    # else:
+    credentials = koppeltaal.utils.Credentials(
+        request.config.option.baseurl,
+        request.config.option.username,
+        request.config.option.password,
+        request.config.option.domain)
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')
     return koppeltaal.connector.Connector(credentials, integration)
