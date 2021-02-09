@@ -35,18 +35,26 @@ url = https://edgekoppeltaal.vhscloud.nl
 username = [username]
 password = [password]
 domain = PythonAdapterTesting
-oauth_secret = [oauth password]
-
 """),
         default="edge")
+
+    parser.addoption('--baseurl')
+    parser.addoption('--domain')
+    parser.addoption('--username')
+    parser.addoption('--password')
 
 
 @pytest.fixture(scope='session')
 def connector(request):
     server = request.config.option.server
-    if not server:
-        raise ValueError("No server name defined.")
-    credentials = koppeltaal.utils.get_credentials_from_file(server)
+    if server:
+        credentials = koppeltaal.utils.get_credentials_from_file(server)
+    else:
+        credentials = koppeltaal.utils.Credentials(
+            request.config.option.baseurl,
+            request.config.option.username,
+            request.config.option.password,
+            request.config.option.domain)
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')
     return koppeltaal.connector.Connector(credentials, integration)
