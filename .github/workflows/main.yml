@@ -30,5 +30,6 @@ jobs:
       - name: Virtual env, pip install
         run: |
           python3.8 -m venv .
-          ./bin/pip install -r requirements -e .
+          ./bin/pip install -r requirements
+          ./bin/python -e .
           python3.8 -c "import koppeltaal; print(koppeltaal)"
