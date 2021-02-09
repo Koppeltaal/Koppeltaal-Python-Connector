@@ -4,8 +4,7 @@ Changes
 1.3.5.12 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- #70 Require to also send sofware and version of platform using the adapter.
 
 1.3.5.11 (2021-02-04)
 ---------------------
