@@ -4,8 +4,7 @@ Changes
 1.3.5.12 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- #72 CI based on GitHub Actions.
 
 1.3.5.11 (2021-02-04)
 ---------------------
