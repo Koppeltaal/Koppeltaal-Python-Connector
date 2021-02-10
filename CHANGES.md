@@ -4,7 +4,7 @@ Changes
 1.3.5.12 (unreleased)
 ---------------------
 
-- #72 CI based on GitHub Actions.
+- #72 CI based on GitHub Actions. trigger push
 
 1.3.5.11 (2021-02-04)
 ---------------------
