@@ -1,5 +1,8 @@
 name: Run Koppeltaal Python Adapter tests
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
 jobs:
   build:
     strategy:
@@ -14,7 +17,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Set up Python
+    - name: Set up Pythonzope
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.config[0] }}
