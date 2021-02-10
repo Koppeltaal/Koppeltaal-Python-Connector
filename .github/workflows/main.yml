@@ -29,4 +29,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox
     - name: Test
+      env:
+        ADAPTER_SERVER: https://edgekoppeltaal.vhscloud.nl
+        ADAPTER_DOMAIN: PythonAdapterTesting
+        ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
+        ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
       run: tox -e ${{ matrix.config[1] }}
