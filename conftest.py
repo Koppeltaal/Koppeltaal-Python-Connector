@@ -4,6 +4,7 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
+import os
 import datetime
 import uuid
 import pytest
@@ -32,21 +33,29 @@ For example:
 
 [edge]
 url = https://edgekoppeltaal.vhscloud.nl
+domain = PythonAdapterTesting
 username = [username]
 password = [password]
-domain = PythonAdapterTesting
-oauth_secret = [oauth password]
+"""))
 
-"""),
-        default="edge")
+    parser.addoption('--baseurl')
+    parser.addoption('--domain')
+    parser.addoption('--username')
+    parser.addoption('--password')
 
 
 @pytest.fixture(scope='session')
 def connector(request):
     server = request.config.option.server
-    if not server:
-        raise ValueError("No server name defined.")
-    credentials = koppeltaal.utils.get_credentials_from_file(server)
+    if server:
+        credentials = koppeltaal.utils.get_credentials_from_file(server)
+    else:
+        credentials = koppeltaal.utils.Credentials(
+            os.environ.get('ADAPTER_SERVER'),
+            os.environ.get('ADAPTER_USERNAME'),
+            os.environ.get('ADAPTER_PASSWORD'),
+            os.environ.get('ADAPTER_DOMAIN'),
+            {})
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')
     return koppeltaal.connector.Connector(credentials, integration)
