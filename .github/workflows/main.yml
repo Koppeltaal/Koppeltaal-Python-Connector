@@ -1,5 +1,8 @@
 name: Run Koppeltaal Python Adapter tests
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
 jobs:
   build:
     strategy:
@@ -14,7 +17,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Set up Python
+    - name: Set up Pythonzope
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.config[0] }}
@@ -28,4 +31,23 @@ jobs:
         ADAPTER_DOMAIN: PythonAdapterTesting
         ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
         ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
-      run: tox -e ${{ matrix.config[1] }}
+      run: tox -e ${{ matrix.config[1] }} -- --html=test-report-${{ matrix.config[1] }}.html --self-contained-html
+    - name: Test runner report
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-reports
+        path: ./test-report-${{ matrix.config[1] }}.html
+
+  owasp-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: OWASP dependency check
+      run: |
+        curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v6.0.5/dependency-check-6.0.5-release.zip > dependency-check-cli.zip
+        unzip -q dependency-check-cli.zip
+        dependency-check/bin/dependency-check.sh --project Koppeltaal-Java-Connector --out ./owasp-reports --format "HTML" --format "XML" --scan .
+    - name: OWASP reports
+      uses: actions/upload-artifact@v1
+      with:
+        name: OWASP-reports
+        path: ./owasp-reports
