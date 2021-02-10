@@ -35,8 +35,7 @@ url = https://edgekoppeltaal.vhscloud.nl
 username = [username]
 password = [password]
 domain = PythonAdapterTesting
-"""),
-        default="edge")
+"""))
 
     parser.addoption('--baseurl')
     parser.addoption('--domain')
