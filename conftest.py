@@ -4,6 +4,7 @@
 :license: AGPL, see `LICENSE.md` for more details.
 """
 
+import os
 import datetime
 import uuid
 import pytest
@@ -49,11 +50,12 @@ def connector(request):
     if server:
         credentials = koppeltaal.utils.get_credentials_from_file(server)
     else:
+
         credentials = koppeltaal.utils.Credentials(
-            request.config.option.baseurl,
-            request.config.option.username,
-            request.config.option.password,
-            request.config.option.domain,
+            os.environ.get('ADAPTER_SERVER'),
+            os.environ.get('ADAPTER_USERNAME'),
+            os.environ.get('ADAPTER_PASSWORD'),
+            os.environ.get('ADAPTER_DOMAIN'),
             {})
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')
