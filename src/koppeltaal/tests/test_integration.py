@@ -3,7 +3,7 @@
 :copyright: (c) 2015 - 2017 Stichting Koppeltaal
 :license: AGPL, see `LICENSE.md` for more details.
 """
-import pdb
+import os
 import koppeltaal.interfaces
 import koppeltaal.utils
 import koppeltaal.models
@@ -13,6 +13,9 @@ import selenium.webdriver.support.expected_conditions as EC
 import selenium.webdriver.support.wait
 
 from six.moves.urllib.parse import urlparse, parse_qs
+
+
+ON_GITHUB = os.environ.get('GITHUB_ACTIONS', False)
 
 
 def test_request_metadata(connector):
@@ -53,6 +56,8 @@ def parse_launch_url(url):
     return query.get('iss', [''])[0]
 
 
+@pytest.mark.skipif(
+    ON_GITHUB, reason="Webdriver-based test cannot run on GitHub")
 def test_launch_patient(
         connector, careplan, careplan_response, patient, browser):
     launch_url = connector.launch(careplan, user=patient)
@@ -79,6 +84,8 @@ def test_launch_patient(
         careplan.patient.fhir_link
 
 
+@pytest.mark.skipif(
+    ON_GITHUB, reason="Webdriver-based test cannot run on GitHub")
 def test_launch_practitioner(
         connector, careplan, careplan_response, practitioner, browser):
     # There is a 'login with oauth' button in the page, let's see what that
@@ -98,6 +105,8 @@ def test_launch_practitioner(
         practitioner.fhir_link
 
 
+@pytest.mark.skipif(
+    ON_GITHUB, reason="Webdriver-based test cannot run on GitHub")
 def test_sso(connector):
     connector.integration.client_id = 'MindDistrict'
     connector.integration.client_secret = \
@@ -141,6 +150,8 @@ def test_sso(connector):
     assert 'user' in token and token['user'] == patient_link
 
 
+@pytest.mark.skipif(
+    ON_GITHUB, reason="Webdriver-based test cannot run on GitHub")
 def test_sso_intent(connector):
     connector.integration.client_id = 'MindDistrict'
     connector.integration.client_secret = \
