@@ -15,21 +15,17 @@ jobs:
     - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
-    - name: Test vars
+      with:
+        python-version: ${{ matrix.config[0] }}
+    - name: Test env
       with:
         ADAPTER_SERVER: https://edgekoppeltaal.vhscloud.nl
         ADAPTER_DOMAIN: PythonAdapterTesting
         ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
       run: echo "$ADAPTER_SERVER" "$ADAPTER_DOMAIN" "$ADAPTER_USERNAME"
-    # - name: Install dependencies
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install tox
-    # - name: Test
-    #   with:
-    #     python-version: ${{ matrix.config[0] }}
-    #     ADAPTER_SERVER: https://edgekoppeltaal.vhscloud.nl
-    #     ADAPTER_DOMAIN: PythonAdapterTesting
-    #     ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
-    #     ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
-    #   run: tox -e ${{ matrix.config[1] }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+    - name: Test
+      run: tox -e ${{ matrix.config[1] }}
