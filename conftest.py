@@ -33,9 +33,9 @@ For example:
 
 [edge]
 url = https://edgekoppeltaal.vhscloud.nl
+domain = PythonAdapterTesting
 username = [username]
 password = [password]
-domain = PythonAdapterTesting
 """))
 
     parser.addoption('--baseurl')
@@ -50,7 +50,6 @@ def connector(request):
     if server:
         credentials = koppeltaal.utils.get_credentials_from_file(server)
     else:
-
         credentials = koppeltaal.utils.Credentials(
             os.environ.get('ADAPTER_SERVER'),
             os.environ.get('ADAPTER_USERNAME'),
