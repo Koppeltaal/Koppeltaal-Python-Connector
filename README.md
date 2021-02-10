@@ -1,3 +1,5 @@
+![Run Koppeltaal Python Adapter tests](https://github.com/Koppeltaal/Koppeltaal-Python-Connector/workflows/Run%20Koppeltaal%20Python%20Adapter%20tests/badge.svg)
+
 Koppeltaal Python connector
 ===========================
 
