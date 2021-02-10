@@ -6,6 +6,8 @@ Changes
 
 - #70 Require to also send sofware and version of platform using the adapter.
 
+- #72 CI based on GitHub Actions.
+
 1.3.5.11 (2021-02-04)
 ---------------------
 

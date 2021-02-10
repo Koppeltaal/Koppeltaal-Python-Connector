@@ -1,3 +1,5 @@
+![Run Koppeltaal Python Adapter tests](https://github.com/Koppeltaal/Koppeltaal-Python-Connector/workflows/Run%20Koppeltaal%20Python%20Adapter%20tests/badge.svg)
+
 Koppeltaal Python connector
 ===========================
 
@@ -19,7 +21,7 @@ This Koppeltaal connector was initially developed by Minddistrict Development B.
 Setting up for development
 ---------------------------
 
-Previously `buildout` was used for setting up the package for development. We now realy on using a *virtual env*, *pip* and a requirements file instead.
+Previously `buildout` was used for setting up the package for development. We now rely on using a *virtual env*, *pip* and a requirements file instead.
 
 Quick start:
 
