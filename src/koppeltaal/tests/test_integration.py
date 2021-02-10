@@ -200,7 +200,9 @@ def test_sso_intent(connector):
 def test_send_activity(connector):
     uuid = koppeltaal.utils.uniqueid()
 
-    assert len(list(connector.activities())) == 1
+    assert len([
+        ad for ad in connector.activities()
+        if ad.identifier == u'uuid://{}'.format(uuid)]) == 0
     assert connector.activity(u'uuid://{}'.format(uuid)) is None
 
     application = koppeltaal.models.ReferredResource(
@@ -215,7 +217,9 @@ def test_send_activity(connector):
         subactivities=[])
 
     updated = connector.send_activity(ad)
-    assert len(list(connector.activities())) == 2
+    assert len([
+        ad for ad in connector.activities()
+        if ad.identifier == u'uuid://{}'.format(uuid)]) == 1
     assert updated.fhir_link is not None
     assert updated.fhir_link.startswith(
         'https://edgekoppeltaal.vhscloud.nl/FHIR/Koppeltaal'
@@ -236,7 +240,9 @@ def test_send_activity(connector):
     assert updated.is_archived is True
     assert connector.activity(u'uuid://{}'.format(uuid)) is None
 
-    assert len(list(connector.activities())) == 1
+    assert len([
+        ad for ad in connector.activities()
+        if ad.identifier == u'uuid://{}'.format(uuid)]) == 0
 
 
 def test_send_versioned_focal_resource_careplan(connector, careplan):

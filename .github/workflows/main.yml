@@ -1,4 +1,4 @@
-name: CI
+name: Run Koppeltaal Python Adapter tests
 
 on: [push, pull_request]
 
