@@ -28,7 +28,12 @@ jobs:
         ADAPTER_DOMAIN: PythonAdapterTesting
         ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
         ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
-      run: tox -e ${{ matrix.config[1] }}
+      run: tox -e ${{ matrix.config[1] }} -- --html=test-report-${{ matrix.config[1] }}.html --self-contained-html
+    - name: Test runner report
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-reports
+        path: ./test-report-${{ matrix.config[1] }}.html
 
   owasp-scan:
     runs-on: ubuntu-latest
