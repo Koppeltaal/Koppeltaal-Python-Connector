@@ -29,3 +29,17 @@ jobs:
         ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
         ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
       run: tox -e ${{ matrix.config[1] }}
+
+  owasp-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: OWASP dependency check
+      run: |
+        curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v6.0.5/dependency-check-6.0.5-release.zip > dependency-check-cli.zip
+        unzip -q dependency-check-cli.zip
+        dependency-check/bin/dependency-check.sh --project Koppeltaal-Java-Connector --out ./owasp-reports --format "HTML" --format "XML" --scan .
+    - name: OWASP reports
+      uses: actions/upload-artifact@v1
+      with:
+        name: OWASP-reports
+        path: ./owasp-reports
