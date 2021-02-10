@@ -15,7 +15,7 @@ import selenium.webdriver.support.wait
 from six.moves.urllib.parse import urlparse, parse_qs
 
 
-ON_GITHUB = os.environ.get('GITHUB_ACTIONS', False)
+ON_GITHUB = bool(os.environ.get('GITHUB_ACTIONS', False))
 
 
 def test_request_metadata(connector):

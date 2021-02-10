@@ -9,6 +9,8 @@ jobs:
         config:
         # [Python version, tox env]
         - ["3.8",   "py38"]
+        - ["3.7",   "py37"]
+        - ["3.6",   "py36"]
     runs-on: ubuntu-latest
     name: ${{ matrix.config[1] }}
     steps:
@@ -18,12 +20,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.config[0] }}
-    - name: Test env
-      env:
-        ADAPTER_SERVER: https://edgekoppeltaal.vhscloud.nl
-        ADAPTER_DOMAIN: PythonAdapterTesting
-        ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
-      run: echo "$ADAPTER_SERVER" "$ADAPTER_DOMAIN" "$ADAPTER_USERNAME"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
