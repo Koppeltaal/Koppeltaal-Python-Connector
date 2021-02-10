@@ -17,13 +17,15 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.config[0] }}
-        adapter_server: https://edgekoppeltaal.vhscloud.nl
-        adapter_domain: PythonAdapterTesting
-        adapter_username: ${{ secrets.ADAPTER_USERNAME }}
-        adapter_password: ${{ secrets.ADAPTER_PASSWORD }}
+        ADAPTER_SERVER: https://edgekoppeltaal.vhscloud.nl
+        ADAPTER_DOMAIN: PythonAdapterTesting
+        ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
+        ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
-    - name: Test
-      run: tox -e ${{ matrix.config[1] }}
+      run: echo "$ADAPTER_SERVER" "$ADAPTER_DOMAIN"
+    # - name: Install dependencies
+    #   run: |
+    #     python -m pip install --upgrade pip
+    #     pip install tox
+    # - name: Test
+    #   run: tox -e ${{ matrix.config[1] }}
