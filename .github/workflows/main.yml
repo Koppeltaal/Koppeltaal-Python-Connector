@@ -12,13 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     name: ${{ matrix.config[1] }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repo
+      uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.config[0] }}
     - name: Test env
-      with:
+      env:
         ADAPTER_SERVER: https://edgekoppeltaal.vhscloud.nl
         ADAPTER_DOMAIN: PythonAdapterTesting
         ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
