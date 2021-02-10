@@ -54,7 +54,8 @@ def connector(request):
         request.config.option.baseurl,
         request.config.option.username,
         request.config.option.password,
-        request.config.option.domain)
+        request.config.option.domain,
+        {})
     integration = koppeltaal.connector.Integration(
         name='Python connector tests')
     return koppeltaal.connector.Connector(credentials, integration)
