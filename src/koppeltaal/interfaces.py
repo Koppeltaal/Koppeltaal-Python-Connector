@@ -9,7 +9,7 @@ import zope.interface
 
 NAMESPACE = 'http://ggz.koppeltaal.nl/fhir/Koppeltaal/'
 
-SOFTWARE = 'Koppeltaal python adapter'
+SOFTWARE = 'Koppeltaal Python Adapter'
 VERSION = pkg_resources.get_distribution('koppeltaal').version
 
 OTHER_URL = '/FHIR/Koppeltaal/Other'

@@ -10,6 +10,7 @@ import uuid
 import pytest
 import selenium.webdriver
 import six
+import koppeltaal.interfaces
 import koppeltaal.connector
 import koppeltaal.models
 import koppeltaal.testing
@@ -57,7 +58,10 @@ def connector(request):
             os.environ.get('ADAPTER_DOMAIN'),
             {})
     integration = koppeltaal.connector.Integration(
-        name='Python connector tests')
+        'Koppeltaal Python Adapter Tests',
+        'https://example.com/fhir/Koppeltaal',
+        software='Koppeltaal Python Adapter Tests Runner',
+        version=koppeltaal.interfaces.VERSION)
     return koppeltaal.connector.Connector(credentials, integration)
 
 

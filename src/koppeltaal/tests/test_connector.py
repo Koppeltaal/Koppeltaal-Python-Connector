@@ -669,3 +669,32 @@ def test_updates_same_source_acked(connector, transport):
             koppeltaal.testing.has_extension(
                 '#ProcessingStatusStatus',
                 hamcrest.has_entry('valueCode', 'Success'))))
+
+
+def test_software_name_and_version(
+        connector, transport, careplan_from_fixture):
+    transport.expect(
+        'POST',
+        '/FHIR/Koppeltaal/Mailbox',
+        respond_with='fixtures/bundle_post_careplan_ok.json')
+    connector.send(
+        'CreateOrUpdateCarePlan',
+        careplan_from_fixture,
+        careplan_from_fixture.patient)
+    sent = transport.called.get('/FHIR/Koppeltaal/Mailbox')
+    assert sent is not None
+    hamcrest.assert_that(
+         sent,
+         hamcrest.has_entry(
+             'entry', hamcrest.has_item(
+                 hamcrest.has_entry(
+                     'content', hamcrest.has_entry(
+                        'source', hamcrest.has_entries(
+                            'endpoint', 'https://example.com/fhir/Koppeltaal',
+                            'name', 'Koppeltaal Python Adapter Tests',
+                            'software', (
+                                'Koppeltaal Python Adapter; '
+                                'Koppeltaal Python Adapter Tests Runner'),
+                            'version', hamcrest.all_of(
+                                hamcrest.starts_with('1.3.5.'),
+                                hamcrest.contains_string('; 1.3.5.'))))))))
