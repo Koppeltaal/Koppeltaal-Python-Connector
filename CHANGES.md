@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.13 (unreleased)
+1.3.5.13 (2021-05-05)
 ---------------------
 
 - #76 Consolidate the valueset for relationship type to 
