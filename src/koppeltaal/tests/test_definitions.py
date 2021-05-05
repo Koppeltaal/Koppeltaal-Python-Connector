@@ -484,7 +484,7 @@ def test_unpack_related_person(packer, namespace):
         'relationship': {'coding': [{
             'code': 'PRN',
             'display': 'parent',
-            'system': 'http://hl7.org/fhir/vs/relatedperson-relationshiptype'}]},
+            'system': 'http://hl7.org/fhir/v3/RoleCode'}]},
         'name': {'given': ['Paul'],
              'family': ['Roger'],
              'use': 'official'},
@@ -609,7 +609,7 @@ def test_pack_related_person(packer):
         'relationship': {'coding': [{
             'code': 'PRN',
             'display': 'parent',
-            'system': 'http://hl7.org/fhir/vs/relatedperson-relationshiptype'}]},
+            'system': 'http://hl7.org/fhir/v3/RoleCode'}]},
         'name': {'id': 'ref002',
             'given': ['Paul'],
             'family': ['Roger'],
