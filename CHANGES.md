@@ -4,8 +4,8 @@ Changes
 1.3.5.13 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- #76 Consolidate the valueset for relationship type to 
+  http://hl7.org/fhir/v3/RoleCode.
 
 1.3.5.12 (2021-02-18)
 ---------------------
