@@ -236,19 +236,8 @@ ORGANIZATION_TYPE = Code(
      })
 
 RELATED_PERSON_RELATIONSHIP_TYPE = Code(
-    'http://hl7.org/fhir/vs/relatedperson-relationshiptype',
-    {'emergency': 'Emergency',
-     'family': 'Family',
-     'guardian': 'Guardian',
-     'friend': 'Friend',
-     'partner': 'Partner',
-     'work': 'Work',
-     'caregiver': 'Caregiver',
-     'agent': 'Agent',
-     'guarantor': 'Guarantor',
-     'owner': 'Owner of animal',
-     'parent': 'Parent',
-     'FAMMEMB': 'family member',
+    'http://hl7.org/fhir/v3/RoleCode',
+    {'FAMMEMB': 'family member',
      'CHILD': 'child',
      'CHLDADOPT': 'adopted child',
      'DAUADOPT': 'adopted daughter',
