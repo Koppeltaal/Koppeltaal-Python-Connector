@@ -105,8 +105,6 @@ def test_launch_practitioner(
         practitioner.fhir_link
 
 
-@pytest.mark.skipif(
-    ON_GITHUB, reason="Webdriver-based test cannot run on GitHub")
 def test_sso(connector):
     connector.integration.client_id = 'MindDistrict'
     connector.integration.client_secret = \
@@ -150,8 +148,6 @@ def test_sso(connector):
     assert 'user' in token and token['user'] == patient_link
 
 
-@pytest.mark.skipif(
-    ON_GITHUB, reason="Webdriver-based test cannot run on GitHub")
 def test_sso_intent(connector):
     connector.integration.client_id = 'MindDistrict'
     connector.integration.client_secret = \
