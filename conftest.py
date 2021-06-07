@@ -56,7 +56,7 @@ def connector(request):
             os.environ.get('ADAPTER_USERNAME'),
             os.environ.get('ADAPTER_PASSWORD'),
             os.environ.get('ADAPTER_DOMAIN'),
-            {})
+            {'oauth_secret': os.environ.get('ADAPTER_OAUTH_SECRET')})
     integration = koppeltaal.connector.Integration(
         'Koppeltaal Python Adapter Tests',
         'https://example.com/fhir/Koppeltaal',

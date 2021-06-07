@@ -31,6 +31,7 @@ jobs:
         ADAPTER_DOMAIN: PythonAdapterTesting
         ADAPTER_USERNAME: ${{ secrets.ADAPTER_USERNAME }}
         ADAPTER_PASSWORD: ${{ secrets.ADAPTER_PASSWORD }}
+        ADAPTER_OAUTH_SECRET: ${{ secrets.ADAPTER_OAUTH_SECRET }}
       run: tox -e ${{ matrix.config[1] }} -- --html=test-report-${{ matrix.config[1] }}.html --self-contained-html
     - name: Test runner report
       uses: actions/upload-artifact@v1

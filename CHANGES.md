@@ -4,13 +4,12 @@ Changes
 1.3.5.14 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- #80 Enable two SSO related tests on GitHub Actions again.
 
 1.3.5.13 (2021-05-05)
 ---------------------
 
-- #76 Consolidate the valueset for relationship type to 
+- #76 Consolidate the valueset for relationship type to
   http://hl7.org/fhir/v3/RoleCode.
 
 1.3.5.12 (2021-02-18)
@@ -18,7 +17,7 @@ Changes
 
 - #70 Require to also send sofware and version of platform using the adapter.
 
-  NOTE: this is a backwards incompatible change, so your platform code to 
+  NOTE: this is a backwards incompatible change, so your platform code to
   setup the Integration object needs to be adjusted.
 
 - #72 CI based on GitHub Actions.
