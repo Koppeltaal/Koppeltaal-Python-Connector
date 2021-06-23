@@ -298,7 +298,11 @@ def console():
         logger.set_log_level(logging.ERROR)
 
     credentials = get_credentials(args)
-    integration = connector.Integration(name='Python command line')
+    integration = connector.Integration(
+        name='Python command line',
+        url='https://example.com',
+        software='Python command line',
+        version='0.0')
     connection = connector.Connector(credentials, integration)
     commands = {
         'activities': _activities,
