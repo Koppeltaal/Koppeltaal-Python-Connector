@@ -4,6 +4,8 @@ Changes
 1.3.5.14 (unreleased)
 ---------------------
 
+- Add deprecation notice now that Koppeltaal-1 is no longer.
+
 - #80 Enable two SSO related tests on GitHub Actions again.
 
 1.3.5.13 (2021-05-05)

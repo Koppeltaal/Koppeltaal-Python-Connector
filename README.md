@@ -1,7 +1,7 @@
-![Run Koppeltaal Python Adapter tests](https://github.com/Koppeltaal/Koppeltaal-Python-Connector/workflows/Run%20Koppeltaal%20Python%20Adapter%20tests/badge.svg)
-
 Koppeltaal Python connector
 ===========================
+
+**Warning:** This code is for the so-called Koppeltaal-1 specification. As of Dec 31 2024 all Koppeltaal-1 technical infrastructure is decomissioned and this code base is obsolete. It is left here for historical purposes.
 
 “Koppeltaal” (Ducth for "Connect language") is a technical solution based on
 the international HL7/FHIR standard. It enables the exchange of e-health
