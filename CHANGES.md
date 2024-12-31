@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.3.5.14 (unreleased)
+## 1.3.5.14 (2024-12-31)
 ---------------------
 
 - Add deprecation notice now that Koppeltaal-1 is no longer.
